@@ -3140,7 +3140,20 @@
       74% { opacity: 1; transform: translate(-50%, -50%) scale(1.08); }
       100% { opacity: 0; transform: translate(-50%, -54%) scale(1.16); }
     }
-      /* ===== TEST SITE: design-review fixes ===== */
+      .reset-pick { display: flex; flex-direction: column; gap: 0.6rem; margin-top: 0.8rem; }
+    .reset-opt { display: flex; align-items: center; gap: 0.7rem; min-height: 3.4rem; padding: 0 1rem 0 0.75rem; border-radius: 1.15rem; border: 1px solid rgba(255,255,255,0.35);
+      font: 600 1.15rem/1.1 var(--ui-font); color: #fff; cursor: pointer; text-align: left;
+      box-shadow: 0 3px 0 rgba(0,0,0,0.22), 0 8px 18px rgba(10,4,30,0.28), inset 0 1px 0 rgba(255,255,255,0.35); transition: transform 0.12s ease; }
+    .reset-opt .menu-lb-ico { display: grid; place-items: center; width: 2.2rem; height: 2.2rem; border-radius: 0.7rem; background: rgba(255,255,255,0.28); font-size: 1.2rem; }
+    .reset-opt-game { background: linear-gradient(135deg, #e0782a 0%, #b93a78 55%, #6a35b8 100%); }
+    .reset-opt-avatar { background: linear-gradient(135deg, #8fe9df 0%, #3bb3c9 100%); color: #06323a; }
+    .reset-opt-both { background: linear-gradient(135deg, #ffe39a 0%, #f0b545 100%); color: #3a2400; }
+    .reset-opt.reset-cancel { justify-content: center; min-height: 2.9rem; background: rgba(255,255,255,0.14); }
+    .reset-opt:active { transform: translateY(2px); }
+    .reset-confirm-card h2 { font-size: clamp(1.6rem, 6.5vw, 2.4rem); line-height: 1.15; }
+    .reset-sure-text { font: 600 1.05rem/1.35 var(--ui-font); }
+    @media (prefers-reduced-motion: reduce) { .reset-opt { transition: none; } .reset-opt:active { transform: none; } }
+    /* ===== TEST SITE: design-review fixes ===== */
     :root { --ui-font: ui-rounded, "SF Pro Rounded", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
     .test-badge { position: fixed; top: 0.4rem; right: 0.4rem; z-index: 9999; pointer-events: none; padding: 0.15rem 0.45rem; border-radius: 0.4rem;
       background: #ffd34e; color: #2a1d00; font: 700 0.62rem/1.3 var(--ui-font); letter-spacing: 0.08em; opacity: 0.85; }
@@ -8688,7 +8701,9 @@
       if (!me || (avPulled === me.name && !force)) return;
       avPulled = me.name;
       lbGet("action=avatar&name=" + encodeURIComponent(me.name)).then(function (d) {
-        const remote = d && d.avatar ? avClean(d.avatar) : null;
+        let remote = d && d.avatar ? avClean(d.avatar) : null;
+        const resetAt = Number(localStorage.getItem(AV_RESET_KEY) || 0);
+        if (remote && remote.updated && remote.updated < resetAt) { avPush(); return; }
         if (!remote) { if (avatar.made || avatar.owned.length) avPush(); return; }
         const merged = remote.updated > avatar.updated ? remote : avatar;
         const owned = avatar.owned.concat(remote.owned.filter(function (id) { return avatar.owned.indexOf(id) < 0; }));
@@ -9388,11 +9403,10 @@
       card.appendChild(row);
       if (includeReset) {
         const resetWrap = el("div", { class: "beat-actions reset-zone" });
-        resetWrap.appendChild(el("p", { class: "reset-note", text: "For teachers" }));
         resetWrap.appendChild(el("button", {
           class: "reset-challenge",
           type: "button",
-          text: "Reset challenge",
+          text: "Reset",
           onClick: function (event) { confirmResetChallenge(event && event.currentTarget); }
         }));
         card.appendChild(resetWrap);
@@ -9518,45 +9532,102 @@
 
     // Ask before resetting: an in-page dialog styled like the Congratulations card.
     // "No" has focus; No, Escape, or a tap outside the card closes it with nothing changed.
+    // Reset picker: Game, Avatar, or Both. Leaderboard points are never touched.
+    const AV_RESET_KEY = "mad-facts-av-reset";
+    function resetAvatar() {
+      const me = typeof lbMe === "function" && LEADERBOARD_URL ? lbMe() : null;
+      avatar = avClean(null);
+      avatar.updated = Date.now();
+      try { localStorage.setItem(AV_KEY, JSON.stringify(avatar)); localStorage.setItem(AV_RESET_KEY, String(avatar.updated)); } catch (e) {}
+      clearTimeout(avPushTimer);
+      if (!me) return Promise.resolve(true);
+      // v4 scripts delete this kid's row. Older scripts: save the blank avatar over it.
+      return lbGet("action=version").then(function (d) {
+        if (d && d.version >= 4) {
+          return fetch(LEADERBOARD_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify({ type: "avatarDelete", name: me.name, code: me.code }) }).then(function () { return true; });
+        }
+        avPush();
+        return false;
+      }).catch(function () { avPush(); return false; });
+    }
     function confirmResetChallenge(opener) {
       const old = document.getElementById("reset-confirm");
       if (old) old.remove();
       const layer = el("div", { id: "reset-confirm", class: "congrats-layer reset-confirm-layer" });
-      const card = el("div", { class: "congrats-card reset-confirm-card", role: "alertdialog", "aria-modal": "true", "aria-labelledby": "reset-confirm-title", "aria-describedby": "reset-confirm-text" });
-      card.appendChild(el("h2", { id: "reset-confirm-title", text: "Reset challenge?" }));
-      card.appendChild(el("p", { id: "reset-confirm-text", text: "This locks all beats and hides the mini games." }));
-      const row = el("div", { class: "reset-confirm-actions" });
-      function close() {
+      const card = el("div", { class: "congrats-card reset-confirm-card", role: "alertdialog", "aria-modal": "true", "aria-labelledby": "reset-confirm-title" });
+      layer.appendChild(card);
+      function close(keepFocus) {
         document.removeEventListener("keydown", onKey, true);
         layer.remove();
-        if (opener && document.body.contains(opener)) opener.focus();
+        if (!keepFocus && opener && document.body.contains(opener)) opener.focus();
       }
-      const yes = el("button", { type: "button", class: "reset-yes", text: "Yes, reset", onClick: function () {
-        close();
-        resetMusicChallenge();
-        const again = document.querySelector("button.reset-challenge");
-        if (again) again.focus();
-      } });
-      const no = el("button", { type: "button", class: "reset-no", text: "No", onClick: close });
       function onKey(event) {
         if (event.key === "Escape") { event.preventDefault(); close(); return; }
         if (event.key === "Tab") {
-          // Keep focus inside the dialog.
+          const btns = Array.prototype.slice.call(card.querySelectorAll("button"));
+          if (!btns.length) return;
+          const i = btns.indexOf(document.activeElement);
           event.preventDefault();
-          const active = document.activeElement;
-          if (active === yes) no.focus();
-          else if (active === no) yes.focus();
-          else no.focus();
+          btns[(i + (event.shiftKey ? -1 : 1) + btns.length) % btns.length].focus();
         }
       }
+      const WHAT = {
+        game: { title: "Reset Game?", text: "Your beats, mini games, and unlocked games will lock again. Your points stay." },
+        avatar: { title: "Reset Avatar?", text: "Your avatar, clothes, and prizes will be gone. You will make a new one. Your points stay." },
+        both: { title: "Reset Both?", text: "Your game and your avatar start over. Beats, unlocks, clothes, and prizes will be gone. Your points stay." }
+      };
+      function picker() {
+        card.replaceChildren();
+        card.appendChild(el("h2", { id: "reset-confirm-title", text: "What do you want to reset?" }));
+        const list = el("div", { class: "reset-pick" });
+        [["game", "Reset Game", "\uD83C\uDFAE"], ["avatar", "Reset Avatar", "\uD83D\uDC55"], ["both", "Reset Both", "\uD83D\uDD04"]].forEach(function (c) {
+          list.appendChild(el("button", { type: "button", class: "reset-opt reset-opt-" + c[0], onClick: function () { sure(c[0]); } }, [
+            el("span", { class: "menu-lb-ico", "aria-hidden": "true", text: c[2] }), el("span", { class: "hb-label", text: c[1] })
+          ]));
+        });
+        list.appendChild(el("button", { type: "button", class: "reset-opt reset-cancel", text: "Cancel", onClick: function () { close(); } }));
+        card.appendChild(list);
+        card.querySelector(".reset-cancel").focus();
+      }
+      function sure(kind) {
+        card.replaceChildren();
+        card.appendChild(el("h2", { id: "reset-confirm-title", text: WHAT[kind].title }));
+        card.appendChild(el("p", { class: "reset-sure-text", text: WHAT[kind].text }));
+        const row = el("div", { class: "reset-confirm-actions" });
+        const yes = el("button", { type: "button", class: "reset-yes", text: "Yes", onClick: function () { doReset(kind); } });
+        const no = el("button", { type: "button", class: "reset-no", text: "No", onClick: picker });
+        row.appendChild(yes); row.appendChild(no);
+        card.appendChild(row);
+        no.focus();
+      }
+      function done(text, then) {
+        card.replaceChildren();
+        card.appendChild(el("h2", { id: "reset-confirm-title", text: "All done!" }));
+        if (text) card.appendChild(el("p", { class: "reset-sure-text", text: text }));
+        const row = el("div", { class: "reset-confirm-actions" });
+        const ok = el("button", { type: "button", class: "reset-yes", text: "OK", onClick: function () { close(true); then(); } });
+        row.appendChild(ok);
+        card.appendChild(row);
+        ok.focus();
+      }
+      function doReset(kind) {
+        const withAvatar = kind === "avatar" || kind === "both";
+        const go = function (fast) {
+          if (kind === "game" || kind === "both") resetMusicChallenge();
+          state.heroPick = false;
+          done(withAvatar && !fast ? "Your new avatar may take a moment to show everywhere." : "",
+            function () { if (withAvatar) goPage("closet"); else goPage("menu"); window.scrollTo(0, 0); });
+        };
+        if (!withAvatar) { go(true); return; }
+        card.replaceChildren(el("h2", { id: "reset-confirm-title", text: "Resetting\u2026" }));
+        // Avatar first: it needs the kid's leaderboard name, which Reset Game clears.
+        resetAvatar().then(go);
+      }
       layer.addEventListener("click", function (event) { if (event.target === layer) close(); });
-      row.appendChild(yes);
-      row.appendChild(no);
-      card.appendChild(row);
-      layer.appendChild(card);
       document.body.appendChild(layer);
       document.addEventListener("keydown", onKey, true);
-      no.focus();
+      picker();
     }
 
     function setOperation(op) {
