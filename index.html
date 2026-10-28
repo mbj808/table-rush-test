@@ -3240,6 +3240,22 @@
       .bb-bar-fill { transition: none; }
     }
     @keyframes bbFade { from { opacity: 1; } to { opacity: 0; } }
+    /* Sign in */
+    .si-bar { display: flex; align-items: center; justify-content: center; gap: 0.6rem; flex-wrap: wrap; margin: 0 auto 0.4rem; color: #fff; font-family: var(--ui-font); }
+    .si-in, .si-out { min-height: 2.75rem; padding: 0 1rem; border-radius: 999px; border: 2px solid rgba(255,255,255,0.7); background: #1d1736; color: #fff; font: 800 1.05rem/1 var(--ui-font); cursor: pointer; }
+    .si-out { min-height: 2.5rem; font-size: 0.95rem; background: transparent; }
+    .si-hi { font: 800 1.2rem/1.1 var(--ui-font); text-shadow: 0 1px 3px rgba(0,0,0,0.7); }
+    .si-hint { font: 600 0.95rem/1.1 var(--ui-font); color: #fff7ea; text-shadow: 0 1px 3px rgba(0,0,0,0.7); }
+    .si-card { max-width: 32rem; width: 100%; box-sizing: border-box; margin: 0 auto; display: flex; flex-direction: column; gap: 0.75rem; }
+    .si-big { margin: 0.2rem 0 0; font: 800 1.6rem/1.15 var(--ui-font); color: #fff; }
+    .si-sub { margin: 0; font: 600 1.1rem/1.3 var(--ui-font); color: #fff7ea; }
+    .si-names { display: grid; grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr)); gap: 0.55rem; }
+    .si-name { min-height: 3.6rem; padding: 0.4rem 0.6rem; border-radius: 1rem; border: 2px solid rgba(255,255,255,0.45); background: #1d1736; color: #fff; font: 800 1.15rem/1.15 var(--ui-font); cursor: pointer; }
+    .si-input { min-height: 3.6rem; border-radius: 1rem; border: 2px solid #fff6dc; background: #fffef6; color: #1a1233; padding: 0 1rem; font: 800 1.5rem/1 var(--ui-font); }
+    .si-go { min-height: 3.6rem; }
+    .si-msg { margin: 0; min-height: 1.3rem; font: 700 1.05rem/1.3 var(--ui-font); color: #ffe39a; }
+    .si-ask { text-align: center; font-size: 1rem; opacity: 0.9; }
+    .av-signnote { margin: 0.3rem 0 0; text-align: center; font: 700 1rem/1.2 var(--ui-font); color: #ffe39a; }
     /* Head to Head */
     .h2h-mode { display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto auto; column-gap: 0.8rem; align-items: center; text-align: left; min-height: 4.6rem; padding: 0.7rem 1rem; border-radius: 1.1rem; border: 2px solid rgba(255,255,255,0.4); background: #1d1736; color: #fff; cursor: pointer; font-family: var(--ui-font); }
     .h2h-mode-ico { grid-row: 1 / 3; font-size: 2rem; }
@@ -8444,6 +8460,7 @@
       if (page === "closet") { stack.appendChild(closetCard()); app.appendChild(stack); return; }
       if (page === "bricks") { stack.appendChild(bricksCard()); app.appendChild(stack); return; }
       if (page === "h2h") { stack.appendChild(h2hCard()); app.appendChild(stack); return; }
+      if (page === "signin") { stack.appendChild(siCard()); app.appendChild(stack); return; }
       if (page === "leaders") { stack.appendChild(leaderboardCard()); app.appendChild(stack); return; }
       const opsCard = operationCard();
       if (page === "games" && learnList.length) stack.appendChild(learnCard());
@@ -8681,7 +8698,7 @@
     const LB_KEY = "mad-facts-lb";
     const lb = { names: null, board: null, view: "points", tab: "today", game: "__all", loading: false, failed: false, msg: "" };
     function lbMe() {
-      try { const v = JSON.parse(localStorage.getItem(LB_KEY) || "null"); return v && v.name && v.code ? v : null; } catch (e) { return null; }
+      try { const v = JSON.parse(localStorage.getItem(LB_KEY) || "null"); return v && v.name && v.code && v.pw ? v : null; } catch (e) { return null; }
     }
     function lbForget() { lbFlush(true); try { localStorage.removeItem(LB_KEY); localStorage.removeItem(LB_PTS_KEY); } catch (e) {} }
     // ---- Points: 1 for each right answer, minus 1 for each wrong one. Sent in small batches. ----
@@ -8826,6 +8843,89 @@
       wrap.appendChild(el("p", { class: "lb-hint", text: "60 Seconds: right minus wrong. All Facts: time plus 5 seconds for each wrong one." }));
       return wrap;
     }
+    // ===== Sign in: pick your name, then your own password. The sheet script checks it; the page only keeps a token. =====
+    const si = { step: "name", name: "", hasPw: false, msg: "", busy: false };
+    function siPost(obj) {
+      return fetch(LEADERBOARD_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(obj) })
+        .then(function (r) { if (!r.ok) throw new Error("si " + r.status); return r.json(); });
+    }
+    function siOpen() { si.step = "name"; si.name = ""; si.msg = ""; si.busy = false; goPage("signin"); }
+    function siDone(name, token) {
+      try { localStorage.setItem(LB_KEY, JSON.stringify({ name: name, code: token, pw: 1 })); } catch (e) {}
+      lb.msg = ""; si.step = "name"; si.msg = "";
+      if (avOwner() && avOwner() !== name) avSwitchKid(name);
+      avPull(true); lbCaps(); lb.board = null;
+      goPage("menu");
+    }
+    // Not you? Send anything still waiting, then start this device clean (no mixing with the next kid).
+    function siOut() { if (avPending()) avPush(); lbForget(); avSwitchKid(""); lb.board = null; render(); }
+    function siPickName(n) {
+      si.name = n; si.step = "pw"; si.msg = ""; render();
+      setTimeout(function () { const i = document.querySelector(".si-input"); if (i) i.focus(); }, 50);
+    }
+    function siInput(label) { return el("input", { class: "si-input", type: "password", autocomplete: "off", autocapitalize: "off", spellcheck: "false", maxlength: "40", "aria-label": label, placeholder: label }); }
+    function siCard() {
+      const card = el("div", { class: "card si-card" });
+      const back = function () { if (si.step === "name") goPage("menu"); else { si.step = "name"; si.msg = ""; render(); } };
+      card.appendChild(el("div", { class: "lb-head" }, [
+        el("button", { type: "button", class: "av-back lb-back", text: "\u2039 Back", onClick: back }),
+        el("h2", { class: "lb-title", text: "\uD83D\uDC64 Sign in" })
+      ]));
+      const note = el("p", { class: "si-msg", role: "status", text: si.msg });
+      if (!LEADERBOARD_URL) { card.appendChild(el("p", { class: "si-big", text: "Sign in is off here." })); return card; }
+      if (si.step === "name") {
+        if (!lb.names && !si.msg) siOpenNames();
+        card.appendChild(el("p", { class: "si-big", text: "Tap your name" }));
+        const list = el("div", { class: "si-names" });
+        (lb.names || []).forEach(function (n) { list.appendChild(el("button", { type: "button", class: "si-name", text: n, onClick: function () { if (!si.busy) siPickName(n); } })); });
+        if (!lb.names && !si.msg) card.appendChild(el("p", { class: "si-msg", text: "Loading\u2026" }));
+        card.appendChild(list);
+        card.appendChild(note);
+        return card;
+      }
+      card.appendChild(el("p", { class: "si-big", text: "Hi, " + si.name + "!" }));
+      if (si.step === "pw") {
+        card.appendChild(el("p", { class: "si-sub", text: "Type your password." }));
+        const a = siInput("Password");
+        card.appendChild(a);
+        const go = function () {
+          if (si.busy || !a.value) return;
+          si.busy = true; note.textContent = "Checking\u2026";
+          siPost({ type: "pwCheck", name: si.name, password: a.value }).then(function (d) {
+            si.busy = false;
+            if (d && d.ok && d.token) siDone(d.name, d.token);
+            else if (d && d.error === "tries") note.textContent = "Too many tries. Wait 5 minutes.";
+            else if (d && d.error === "none") { note.textContent = "Ask your teacher for a password."; a.value = ""; }
+            else { note.textContent = "That\u2019s not it. Try again."; a.value = ""; a.focus(); }
+          }).catch(function () { si.busy = false; note.textContent = "Can\u2019t connect right now."; });
+        };
+        a.addEventListener("keydown", function (e) { if (e.key === "Enter") go(); });
+        card.appendChild(el("button", { type: "button", class: "lb-go si-go", text: "Sign in", onClick: go }));
+        card.appendChild(note);
+        card.appendChild(el("p", { class: "si-sub si-ask", text: "Forgot it? Ask your teacher." }));
+        return card;
+      }
+      return card;
+    }
+    function siOpenNames() {
+      if (si.loading) return;
+      si.loading = true;
+      lbGet("action=roster").then(function (d) { lb.names = (d && d.names) || []; }).catch(function () { si.msg = "Can\u2019t load names. Try again."; })
+        .then(function () { si.loading = false; if (currentPage() === "signin") render(); });
+    }
+    // Small bar at the top of home.
+    function siBar() {
+      if (!LEADERBOARD_URL) return null;
+      const me = lbMe();
+      if (me) return el("div", { class: "si-bar" }, [
+        el("span", { class: "si-hi", text: "Hi, " + me.name + "!" }),
+        el("button", { type: "button", class: "si-out", text: "Not you?", onClick: siOut })
+      ]);
+      return el("div", { class: "si-bar" }, [
+        el("button", { type: "button", class: "si-in", text: "\uD83D\uDC64 Sign in", onClick: siOpen }),
+        el("span", { class: "si-hint", text: "Sign in to save" })
+      ]);
+    }
     function leaderboardCard() {
       const card = el("div", { class: "card lb-card" });
       card.appendChild(el("div", { class: "lb-head" }, [
@@ -8836,30 +8936,14 @@
       if (!lb.board && !lb.loading && !lb.failed) lbRefresh();
       const me = lbMe();
       if (!me) {
-        const form = el("div", { class: "lb-join" });
-        form.appendChild(el("p", { class: "lb-big", text: "Who are you?" }));
-        const pick = el("select", { class: "lb-select", "aria-label": "Your name" });
-        pick.appendChild(el("option", { value: "", text: lb.names ? "Pick your name" : (lb.failed ? "Can\u2019t load names" : "Loading\u2026") }));
-        (lb.names || []).forEach(function (n) { pick.appendChild(el("option", { value: n, text: n })); });
-        form.appendChild(pick);
-        const code = el("input", { class: "lb-code", type: "text", autocomplete: "off", autocapitalize: "characters", spellcheck: "false", placeholder: "Class code", "aria-label": "Class code", maxlength: "20" });
-        form.appendChild(code);
-        const note = el("p", { class: "lb-note", role: "status", text: lb.msg || "" });
-        form.appendChild(el("button", { type: "button", class: "lb-go", text: "Join", onClick: function () {
-          const name = pick.value, c = code.value.trim();
-          if (!name || !c) { note.textContent = "Pick your name and type the code."; return; }
-          note.textContent = "Checking\u2026";
-          lbGet("action=check&code=" + encodeURIComponent(c)).then(function (d) {
-            if (d && d.ok) { localStorage.setItem(LB_KEY, JSON.stringify({ name: name, code: c })); lb.msg = ""; if (avOwner() && avOwner() !== name) avSwitchKid(name); avPull(true); lbCaps(); render(); }
-            else note.textContent = "That code is not right.";
-          }).catch(function () { note.textContent = "Can\u2019t connect right now."; });
-        } }));
-        form.appendChild(note);
-        card.appendChild(form);
+        card.appendChild(el("div", { class: "lb-join" }, [
+          el("p", { class: "lb-big", text: "Sign in to get on the board." }),
+          el("button", { type: "button", class: "lb-go", text: "\uD83D\uDC64 Sign in", onClick: siOpen })
+        ]));
       } else {
         card.appendChild(el("p", { class: "lb-me" }, [
           document.createTextNode("You are "), el("strong", { text: me.name }), document.createTextNode(" "),
-          el("button", { type: "button", class: "lb-change", text: "Change", onClick: function () { if (avPending()) avPush(); lbForget(); avSwitchKid(""); lb.names = null; lb.board = null; render(); } })
+          el("button", { type: "button", class: "lb-change", text: "Not you?", onClick: siOut })
         ]));
       }
       const views = el("div", { class: "lb-views", role: "tablist", "aria-label": "Board" });
@@ -9007,7 +9091,7 @@
           body: JSON.stringify({ type: "avatar", name: me.name, code: me.code, avatar: avatar }) });
       } catch (e) { req = Promise.reject(e); }
       req.then(function (r) { if (!r.ok) throw new Error("save " + r.status); return r.json().catch(function () { return { ok: true }; }); })
-        .then(function (d) { if (d && d.ok === false) throw new Error("save " + (d.error || "no")); })
+        .then(function (d) { if (d && d.ok === false && d.error === "code") { lbForget(); setTimeout(render, 0); } if (d && d.ok === false) throw new Error("save " + (d.error || "no")); })
         .then(function () {
           avSending = false; avTry = 0;
           const now = lbMe();
@@ -9397,6 +9481,7 @@
       const big = el("div", { class: "closet-preview av-big" + (avBounce ? " bounce" : "") }, [avNode(avatar, 260)]);
       avBounce = false;
       top.appendChild(big);
+      if (LEADERBOARD_URL && !me) top.appendChild(el("button", { type: "button", class: "si-in av-signnote-btn", text: "\uD83D\uDC64 Sign in to save", onClick: siOpen }));
       const status = el("p", { class: "av-status " + avStatus, id: "av-status", role: "status" });
       top.appendChild(status);
       if (avatar.pz > 0 && avAnyToWin()) top.appendChild(el("button", { type: "button", class: "pz-claim", text: "\uD83C\uDF81 Pick your prize!", onClick: function () { avPrizeShow(""); } }));
@@ -9468,8 +9553,8 @@
       }
       return card;
     }
-    const PAGES = ["menu", "beats", "backgrounds", "games", "minigames", "leaders", "closet", "bricks", "h2h"];
-    const PAGE_TITLES = { beats: "Beats", backgrounds: "Backgrounds", games: "Fact Challenge", minigames: "Mini Games", leaders: "Leaders", closet: "Avatar", bricks: "Brick by Brick", h2h: "Head to Head" };
+    const PAGES = ["menu", "beats", "backgrounds", "games", "minigames", "leaders", "closet", "bricks", "h2h", "signin"];
+    const PAGE_TITLES = { beats: "Beats", backgrounds: "Backgrounds", games: "Fact Challenge", minigames: "Mini Games", leaders: "Leaders", closet: "Avatar", bricks: "Brick by Brick", h2h: "Head to Head", signin: "Sign in" };
     let menuSmooth = false;
     function currentPage() {
       const h = (location.hash || "").replace(/^#/, "");
@@ -9502,6 +9587,7 @@
     }
     function menuPage() {
       const sec = el("section", { class: "menu-page home-stack", id: "menu-page", "aria-label": "Menu" });
+      { const bar = siBar(); if (bar) sec.appendChild(bar); }
       // 1. Boom box
       const playerCard = el("div", { class: "card beats-card menu-player" });
       const player = el("div", { class: "setup-player" });
