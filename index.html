@@ -8863,7 +8863,7 @@
       si.name = n; si.step = "pw"; si.msg = ""; render();
       setTimeout(function () { const i = document.querySelector(".si-input"); if (i) i.focus(); }, 50);
     }
-    function siInput(label) { return el("input", { class: "si-input", type: "password", autocomplete: "off", autocapitalize: "off", spellcheck: "false", maxlength: "40", "aria-label": label, placeholder: label }); }
+    function siInput(label) { return el("input", { class: "si-input", type: "text", autocomplete: "off", autocapitalize: "off", autocorrect: "off", spellcheck: "false", maxlength: "40", "aria-label": label, placeholder: label }); }
     function siCard() {
       const card = el("div", { class: "card si-card" });
       const back = function () { if (si.step === "name") goPage("menu"); else { si.step = "name"; si.msg = ""; render(); } };
