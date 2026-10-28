@@ -3279,6 +3279,23 @@
     .av-top .pz-claim { min-height: 2.8rem; padding: 0.4rem; font: 700 1.05rem/1.2 var(--ui-font); }
     .av-tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.4rem; margin: 0; }
     .av-tabs .lb-tab { min-height: 2.8rem; font: 600 1rem/1.1 var(--ui-font); border-radius: 0.9rem; white-space: nowrap; }
+    .av-status { margin: -0.2rem 0 0; min-height: 1.2rem; text-align: center; font: 700 0.95rem/1.2 var(--ui-font); color: rgba(255,255,255,0.75); }
+    .av-status.saved { color: #8ff0a4; }
+    .av-status.offline { color: #ffd34e; }
+    .av-loading, .av-tip { margin: 0; text-align: center; font: 700 1.05rem/1.35 var(--ui-font); color: #fff; }
+    .av-loading { padding: 2rem 0; font-size: 1.25rem; }
+    .av-tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 0.6rem; padding-top: 0.35rem; }
+    .av-tile { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.25rem; min-height: 112px; padding: 0.5rem 0.25rem;
+      border-radius: 1rem; border: 3px solid rgba(255,255,255,0.18); background: rgba(18,10,38,0.85); color: #fff; font: 700 0.95rem/1.1 var(--ui-font); cursor: pointer; transition: transform 0.12s ease; }
+    .av-tile:active { transform: scale(0.96); }
+    .av-tile.on { border-color: #ffd34e; background: rgba(80,50,10,0.85); box-shadow: 0 0 0 2px rgba(255,211,78,0.35); }
+    .av-tile.gold { border-color: rgba(255,211,78,0.6); }
+    .av-tile.locked { opacity: 0.6; }
+    .av-tile.locked svg, .av-tile.locked .av-tile-swatch { filter: grayscale(0.7); }
+    .av-tile-swatch { width: 60px; height: 60px; border-radius: 50%; border: 3px solid rgba(255,255,255,0.7); }
+    .av-tile-on { position: absolute; top: 6px; right: 6px; width: 26px; height: 26px; border-radius: 50%; background: #ffd34e; color: #2a1d00; font: 900 0.95rem/26px var(--ui-font); }
+    .av-tile-lock { position: absolute; top: 6px; right: 6px; font-size: 1rem; }
+    @media (prefers-reduced-motion: reduce) { .av-tile { transition: none; } .av-tile:active { transform: none; } }
     .av-items { display: flex; flex-direction: column; gap: 1rem; padding: 0.9rem 0.2rem 1.5rem; }
     .closet-h { font: 700 1.05rem/1.2 var(--ui-font); letter-spacing: 0.03em; text-transform: uppercase; opacity: 0.9; }
     .closet-card .closet-opts { display: grid; grid-template-columns: repeat(auto-fill, minmax(5.2rem, 1fr)); gap: 0.55rem; overflow: visible; padding: 0.2rem 0; scroll-snap-type: none; }
@@ -8716,7 +8733,7 @@
     }
     document.addEventListener("visibilitychange", function () { if (document.visibilityState === "hidden") lbFlush(true); });
     // Load a named kid's avatar from the sheet right away, not only when the Leaders page opens.
-    if (LEADERBOARD_URL) setTimeout(function () { if (lbMe()) { lbCaps(); avPull(); } }, 1500);
+    if (LEADERBOARD_URL) setTimeout(function () { if (lbMe()) { lbCaps(); avPull(); } }, 300);
     function lbGet(params) {
       return fetch(LEADERBOARD_URL + (LEADERBOARD_URL.indexOf("?") >= 0 ? "&" : "?") + params, { cache: "no-store" })
         .then(function (r) { if (!r.ok) throw new Error("lb " + r.status); return r.json(); });
@@ -8796,7 +8813,7 @@
           if (!name || !c) { note.textContent = "Pick your name and type the code."; return; }
           note.textContent = "Checking\u2026";
           lbGet("action=check&code=" + encodeURIComponent(c)).then(function (d) {
-            if (d && d.ok) { localStorage.setItem(LB_KEY, JSON.stringify({ name: name, code: c })); lb.msg = ""; avPull(true); lbCaps(); render(); }
+            if (d && d.ok) { localStorage.setItem(LB_KEY, JSON.stringify({ name: name, code: c })); lb.msg = ""; if (avOwner() && avOwner() !== name) avSwitchKid(name); avPull(true); lbCaps(); render(); }
             else note.textContent = "That code is not right.";
           }).catch(function () { note.textContent = "Can\u2019t connect right now."; });
         } }));
@@ -8805,7 +8822,7 @@
       } else {
         card.appendChild(el("p", { class: "lb-me" }, [
           document.createTextNode("You are "), el("strong", { text: me.name }), document.createTextNode(" "),
-          el("button", { type: "button", class: "lb-change", text: "Change", onClick: function () { lbForget(); lb.names = null; lb.board = null; render(); } })
+          el("button", { type: "button", class: "lb-change", text: "Change", onClick: function () { if (avPending()) avPush(); lbForget(); avSwitchKid(""); lb.names = null; lb.board = null; render(); } })
         ]));
       }
       const views = el("div", { class: "lb-views", role: "tablist", "aria-label": "Board" });
@@ -8912,39 +8929,102 @@
         pz: Math.max(0, Math.min(99, Number(a.pz) || 0)), pg: a.pg ? 1 : 0, updated: Number(a.updated) || 0 };
     }
     let avatar = (function () { try { return avClean(JSON.parse(localStorage.getItem(AV_KEY) || "null")); } catch (e) { return avClean(null); } })();
-    let avPushTimer = 0;
+    // ---- Saving: every change is saved on this device at once, then sent to the sheet with retries.
+    // A waiting save is remembered (AV_PENDING_KEY) and sent on the next load, when back online, or after joining.
+    const AV_PENDING_KEY = "mad-facts-av-pending";
+    const AV_OWNER_KEY = "mad-facts-av-owner";
+    let avPushTimer = 0, avTry = 0, avSending = false;
+    let avStatus = "";          // "", "saving", "saved", "offline"
+    let avLoadedFor = "", avLoading = false, avPullAt = 0;
+    function avPending() { try { return !!localStorage.getItem(AV_PENDING_KEY); } catch (e) { return false; } }
+    function avSetPending(on) { try { if (on) localStorage.setItem(AV_PENDING_KEY, "1"); else localStorage.removeItem(AV_PENDING_KEY); } catch (e) {} }
+    function avShowStatus(st) {
+      avStatus = st;
+      const box = document.getElementById("av-status");
+      if (!box) return;
+      box.className = "av-status " + st;
+      box.textContent = st === "saving" ? "Saving\u2026" : st === "saved" ? "Saved \u2713" : st === "offline" ? "Will save when online" : "";
+    }
     function avSave(sync) {
       avatar.updated = Date.now();
       try { localStorage.setItem(AV_KEY, JSON.stringify(avatar)); } catch (e) {}
-      if (sync !== false) { clearTimeout(avPushTimer); avPushTimer = setTimeout(avPush, 1200); }
+      if (sync === false) return;
+      avSetPending(true);
+      const me = LEADERBOARD_URL ? lbMe() : null;
+      if (!me) { avShowStatus("saved"); return; }   // Saved on this device; sent to the sheet after joining.
+      avTry = 0;
+      avShowStatus("saving");
+      clearTimeout(avPushTimer); avPushTimer = setTimeout(avPush, 800);
     }
     function avPush() {
-      const me = typeof lbMe === "function" && LEADERBOARD_URL ? lbMe() : null;
-      if (!me) return;
+      clearTimeout(avPushTimer);
+      const me = LEADERBOARD_URL ? lbMe() : null;
+      if (!me || avSending) return;
+      if (!avPending()) { avShowStatus(avStatus === "saving" || avStatus === "offline" ? "saved" : avStatus); return; }
+      if (avLoading) { avPushTimer = setTimeout(avPush, 1000); return; }   // Load this kid's stuff first.
+      const sent = avatar.updated, name = me.name;
+      avSending = true;
+      let req;
       try {
-        fetch(LEADERBOARD_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, keepalive: true,
-          body: JSON.stringify({ type: "avatar", name: me.name, code: me.code, avatar: avatar }) }).catch(function () {});
-      } catch (e) {}
+        req = fetch(LEADERBOARD_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({ type: "avatar", name: me.name, code: me.code, avatar: avatar }) });
+      } catch (e) { req = Promise.reject(e); }
+      req.then(function (r) { if (!r.ok) throw new Error("save " + r.status); return r.json().catch(function () { return { ok: true }; }); })
+        .then(function (d) { if (d && d.ok === false) throw new Error("save " + (d.error || "no")); })
+        .then(function () {
+          avSending = false; avTry = 0;
+          const now = lbMe();
+          if (!now || now.name !== name) return;
+          if (avatar.updated === sent) { avSetPending(false); avShowStatus("saved"); }
+          else avPush();   // Changed while sending: send the newer one.
+        })
+        .catch(function () {
+          avSending = false; avTry += 1;
+          avShowStatus("offline");
+          if (avTry <= 6) avPushTimer = setTimeout(avPush, Math.min(60000, 2000 * Math.pow(2, avTry - 1)));
+        });
     }
-    let avPulled = "";
+    window.addEventListener("online", function () { avTry = 0; avPush(); });
+    // Load this kid's saved avatar. Never mixes in another kid's stuff, and never undoes a newer change on this device.
     function avPull(force) {
       const me = LEADERBOARD_URL ? lbMe() : null;
-      if (!me || (avPulled === me.name && !force)) return;
-      avPulled = me.name;
-      lbGet("action=avatar&name=" + encodeURIComponent(me.name)).then(function (d) {
-        let remote = d && d.avatar ? avClean(d.avatar) : null;
+      if (!me || avLoading) return;
+      if (!force && avLoadedFor === me.name && Date.now() - avPullAt < 30000) return;
+      if (avOwner() && avOwner() !== me.name) avSwitchKid(me.name);
+      avLoading = true; avPullAt = Date.now();
+      const startedAt = avatar.updated, name = me.name;
+      const done = function () {
+        avLoading = false; avLoadedFor = name;
+        if (state.phase === "setup" || ((state.phase === "play" || state.phase === "quiz") && !avPrizeOpen())) render();
+        if (avPending()) avPush();
+      };
+      lbGet("action=avatar&name=" + encodeURIComponent(name)).then(function (d) {
+        const now = lbMe();
+        if (!now || now.name !== name) { avLoading = false; return; }
+        try { localStorage.setItem(AV_OWNER_KEY, name); } catch (e) {}
+        const remote = d && d.avatar ? avClean(d.avatar) : null;
         const resetAt = Number(localStorage.getItem(AV_RESET_KEY) || 0);
-        if (remote && remote.updated && remote.updated < resetAt) { avPush(); return; }
-        if (!remote) { if (avatar.made || avatar.owned.length) avPush(); return; }
-        const merged = remote.updated > avatar.updated ? remote : avatar;
+        if (!remote || (remote.updated && remote.updated < resetAt)) { if (avatar.made || avatar.owned.length) avSetPending(true); done(); return; }
         const owned = avatar.owned.concat(remote.owned.filter(function (id) { return avatar.owned.indexOf(id) < 0; }));
-        const before = JSON.stringify(avatar);
-        avatar = avClean(Object.assign({}, merged, { owned: owned, made: avatar.made || remote.made }));
-        avatar.updated = Math.max(remote.updated, avatar.updated);
+        const localNewer = avatar.updated !== startedAt || avPending() || avatar.updated >= remote.updated;
+        const base = localNewer ? avatar : remote;
+        const upd = Math.max(remote.updated, avatar.updated);
+        avatar = avClean(Object.assign({}, base, { owned: owned, made: avatar.made || remote.made }));
+        avatar.updated = upd;
         try { localStorage.setItem(AV_KEY, JSON.stringify(avatar)); } catch (e) {}
-        if (JSON.stringify(remote) !== JSON.stringify(avatar)) avPush();
-        if (before !== JSON.stringify(avatar) && (state.phase === "setup" || ((state.phase === "play" || state.phase === "quiz") && !avPrizeOpen()))) render();
-      }).catch(function () { avPulled = ""; });
+        if (JSON.stringify(Object.assign({}, remote, { updated: 0 })) !== JSON.stringify(Object.assign({}, avatar, { updated: 0 }))) avSetPending(true);
+        done();
+      }).catch(function () { avLoading = false; avLoadedFor = name; avPullAt = 0; if (state.phase === "setup" && currentPage() === "closet") render(); });
+    }
+    function avOwner() { try { return localStorage.getItem(AV_OWNER_KEY) || ""; } catch (e) { return ""; } }
+    // Shared iPads: a different kid starts from a blank avatar, then their own saved one loads.
+    function avSwitchKid(name) {
+      avatar = avClean(null);
+      avatar.updated = 0;
+      clearTimeout(avPushTimer); avTry = 0;
+      avSetPending(false);
+      avLoadedFor = ""; avStatus = "";
+      try { localStorage.setItem(AV_KEY, JSON.stringify(avatar)); localStorage.setItem(AV_OWNER_KEY, name || ""); localStorage.removeItem(AV_RESET_KEY); } catch (e) {}
     }
     function avShade(hex, f) {
       const n = parseInt(hex.slice(1), 16);
@@ -9254,13 +9334,25 @@
       return row;
     }
     // ---- Closet page ----
-    let closetTab = "look";
+    let closetTab = "mine";
     let avBounce = false;
+    function avMineLooks() {
+      // Looks the kid can use now, in a simple order. Animal kinds only matter for the Animal style.
+      return AV_LOOK.filter(function (it) {
+        if (!avOwns(it.id)) return false;
+        if (it.cat === "animal" && avatar.style !== "animal") return false;
+        if (it.cat === "hair" && !avHasHair(avatar)) return false;
+        if (it.key === "hairColor" && avatar.hair === "none") return false;
+        return true;
+      });
+    }
     function closetCard() {
       const card = el("div", { class: "card closet-card" });
-      // Sticky top: Back, name, big avatar, prize, tabs.
+      const me = LEADERBOARD_URL ? lbMe() : null;
+      if (me && avLoadedFor !== me.name && !avLoading && Date.now() - avPullAt > 3000) setTimeout(function () { avPull(true); }, 0);
+      else if (me && avLoadedFor === me.name && Date.now() - avPullAt > 30000) setTimeout(function () { avPull(true); }, 0);
+      // Sticky top: Back, name, big avatar, save note, tabs.
       const top = el("div", { class: "av-top" });
-      const me = typeof lbMe === "function" ? lbMe() : null;
       top.appendChild(el("div", { class: "av-top-row" }, [
         el("button", { type: "button", class: "page-back av-back", text: "\u2039 Back", onClick: function () { goPage("menu"); } }),
         el("span", { class: "av-name", text: me ? me.name : "My Avatar" })
@@ -9268,56 +9360,74 @@
       const big = el("div", { class: "closet-preview av-big" + (avBounce ? " bounce" : "") }, [avNode(avatar, 260)]);
       avBounce = false;
       top.appendChild(big);
+      const status = el("p", { class: "av-status " + avStatus, id: "av-status", role: "status" });
+      top.appendChild(status);
       if (avatar.pz > 0 && avAnyToWin()) top.appendChild(el("button", { type: "button", class: "pz-claim", text: "\uD83C\uDF81 Pick your prize!", onClick: function () { avPrizeShow(""); } }));
       const tabs = el("div", { class: "lb-tabs av-tabs", role: "tablist" });
-      [["look", "My Look"], ["clothes", "My Clothes"], ["all", "All items"]].forEach(function (t) {
+      [["mine", "My Stuff"], ["win", "Win More"]].forEach(function (t) {
         tabs.appendChild(el("button", { type: "button", role: "tab", class: "lb-tab" + (closetTab === t[0] ? " on" : ""), "aria-selected": String(closetTab === t[0]), text: t[1], onClick: function () { closetTab = t[0]; render(); window.scrollTo(0, 0); } }));
       });
       top.appendChild(tabs);
       card.appendChild(top);
+      setTimeout(function () { avShowStatus(avStatus); }, 0);
       const items = el("div", { class: "av-items" });
       card.appendChild(items);
-      const tryOn = function () { avatar.made = true; avBounce = true; avSave(); render(); };
-      const set = function (k, v) { const id = avLookId(k, v); if (!avOwns(id)) { if (!avatar.made) { avatar.made = true; avSave(); render(); } say("Win it with 10 in a row!"); return; } avatar[k] = v; tryOn(); };
-      const sec = function (title, kids, cls) { return el("div", { class: "closet-sec" }, [el("p", { class: "closet-h", text: title }), el("div", { class: "closet-opts " + (cls || "") }, kids)]); };
-      const mark = function (btn, on) { if (on) btn.appendChild(el("span", { class: "pz-badge ok av-on", "aria-hidden": "true", text: "\u2713" })); return btn; };
-      const lk = function (btn, key, val) { if (!avOwns(avLookId(key, val))) { btn.classList.add("locked"); btn.setAttribute("aria-label", "Locked"); btn.appendChild(el("span", { class: "pz-badge lock", text: "\uD83D\uDD12" })); } return btn; };
-      const opt = function (key, val, label, prev) {
-        const on = avatar[key] === val;
-        return lk(mark(el("button", { type: "button", class: "closet-opt" + (on ? " on" : ""), "aria-pressed": String(on), onClick: function () { set(key, val); } }, [avNode(prev, 56), el("span", { text: label })]), on), key, val);
+      if (me && avLoading && avLoadedFor !== me.name) {
+        items.appendChild(el("p", { class: "av-loading", text: "Loading your stuff\u2026" }));
+        return card;
+      }
+      // Wearing changes the big avatar right away; the rest of the page stays put.
+      const refresh = function () {
+        avatar.made = true;
+        avSave();
+        const keepY = window.scrollY;
+        render();
+        window.scrollTo(0, keepY);
       };
-      const sw = function (key, col, label) {
-        const on = avatar[key] === col;
-        return lk(el("button", { type: "button", class: "closet-swatch" + (on ? " on" : ""), "aria-label": label, "aria-pressed": String(on), style: "background:" + col, onClick: function () { set(key, col); } }), key, col);
+      const tile = function (it, on, pic, tap) {
+        const btn = el("button", { type: "button", class: "av-tile" + (on ? " on" : "") + (it.gold ? " gold" : ""), "aria-pressed": String(on), "aria-label": it.name + (on ? ", wearing" : ""), onClick: tap }, [pic, el("span", { class: "av-tile-name", text: it.name })]);
+        if (on) btn.appendChild(el("span", { class: "av-tile-on", "aria-hidden": "true", text: "\u2713" }));
+        return btn;
       };
-      if (closetTab === "all") {
-        items.appendChild(avGrid(false));
-        items.appendChild(el("p", { class: "lb-hint", text: "Get 10 in a row to win one." }));
-      } else if (closetTab === "look") {
-        items.appendChild(sec("Style", AV_STYLES.map(function (x) { return opt("style", x[0], x[1], Object.assign({}, avatar, { style: x[0] })); })));
-        if (avatar.style === "animal") items.appendChild(sec("Animal", AV_ANIMALS.map(function (x) { return opt("animal", x[0], x[1], Object.assign({}, avatar, { animal: x[0] })); })));
-        items.appendChild(sec("Color", AV_COLORS.map(function (c) { return sw("color", c, "Color"); }), "swatches"));
-        items.appendChild(sec("Face", AV_FACES.map(function (x) { return opt("face", x[0], x[1], Object.assign({}, avatar, { face: x[0], wear: {} })); })));
-        if (avHasHair(avatar)) {
-          items.appendChild(sec("Hair", AV_HAIRS.map(function (x) { return opt("hair", x[0], x[1], Object.assign({}, avatar, { hair: x[0], wear: {} })); })));
-          if (avatar.hair !== "none") items.appendChild(sec("Hair color", AV_HAIR_COLORS.map(function (c) { return sw("hairColor", c, "Hair color"); }), "swatches"));
-        }
-      } else {
-        if (!AV_ITEMS.some(function (i) { return avatar.owned.indexOf(i.id) >= 0; })) items.appendChild(el("p", { class: "closet-empty", text: "Get 10 in a row to win clothes!" }));
+      const sec = function (title, kids) { return el("div", { class: "closet-sec" }, [el("p", { class: "closet-h", text: title }), el("div", { class: "av-tiles" }, kids)]); };
+      if (closetTab === "mine") {
+        items.appendChild(el("p", { class: "av-tip", text: "Tap to wear it." }));
+        // Clothes and pets first: the things kids win most.
         AV_SLOTS.forEach(function (sl) {
           const mine = AV_ITEMS.filter(function (i) { return i.slot === sl[0] && avatar.owned.indexOf(i.id) >= 0; });
           if (!mine.length) return;
           items.appendChild(sec(sl[1], mine.map(function (it) {
             const on = avatar.wear[sl[0]] === it.id;
-            const btn = el("button", { type: "button", class: "closet-opt" + (on ? " on" : "") + (it.gold ? " gold" : ""), "aria-pressed": String(on), onClick: function () {
-              if (on) delete avatar.wear[sl[0]]; else avatar.wear[sl[0]] = it.id;
-              tryOn();
-            } }, [avNode(Object.assign({}, avatar, { wear: (function () { const o = {}; o[sl[0]] = it.id; return o; })() }), 56), el("span", { text: it.name })]);
-            if (on) btn.appendChild(el("span", { class: "av-wearing", text: "Wearing" }));
+            const prev = Object.assign({}, avatar, { wear: (function () { const o = {}; o[sl[0]] = it.id; return o; })() });
+            return tile(it, on, avNode(prev, 72), function () { if (on) delete avatar.wear[sl[0]]; else avatar.wear[sl[0]] = it.id; refresh(); });
+          })));
+        });
+        const looks = avMineLooks();
+        [["style", "Styles"], ["animal", "Animals"], ["color", "Colors"], ["face", "Faces"], ["hair", "Hair"]].forEach(function (c) {
+          const list = looks.filter(function (it) { return it.cat === c[0]; });
+          if (!list.length) return;
+          items.appendChild(sec(c[1], list.map(function (it) {
+            const on = avatar[it.key] === it.val;
+            const pic = it.swatch ? el("span", { class: "av-tile-swatch", style: "background:" + it.swatch }) : avNode(avPreview(Object.assign({}, it)), 72);
+            if (it.swatch) it = Object.assign({}, it, { name: it.key === "hairColor" ? "Hair color" : "Color" });
+            return tile(it, on, pic, function () { avApply(it); refresh(); });
+          })));
+        });
+      } else {
+        items.appendChild(el("p", { class: "av-tip", text: "Get 10 in a row in Fact Challenge to win a prize. Gold ones need 50 in a row." }));
+        let any = false;
+        AV_CATS.forEach(function (c) {
+          const list = avAll(c[0]).filter(function (it) { return !avOwns(it.id); });
+          if (!list.length) return;
+          any = true;
+          items.appendChild(sec(c[1], list.map(function (it) {
+            const pic = it.swatch ? el("span", { class: "av-tile-swatch", style: "background:" + it.swatch }) : avNode(avPreview(it), 72);
+            const btn = el("button", { type: "button", class: "av-tile locked" + (it.gold ? " gold" : ""), "aria-label": it.name + ", locked", onClick: function () { say(it.gold ? "Gold needs 50 in a row." : "Win it with 10 in a row!"); } },
+              [pic, el("span", { class: "av-tile-name", text: it.swatch ? "Color" : it.name }), el("span", { class: "av-tile-lock", "aria-hidden": "true", text: it.gold ? "\u2B50" : "\uD83D\uDD12" })]);
             return btn;
           })));
         });
-        if (AV_ITEMS.some(function (i) { return avatar.owned.indexOf(i.id) >= 0; })) items.appendChild(el("p", { class: "lb-hint", text: "Tap to put on or take off." }));
+        if (!any) items.appendChild(el("p", { class: "av-tip", text: "You won everything! \uD83C\uDF89" }));
       }
       return card;
     }
@@ -10300,6 +10410,7 @@
       const me = typeof lbMe === "function" && LEADERBOARD_URL ? lbMe() : null;
       avatar = avClean(null);
       avatar.updated = Date.now();
+      avSetPending(false);
       try { localStorage.setItem(AV_KEY, JSON.stringify(avatar)); localStorage.setItem(AV_RESET_KEY, String(avatar.updated)); } catch (e) {}
       clearTimeout(avPushTimer);
       if (!me) return Promise.resolve(true);
@@ -10309,9 +10420,9 @@
           return fetch(LEADERBOARD_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" },
             body: JSON.stringify({ type: "avatarDelete", name: me.name, code: me.code }) }).then(function () { return true; });
         }
-        avPush();
+        avSetPending(true); avPush();
         return false;
-      }).catch(function () { avPush(); return false; });
+      }).catch(function () { avSetPending(true); avPush(); return false; });
     }
     function confirmResetChallenge(opener) {
       const old = document.getElementById("reset-confirm");
