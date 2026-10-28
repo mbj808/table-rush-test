@@ -3163,6 +3163,62 @@
     .reset-math-note { min-height: 1.3rem; margin: 0.2rem 0 0; font: 700 1rem/1.3 var(--ui-font); color: #ffd34e; }
     .reset-sure-text { font: 600 1.05rem/1.35 var(--ui-font); }
     @media (prefers-reduced-motion: reduce) { .reset-opt { transition: none; } .reset-opt:active { transform: none; } }
+    /* ===== Brick by Brick ===== */
+    body[data-page="bricks"] header h1, body[data-page="bricks"] .page-head { display: none; }
+    .home-fc-row > .home-bb { grid-column: 1 / -1; background: linear-gradient(135deg, #ff8a5c 0%, #e0453a 100%); color: #fff; }
+    .home-fc-row > .home-bb .hb-label { text-shadow: 0 1px 2px rgba(0,0,0,0.25); }
+    .bb-card { max-width: 34rem; margin: 0 auto; width: 100%; display: flex; flex-direction: column; gap: 0.7rem; color: #fff; font-family: var(--ui-font); padding-top: 0.6rem; }
+    .bb-head { display: flex; align-items: center; gap: 0.7rem; }
+    .bb-title { margin: 0; flex: 1 1 auto; font: 700 1.45rem/1.15 var(--ui-font); color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.5); }
+    .bb-tag { margin: 0; font: 600 1.05rem/1.3 var(--ui-font); color: #fff7ea; text-shadow: 0 1px 3px rgba(0,0,0,0.7); }
+    .bb-label { margin: 0.3rem 0 0; font: 700 0.9rem/1 var(--ui-font); letter-spacing: 0.08em; text-transform: uppercase; color: #ffe39a; text-shadow: 0 1px 3px rgba(0,0,0,0.7); }
+    .bb-ops { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.45rem; }
+    .bb-op, .bb-level { min-height: 3.2rem; border-radius: 0.9rem; border: 2px solid rgba(255,255,255,0.4); background: #1d1736; color: #fff; font: 700 1.6rem/1 var(--ui-font); cursor: pointer; }
+    .bb-op:last-child { font-size: 1.1rem; }
+    .bb-op.on, .bb-level.on { background: linear-gradient(180deg, #ffe08a, #e0a43a); color: #2a1800; border-color: #fff6dc; }
+    .bb-levels { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.45rem; }
+    .bb-level { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.2rem; min-height: 3.8rem; font-size: 1.15rem; }
+    .bb-lv-note { font: 600 0.8rem/1 var(--ui-font); opacity: 0.8; }
+    .bb-shelf { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.6rem; }
+    @media (min-width: 700px) { .bb-shelf { grid-template-columns: repeat(4, 1fr); } }
+    .bb-tile { position: relative; display: flex; flex-direction: column; align-items: center; gap: 0.25rem; padding: 0.7rem 0.4rem 0.6rem; border-radius: 1rem; border: 2px solid rgba(255,255,255,0.25); background: #1d1736; color: #fff; cursor: pointer; font-family: var(--ui-font); }
+    .bb-tile.done { border-color: #5fe07a; background: #1f2f3a; }
+    .bb-shelf-art { display: grid; place-items: center; width: 100%; height: 6.5rem; }
+    .bb-shelf-art svg { max-width: 92%; max-height: 100%; }
+    .bb-tile-name { font: 700 1.05rem/1.1 var(--ui-font); }
+    .bb-tile-note { font: 600 0.8rem/1.1 var(--ui-font); opacity: 0.8; }
+    .bb-check { position: absolute; top: 0.4rem; right: 0.4rem; width: 1.6rem; height: 1.6rem; border-radius: 50%; display: grid; place-items: center; background: #2fb457; color: #fff; font: 800 1rem/1 var(--ui-font); }
+    .bb-ghost { fill: rgba(255,255,255,0.06); stroke: rgba(255,255,255,0.28); stroke-width: 1; stroke-dasharray: 3 2; }
+    .bb-bar { position: relative; height: 2rem; border-radius: 999px; background: #1d1736; border: 2px solid rgba(255,255,255,0.35); overflow: hidden; }
+    .bb-bar-fill { position: absolute; left: 0; top: 0; bottom: 0; background: linear-gradient(90deg, #3cba54, #8fe36a); transition: width 0.3s ease; }
+    .bb-bar-text { position: relative; display: block; text-align: center; font: 700 1rem/1.75rem var(--ui-font); text-shadow: 0 1px 2px rgba(0,0,0,0.6); }
+    .bb-stage { display: block; box-sizing: border-box; height: 34vh; min-height: 11rem; padding: 0.4rem; border-radius: 1.1rem; background: radial-gradient(ellipse at 50% 100%, rgba(255,255,255,0.14), rgba(20,10,40,0.55) 70%); border: 1px solid rgba(255,255,255,0.18); overflow: hidden; }
+    .bb-stage svg, .bb-cele-art svg { display: block; width: 100%; height: 100%; overflow: visible; }
+    .bb-stage.bump svg { animation: bbBump 0.35s ease-out 0.2s; }
+    .bb-b { transform-box: fill-box; transform-origin: 50% 100%; }
+    .bb-new { animation: bbDrop 0.3s cubic-bezier(.3,1.5,.6,1) both; }
+    .bb-fall { animation: bbFall 0.9s ease-in forwards; }
+    .bb-fall:nth-of-type(odd), .bb-fall[style*="--i:1"] { animation-name: bbFall2; }
+    @keyframes bbDrop { 0% { transform: translateY(-40px); opacity: 0; } 60% { opacity: 1; } 100% { transform: translateY(0); opacity: 1; } }
+    @keyframes bbBump { 0% { transform: scale(1); } 40% { transform: scale(1.025, 0.975); } 100% { transform: scale(1); } }
+    @keyframes bbFall { 0% { transform: translate(0, 0) rotate(0); opacity: 1; } 100% { transform: translate(-30px, 160px) rotate(-120deg); opacity: 0; } }
+    @keyframes bbFall2 { 0% { transform: translate(0, 0) rotate(0); opacity: 1; } 100% { transform: translate(34px, 160px) rotate(140deg); opacity: 0; } }
+    .bb-q { margin: 0.2rem 0 0; text-align: center; font: 800 3rem/1.1 var(--ui-font); text-shadow: 0 2px 6px rgba(0,0,0,0.6); }
+    .bb-q.miss { color: #ffe39a; }
+    .bb-oops { margin: -0.3rem 0 0; text-align: center; font: 700 1.1rem/1.2 var(--ui-font); color: #ffb3a8; text-shadow: 0 1px 3px rgba(0,0,0,0.7); }
+    .bb-answers { margin-top: 0.2rem; }
+    .bb-answers button { font-family: var(--ui-font); font-size: 2.1rem; min-height: 4.6rem; background: #fffef6; color: #1a1233; backdrop-filter: none; -webkit-backdrop-filter: none; }
+    .bb-cele { display: flex; flex-direction: column; align-items: center; gap: 0.7rem; text-align: center; padding-top: 1rem; }
+    .bb-cele-art { display: block; box-sizing: border-box; width: 100%; height: 40vh; padding: 0.6rem; border-radius: 1.2rem; background: radial-gradient(ellipse at 50% 60%, rgba(255,227,154,0.35), rgba(20,10,40,0.5) 70%); animation: bbBump 0.6s ease-out; }
+    .bb-grit { margin: 0; font: 800 1.6rem/1.2 var(--ui-font); color: #ffe39a; text-shadow: 0 2px 6px rgba(0,0,0,0.6); }
+    .bb-go { min-height: 3.6rem; padding: 0 2rem; border-radius: 1.1rem; border: 2px solid #fff6dc; background: linear-gradient(180deg, #ffe08a, #e0a43a); color: #2a1800; font: 700 1.3rem/1 var(--ui-font); cursor: pointer; }
+    @media (min-width: 760px) { .bb-card { max-width: 40rem; } .bb-stage { height: 38vh; } .bb-q { font-size: 3.6rem; } }
+    @media (prefers-reduced-motion: reduce) {
+      .bb-new, .bb-stage.bump svg, .bb-cele-art { animation: none; }
+      .bb-fall, .bb-fall[style*="--i:1"] { animation: bbFade 0.6s ease forwards; }
+      .bb-bar-fill { transition: none; }
+    }
+    @keyframes bbFade { from { opacity: 1; } to { opacity: 0; } }
     /* ===== Leaderboard compact header ===== */
     body[data-page="leaders"] header h1, body[data-page="leaders"] .page-head { display: none; }
     body[data-page="leaders"] .lb-card { padding-top: 0.6rem; gap: 0.6rem; }
@@ -8225,6 +8281,7 @@
       if (page === "beats") stack.appendChild(musicCard(true, true));
       if (page === "backgrounds") stack.appendChild(backgroundsCard());
       if (page === "closet") { stack.appendChild(closetCard()); app.appendChild(stack); return; }
+      if (page === "bricks") { stack.appendChild(bricksCard()); app.appendChild(stack); return; }
       if (page === "leaders") { stack.appendChild(leaderboardCard()); app.appendChild(stack); return; }
       const opsCard = operationCard();
       stack.appendChild(opsCard);
@@ -9155,8 +9212,8 @@
       }
       return card;
     }
-    const PAGES = ["menu", "beats", "backgrounds", "games", "minigames", "leaders", "closet"];
-    const PAGE_TITLES = { beats: "Beats", backgrounds: "Backgrounds", games: "Fact Challenge", minigames: "Mini Games", leaders: "Leaders", closet: "Avatar" };
+    const PAGES = ["menu", "beats", "backgrounds", "games", "minigames", "leaders", "closet", "bricks"];
+    const PAGE_TITLES = { beats: "Beats", backgrounds: "Backgrounds", games: "Fact Challenge", minigames: "Mini Games", leaders: "Leaders", closet: "Avatar", bricks: "Brick by Brick" };
     let menuSmooth = false;
     function currentPage() {
       const h = (location.hash || "").replace(/^#/, "");
@@ -9214,6 +9271,11 @@
         fcRow.appendChild(el("button", { type: "button", class: "menu-lb home-lb", onClick: function () { goPage("leaders"); } }, [
           el("span", { class: "menu-lb-ico", "aria-hidden": "true", text: "\uD83C\uDFC6" }),
           el("span", { class: "hb-label", text: "Leaderboard" }),
+          el("span", { class: "hb-go", "aria-hidden": "true", text: "\u203A" })
+        ]));
+        fcRow.appendChild(el("button", { type: "button", class: "menu-lb home-bb", onClick: function () { bb.build = null; bb.celebrate = false; bb.lock = false; goPage("bricks"); } }, [
+          el("span", { class: "menu-lb-ico", "aria-hidden": "true", text: "\uD83E\uDDF1" }),
+          el("span", { class: "hb-label", text: "Brick by Brick" }),
           el("span", { class: "hb-go", "aria-hidden": "true", text: "\u203A" })
         ]));
       }
@@ -9601,6 +9663,250 @@
 
     // Ask before resetting: an in-page dialog styled like the Congratulations card.
     // "No" has focus; No, Escape, or a tap outside the card closes it with nothing changed.
+    const BB_BUILDS = {
+      small: [
+        { id: "house", name: "House", art: ["..R..", ".RRR.", "RRRRR", "YLYLY", "YYDYY"] },
+        { id: "car", name: "Car", art: ["..BBB..", ".BLBLB.", "YBBBBBR", "BBBBBBB", ".K...K."] },
+        { id: "tree", name: "Tree", art: ["..G..", ".GGG.", "GGGGG", "GGGGG", ".GGG.", "..T..", "..T.."] },
+        { id: "boat", name: "Boat", art: ["...W...", "..WW...", ".WWW...", "...T...", "RRRRRRR", ".RRRRR."] }
+      ],
+      medium: [
+        { id: "rocket", name: "Rocket", art: ["..R..", ".RRR.", ".WWW.", ".WLW.", ".WWW.", ".WWW.", ".WLW.", ".WWW.", "RWWWR", "RWWWR", "RYOYR"] },
+        { id: "tower", name: "Castle Tower", art: ["...R...", "...T...", "S.S.S.S", "SSSSSSS", ".SSSSS.", ".SSLSS.", ".SSSSS.", ".SSSSS.", ".SSDSS."] },
+        { id: "robot", name: "Robot", art: ["...Y...", "..SSS..", "..ESE..", "..SSS..", "BBBBBBB", "B.BBB.B", "B.BYB.B", "S.BBB.S", "..BBB..", "..B.B..", ".KK.KK."] },
+        { id: "canoe", name: "Canoe", art: ["....T....", "...YYY.T.", "...RRR.T.", "OOOOOOOOO", ".OOOOOOO.", "..OOOOO..", "LLLLLLLLL"] }
+      ],
+      big: [
+        { id: "volcano", name: "Volcano Island", art: ["...O.R.O...", "....RRR....", "....KRK....", "...KKKKK...", "..KKKRKKK..", ".KKKKKKKKK.", ".GKKKKKKKG.", "GGKKKKKKKGG", "YYYYYYYYYYY", "LLLLLLLLLLL"] },
+        { id: "lighthouse", name: "Lighthouse", art: ["....Y....", "...RRR...", "...YYY...", "..KKKKK..", "...WWW...", "...RRR...", "...WWW...", "...RRR...", "...WWW...", "..RRRRR..", "..WWWWW..", "..WWDWW..", ".GGGGGGG.", "KKKKKKKKK", "LLLLLLLLL"] },
+        { id: "dragon", name: "Dragon", art: ["........GG.", ".......GEGG", "..W....GGGO", ".WW...GG..O", "WWW..GGG...", "WWWGGGGG...", ".GGGGGGGG..", "GGGGGGGGG..", "G.GGYYYGG..", "G.GG...GG..", "..KK...KK.."] },
+        { id: "city", name: "City Skyline", art: ["......R....", "..B...S....", "..B...S...G", ".BLB..L..GG", ".BBB.SSS.GL", ".BLB.SLS.GG", "RBBB.SSSYGL", "RLBBRSLSYGG", "RRBBRSSSYGL", "KKKKKKKKKKK"] }
+      ]
+    };
+    // ===== Brick by Brick: practice game. Right answer = one brick on, wrong answer = two bricks off. No points. =====
+    const BB_KEY = "mad-facts-bricks";
+    const BB_COLORS = { R: "#e8443a", Y: "#ffcf33", B: "#3a7bd5", G: "#3cba54", W: "#f4f4f4", K: "#5a5f6b", O: "#ff8c1a", T: "#9a6232", D: "#6b3e1f", L: "#7fd3ff", S: "#a3a8b2", E: "#26262e" };
+    const BB_LEVELS = [["small", "Small"], ["medium", "Medium"], ["big", "Big"]];
+    const BB_OPS = [["mul", "\u00D7"], ["div", "\u00F7"], ["add", "+"], ["sub", "\u2212"], ["mix", "Mix"]];
+    let bbSave = (function () { try { const d = JSON.parse(localStorage.getItem(BB_KEY) || "null"); if (d && typeof d === "object") return d; } catch (e) {} return null; })() || {};
+    bbSave.done = bbSave.done || {}; bbSave.prog = bbSave.prog || {}; bbSave.op = bbSave.op || "mul"; bbSave.level = bbSave.level || "small";
+    const bb = { build: null, prob: null, lock: false, picked: null, add: -1, fall: [], at: 0, celebrate: false };
+    function bbStore() { try { localStorage.setItem(BB_KEY, JSON.stringify(bbSave)); } catch (e) {} }
+    function bbReset() { bbSave = { done: {}, prog: {}, op: "mul", level: "small" }; bb.build = null; try { localStorage.removeItem(BB_KEY); } catch (e) {} }
+    function bbStill() { return !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches); }
+    function bbBricks(b) {
+      if (b._bricks) return b._bricks;
+      const out = [], rows = b.art.length;
+      for (let r = rows - 1; r >= 0; r--) for (let c = 0; c < b.art[r].length; c++) {
+        const ch = b.art[r][c];
+        if (ch !== ".") out.push({ x: c, y: rows - 1 - r, col: BB_COLORS[ch] || "#ccc" });
+      }
+      b._bricks = out;
+      return out;
+    }
+    function bbFind(id) { for (const l in BB_BUILDS) for (const b of BB_BUILDS[l]) if (b.id === id) return b; return null; }
+    function bbShade(hex, f) {
+      const n = parseInt(hex.slice(1), 16), ch = function (v) { return Math.max(0, Math.min(255, Math.round(v * f))); };
+      return "rgb(" + ch(n >> 16) + "," + ch((n >> 8) & 255) + "," + ch(n & 255) + ")";
+    }
+    // Front face + top + right side (3D look), plus a stud on top when nothing sits above.
+    function bbSvg(b, placed, opts) {
+      opts = opts || {};
+      const bricks = bbBricks(b), U = 20, H = 16, D = 8, rows = b.art.length, cols = b.art[0].length;
+      const W = cols * U + D + 2, HT = rows * H + D + 6;
+      const filled = {};
+      bricks.forEach(function (k, i) { if (i < placed) filled[k.x + "," + k.y] = 1; });
+      let s = '<svg viewBox="0 0 ' + W + " " + HT + '" class="bb-svg" role="img" aria-label="' + b.name + '">';
+      const one = function (k, i, cls, ghost) {
+        const x = k.x * U + 1, y = HT - (k.y + 1) * H - 1;
+        const col = opts.shadow ? "#3b2f5c" : k.col;
+        const above = filled[k.x + "," + (k.y + 1)] && !ghost && !cls;
+        let g = '<g class="bb-b' + (cls ? " " + cls : "") + '" style="--i:' + (i % 2) + '">';
+        if (ghost) return '<rect x="' + (x + 1) + '" y="' + (y + 1) + '" width="' + (U - 2) + '" height="' + (H - 2) + '" rx="2" class="bb-ghost"/>';
+        g += '<path d="M' + x + " " + y + "l" + D + " " + -D + "h" + U + "l" + -D + " " + D + 'z" fill="' + bbShade(col, opts.shadow ? 1.25 : 1.18) + '"/>';
+        g += '<path d="M' + (x + U) + " " + y + "l" + D + " " + -D + "v" + H + "l" + -D + " " + D + 'z" fill="' + bbShade(col, 0.72) + '"/>';
+        g += '<rect x="' + x + '" y="' + y + '" width="' + U + '" height="' + H + '" fill="' + col + '" stroke="' + bbShade(col, 0.6) + '" stroke-width="0.8"/>';
+        if (!above) g += '<ellipse cx="' + (x + U / 2 + D / 2) + '" cy="' + (y - D / 2) + '" rx="4.6" ry="2.2" fill="' + bbShade(col, 0.85) + '"/><ellipse cx="' + (x + U / 2 + D / 2) + '" cy="' + (y - D / 2 - 1.3) + '" rx="4.6" ry="2.2" fill="' + bbShade(col, 1.3) + '"/>';
+        return g + "</g>";
+      };
+      if (!opts.shadow && !opts.full) bricks.forEach(function (k, i) { if (i >= placed) s += one(k, i, "", true); });
+      bricks.forEach(function (k, i) { if (i < placed) s += one(k, i, i === opts.add ? "bb-new" : ""); });
+      (opts.fall || []).forEach(function (i) { s += one(bricks[i], i, "bb-fall"); });
+      return s + "</svg>";
+    }
+    function bbRand(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
+    function bbProblem() {
+      let op = bbSave.op === "mix" ? ["mul", "div", "add", "sub"][bbRand(0, 3)] : bbSave.op;
+      let a, b, ans, text;
+      if (op === "mul") { a = bbRand(2, 12); b = bbRand(2, 12); ans = a * b; text = a + " \u00D7 " + b; }
+      else if (op === "div") { a = bbRand(2, 12); b = bbRand(2, 12); ans = b; text = (a * b) + " \u00F7 " + a; }
+      else if (op === "add") { a = bbRand(2, 20); b = bbRand(2, 20); ans = a + b; text = a + " + " + b; }
+      else { a = bbRand(4, 20); b = bbRand(2, a - 2); ans = a - b; text = a + " \u2212 " + b; }
+      const set = [ans], steps = op === "mul" ? [a, -a, b, -b, 1, -1, 2, 10] : [1, -1, 2, -2, 3, -3, 10, -10];
+      for (let t = 0; set.length < 4 && t < 60; t++) {
+        const v = ans + steps[bbRand(0, steps.length - 1)];
+        if (v >= 2 && set.indexOf(v) < 0) set.push(v);
+      }
+      for (let v = ans + 1; set.length < 4; v++) if (set.indexOf(v) < 0) set.push(v);
+      set.sort(function () { return Math.random() - 0.5; });
+      return { text: text, answer: ans, choices: set };
+    }
+    function bbSound(kind) {
+      if (state.muted) return;
+      try {
+        const Ctx = window.AudioContext || window.webkitAudioContext;
+        if (!Ctx) return;
+        audioCtx = audioCtx || new Ctx();
+        audioCtx.resume().catch(function () {});
+        const now = audioCtx.currentTime;
+        const notes = kind === "snap" ? [[880, 0, "square", 0.03], [1320, 0.05, "sine", 0.04]] : kind === "fall" ? [[300, 0, "triangle", 0.05], [180, 0.12, "triangle", 0.05]] : [[523, 0, "sine", 0.05], [659, 0.12, "sine", 0.05], [784, 0.24, "sine", 0.05], [1047, 0.36, "sine", 0.05]];
+        notes.forEach(function (n) {
+          const osc = audioCtx.createOscillator(), gain = audioCtx.createGain(), t = now + n[1];
+          osc.type = n[2]; osc.frequency.value = n[0];
+          gain.gain.setValueAtTime(0.0001, t);
+          gain.gain.exponentialRampToValueAtTime(n[3], t + 0.01);
+          gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.12);
+          osc.connect(gain); gain.connect(audioCtx.destination);
+          osc.start(t); osc.stop(t + 0.14);
+        });
+      } catch (_) {}
+    }
+    function bbStart(b) { bb.build = b.id; bb.prob = bbProblem(); bb.lock = false; bb.picked = null; bb.add = -1; bb.fall = []; bb.celebrate = false; render(); window.scrollTo(0, 0); }
+    function bbAnswer(choice) {
+      if (bb.lock || !bb.prob) return;
+      const b = bbFind(bb.build), total = bbBricks(b).length;
+      let n = bbSave.prog[b.id] || 0;
+      bb.picked = choice;
+      if (choice === bb.prob.answer) {
+        n = Math.min(total, n + 1);
+        bbSave.prog[b.id] = n; bb.add = n - 1; bb.fall = [];
+        bbSound("snap");
+        say("Right! " + n + " of " + total + " bricks.");
+        if (n >= total) {
+          bbSave.done[b.id] = 1; delete bbSave.prog[b.id]; bbStore();
+          bb.lock = true; bb.celebrate = true; bb.add = -1;
+          bbSound("win"); render(); bbBurst();
+          return;
+        }
+        bbStore();
+        bb.prob = bbProblem(); bb.picked = null;
+        render();
+      } else {
+        const left = Math.max(0, n - 2);
+        bb.fall = []; for (let i = left; i < n; i++) bb.fall.push(i);
+        bbSave.prog[b.id] = left; bbStore();
+        bb.add = -1; bb.lock = true;
+        if (bb.fall.length) bbSound("fall");
+        say("Not quite. " + bb.prob.text + " = " + bb.prob.answer + ".");
+        render();
+        setTimeout(function () {
+          if (!bb.lock || bb.celebrate) return;
+          bb.lock = false; bb.fall = []; bb.picked = null; bb.prob = bbProblem();
+          if (currentPage() === "bricks" && state.phase === "setup") render();
+        }, 1800);
+      }
+    }
+    function bbBurst() {
+      if (bbStill()) return;
+      const box = document.querySelector(".bb-cele-art");
+      if (!box) return;
+      const r = box.getBoundingClientRect();
+      [[0.5, 0.45], [0.2, 0.3], [0.8, 0.3]].forEach(function (pt, j) {
+        setTimeout(function () {
+          const fx = el("div", { class: "pz-fx", "aria-hidden": "true", style: "left:" + (r.left + r.width * pt[0]) + "px;top:" + (r.top + r.height * pt[1]) + "px" });
+          fx.appendChild(el("span", { class: "pz-ring gold" }));
+          const cols = ["#ff5a5a", "#ffd34e", "#5fe07a", "#5ff2ff", "#b47cff", "#ff7ab8"];
+          for (let i = 0; i < 26; i++) {
+            const a = (i / 26) * Math.PI * 2 + Math.random() * 0.4, d = 60 + Math.random() * 80;
+            const bit = el("span", { class: "pz-bit" + (i % 3 === 0 ? " star" : "") });
+            bit.style.setProperty("--x", Math.round(Math.cos(a) * d) + "px");
+            bit.style.setProperty("--y", Math.round(Math.sin(a) * d) + "px");
+            bit.style.setProperty("--r", Math.round(Math.random() * 540 - 270) + "deg");
+            bit.style.background = cols[i % cols.length];
+            fx.appendChild(bit);
+          }
+          document.body.appendChild(fx);
+          setTimeout(function () { fx.remove(); }, 1200);
+        }, j * 250);
+      });
+    }
+    function bricksCard() {
+      const card = el("div", { class: "bb-card" });
+      const b = bb.build ? bbFind(bb.build) : null;
+      if (!b) {
+        card.appendChild(el("div", { class: "bb-head" }, [
+          el("button", { type: "button", class: "bb-back", text: "\u2039 Back", onClick: function () { goPage("menu"); } }),
+          el("h2", { class: "bb-title", text: "\uD83E\uDDF1 Brick by Brick" })
+        ]));
+        card.appendChild(el("p", { class: "bb-tag", text: "Big builds happen one brick at a time." }));
+        card.appendChild(el("p", { class: "bb-label", text: "Pick your math" }));
+        const ops = el("div", { class: "bb-ops", role: "group", "aria-label": "Math" });
+        BB_OPS.forEach(function (o) {
+          ops.appendChild(el("button", { type: "button", class: "bb-op" + (bbSave.op === o[0] ? " on" : ""), "aria-pressed": bbSave.op === o[0] ? "true" : "false", text: o[1], onClick: function () { bbSave.op = o[0]; bbStore(); render(); } }));
+        });
+        card.appendChild(ops);
+        card.appendChild(el("p", { class: "bb-label", text: "Pick a size" }));
+        const lv = el("div", { class: "bb-levels", role: "group", "aria-label": "Size" });
+        BB_LEVELS.forEach(function (l) {
+          const got = BB_BUILDS[l[0]].filter(function (x) { return bbSave.done[x.id]; }).length;
+          lv.appendChild(el("button", { type: "button", class: "bb-level" + (bbSave.level === l[0] ? " on" : ""), "aria-pressed": bbSave.level === l[0] ? "true" : "false", onClick: function () { bbSave.level = l[0]; bbStore(); render(); } }, [
+            el("span", { class: "bb-lv-name", text: l[1] }), el("span", { class: "bb-lv-note", text: got + " / " + BB_BUILDS[l[0]].length + " built" })
+          ]));
+        });
+        card.appendChild(lv);
+        card.appendChild(el("p", { class: "bb-label", text: "Pick a build" }));
+        const grid = el("div", { class: "bb-shelf" });
+        BB_BUILDS[bbSave.level].forEach(function (x) {
+          const done = !!bbSave.done[x.id], n = bbSave.prog[x.id] || 0, total = bbBricks(x).length;
+          const art = el("span", { class: "bb-shelf-art", "aria-hidden": "true" });
+          art.innerHTML = bbSvg(x, total, done ? { full: true } : { shadow: true });
+          grid.appendChild(el("button", { type: "button", class: "bb-tile" + (done ? " done" : ""), "aria-label": x.name + (done ? ", built" : ""), onClick: function () { bbStart(x); } }, [
+            art,
+            done ? el("span", { class: "bb-check", "aria-hidden": "true", text: "\u2713" }) : null,
+            el("span", { class: "bb-tile-name", text: x.name }),
+            el("span", { class: "bb-tile-note", text: done ? "Built! Build again" : n ? n + " / " + total + " bricks" : total + " bricks" })
+          ].filter(Boolean)));
+        });
+        card.appendChild(grid);
+        return card;
+      }
+      const total = bbBricks(b).length, n = bbSave.prog[b.id] || 0;
+      if (bb.celebrate) {
+        const cele = el("div", { class: "bb-cele", role: "status" });
+        cele.appendChild(el("h2", { class: "bb-title", text: "You built the " + b.name + "!" }));
+        const art = el("div", { class: "bb-cele-art" });
+        art.innerHTML = bbSvg(b, total, { full: true });
+        cele.appendChild(art);
+        cele.appendChild(el("p", { class: "bb-grit", text: "You didn\u2019t quit. Look what you built!" }));
+        cele.appendChild(el("p", { class: "bb-tag", text: "It is on your shelf now." }));
+        cele.appendChild(el("button", { type: "button", class: "bb-go", text: "See my shelf", onClick: function () { bb.build = null; bb.celebrate = false; bb.lock = false; render(); window.scrollTo(0, 0); } }));
+        card.appendChild(cele);
+        return card;
+      }
+      card.appendChild(el("div", { class: "bb-head" }, [
+        el("button", { type: "button", class: "bb-back", text: "\u2039 Back", onClick: function () { bb.build = null; bb.lock = false; bb.fall = []; render(); window.scrollTo(0, 0); } }),
+        el("h2", { class: "bb-title", text: b.name })
+      ]));
+      const bar = el("div", { class: "bb-bar", role: "progressbar", "aria-valuemin": "0", "aria-valuemax": String(total), "aria-valuenow": String(n), "aria-label": "Bricks placed" });
+      bar.appendChild(el("span", { class: "bb-bar-fill", style: "width:" + Math.round(n / total * 100) + "%" }));
+      bar.appendChild(el("span", { class: "bb-bar-text", text: n + " / " + total + " bricks" }));
+      card.appendChild(bar);
+      const stage = el("div", { class: "bb-stage" + (bb.add >= 0 ? " bump" : "") });
+      stage.innerHTML = bbSvg(b, n, { add: bb.add, fall: bb.fall });
+      card.appendChild(stage);
+      bb.add = -1;
+      const p = bb.prob || (bb.prob = bbProblem());
+      const wrong = bb.lock && bb.picked !== p.answer;
+      card.appendChild(el("p", { class: "bb-q" + (wrong ? " miss" : ""), text: wrong ? p.text + " = " + p.answer : p.text + " = ?" }));
+      if (wrong) card.appendChild(el("p", { class: "bb-oops", text: bb.fall.length ? "Oops! Two bricks fell off." : "Not quite. Keep going!" }));
+      const answers = el("div", { class: "answers bb-answers", role: "group", "aria-label": "Answers" });
+      p.choices.forEach(function (c) {
+        const cls = bb.lock ? (c === p.answer ? "right" : c === bb.picked ? "wrong" : "") : "";
+        answers.appendChild(el("button", { type: "button", class: cls, onClick: function () { bbAnswer(c); } }, [el("span", { text: String(c) })]));
+      });
+      card.appendChild(answers);
+      return card;
+    }
     // Reset picker: Game, Avatar, or Both. Leaderboard points are never touched.
     const AV_RESET_KEY = "mad-facts-av-reset";
     function resetAvatar() {
@@ -9642,7 +9948,7 @@
         }
       }
       const WHAT = {
-        game: { title: "Reset Game?", text: "Your beats, mini games, and unlocked games will lock again. Your points stay." },
+        game: { title: "Reset Game?", text: "Your beats, mini games, unlocked games, and brick builds will be reset. Your points stay." },
         avatar: { title: "Reset Avatar?", text: "Your avatar, clothes, and prizes will be gone. You will make a new one. Your points stay." },
         both: { title: "Reset Both?", text: "Your game and your avatar start over. Beats, unlocks, clothes, and prizes will be gone. Your points stay." }
       };
@@ -9698,7 +10004,7 @@
       function doReset(kind) {
         const withAvatar = kind === "avatar" || kind === "both";
         const go = function (fast) {
-          if (kind === "game" || kind === "both") resetMusicChallenge();
+          if (kind === "game" || kind === "both") { resetMusicChallenge(); bbReset(); }
           state.heroPick = false;
           done(withAvatar && !fast ? "Your new avatar may take a moment to show everywhere." : "",
             function () { if (withAvatar) goPage("closet"); else goPage("menu"); window.scrollTo(0, 0); });
