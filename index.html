@@ -8256,11 +8256,11 @@
         const pick = el("div", { class: "mode-pick", role: "group", "aria-label": "Choose a challenge" });
         pick.appendChild(el("button", { class: "start mode-btn mode-timed", type: "button", onClick: function () { startQuiz("timed"); } }, [
           el("span", { class: "mode-name", text: QUIZ_SECONDS + " Seconds" }),
-          el("span", { class: "mode-note", text: state.quizBest ? "Best " + state.quizBest + " right" : "Answer as many as you can" })
+          el("span", { class: "mode-note", text: "Answer as many as you can" })
         ]));
         pick.appendChild(el("button", { class: "start mode-btn mode-all", type: "button", onClick: function () { startQuiz("all"); } }, [
           el("span", { class: "mode-name", text: "All Facts" }),
-          el("span", { class: "mode-note", text: state.quizBestAllMs ? "Fastest " + formatClock(state.quizBestAllMs) : "Every fact once, against the clock" })
+          el("span", { class: "mode-note", text: "Every fact once, against the clock" })
         ]));
         hero.appendChild(pick);
         hero.appendChild(el("button", { class: "mode-cancel", type: "button", text: "Cancel", onClick: function () { state.heroPick = false; render(); } }));
@@ -9282,11 +9282,11 @@
         const pick = el("div", { class: "mode-pick", role: "group", "aria-label": "Choose a challenge" });
         pick.appendChild(el("button", { class: "start mode-btn mode-timed", type: "button", onClick: function () { startQuiz("timed"); } }, [
           el("span", { class: "mode-name", text: QUIZ_SECONDS + " Seconds" }),
-          el("span", { class: "mode-note", text: state.quizBest ? "Best " + state.quizBest + " right" : "Answer as many as you can" })
+          el("span", { class: "mode-note", text: "Answer as many as you can" })
         ]));
         pick.appendChild(el("button", { class: "start mode-btn mode-all", type: "button", onClick: function () { startQuiz("all"); } }, [
           el("span", { class: "mode-name", text: "All Facts" }),
-          el("span", { class: "mode-note", text: state.quizBestAllMs ? "Fastest " + formatClock(state.quizBestAllMs) : "Every fact once, against the clock" })
+          el("span", { class: "mode-note", text: "Every fact once, against the clock" })
         ]));
         timed.appendChild(pick);
         timed.appendChild(el("button", { class: "mode-cancel", type: "button", text: "Cancel", onClick: function () { state.heroPick = false; render(); } }));
