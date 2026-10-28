@@ -3223,6 +3223,23 @@
       .bb-bar-fill { transition: none; }
     }
     @keyframes bbFade { from { opacity: 1; } to { opacity: 0; } }
+    /* ===== Brick by Brick 3D shelf ===== */
+    .bb-myshelf { min-height: 3.6rem; border-radius: 1.1rem; border: 2px solid #fff6dc; background: linear-gradient(135deg, #ffe39a 0%, #f0b545 100%); color: #3a2400; font: 700 1.25rem/1 var(--ui-font); cursor: pointer; box-shadow: 0 3px 0 rgba(0,0,0,0.22), 0 8px 18px rgba(10,4,30,0.28); }
+    .bb-myshelf .n { font-weight: 600; font-size: 0.95rem; opacity: 0.8; margin-left: 0.4rem; }
+    .bb3-host { position: relative; min-height: 14rem; border-radius: 1.1rem; overflow: hidden; background: radial-gradient(ellipse at 50% 30%, #3b2a5e, #1a1030 75%); border: 1px solid rgba(255,255,255,0.18); }
+    .bb3-canvas { display: block; width: 100%; touch-action: pan-y; cursor: pointer; }
+    .bb3-loading { margin: 0; padding: 5.5rem 1rem; text-align: center; font: 600 1.05rem/1.3 var(--ui-font); color: #fff7ea; }
+    .bb3-host .bb3-flat { padding: 0.6rem; }
+    .bb3-list { display: flex; flex-direction: column; gap: 0.35rem; }
+    .bb3-row { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+    .bb3-chip { min-height: 2.6rem; padding: 0 0.85rem; border-radius: 999px; border: 2px solid rgba(255,255,255,0.25); background: #1d1736; color: rgba(255,255,255,0.55); font: 700 0.95rem/1 var(--ui-font); }
+    .bb3-chip.done { border-color: #5fe07a; background: #1f3a2c; color: #fff; cursor: pointer; }
+    .bb3-hint { margin: 0; text-align: center; font: 600 1rem/1.3 var(--ui-font); color: #fff7ea; text-shadow: 0 1px 3px rgba(0,0,0,0.7); }
+    .bb3-pop { position: fixed; inset: 0; z-index: 10000; display: flex; flex-direction: column; align-items: center; gap: 0.6rem; padding: max(1rem, env(safe-area-inset-top)) 1rem max(1rem, env(safe-area-inset-bottom));
+      background: radial-gradient(ellipse at 50% 40%, #3e2c66 0%, #160c2b 80%); color: #fff; }
+    .bb3-pop-title { flex: 0 0 auto; text-align: center; }
+    .bb3-pop-canvas { flex: 1 1 auto; width: 100%; max-width: 44rem; min-height: 0; touch-action: none; display: block; }
+    .bb3-close { flex: 0 0 auto; min-width: 10rem; }
     /* ===== Leaderboard compact header ===== */
     body[data-page="leaders"] header h1, body[data-page="leaders"] .page-head { display: none; }
     body[data-page="leaders"] .lb-card { padding-top: 0.6rem; gap: 0.6rem; }
@@ -7932,6 +7949,7 @@
     }
     function render() {
       cleanMathTables();
+      bb3Leave();
       applyUnlockedBackground();
       const app = document.getElementById("app");
       const muteBtn = document.getElementById("mute");
@@ -9304,7 +9322,7 @@
           el("span", { class: "hb-label", text: "Leaderboard" }),
           el("span", { class: "hb-go", "aria-hidden": "true", text: "\u203A" })
         ]));
-        fcRow.appendChild(el("button", { type: "button", class: "menu-lb home-bb", onClick: function () { bb.build = null; bb.celebrate = false; bb.lock = false; goPage("bricks"); } }, [
+        fcRow.appendChild(el("button", { type: "button", class: "menu-lb home-bb", onClick: function () { bb.build = null; bb.celebrate = false; bb.lock = false; bb.shelf = false; goPage("bricks"); } }, [
           el("span", { class: "menu-lb-ico", "aria-hidden": "true", text: "\uD83E\uDDF1" }),
           el("span", { class: "hb-label", text: "Brick by Brick" }),
           el("span", { class: "hb-go", "aria-hidden": "true", text: "\u203A" })
@@ -9839,6 +9857,8 @@
     }
     function bricksCard() {
       const card = el("div", { class: "bb-card" });
+      if (bb.shelf) return shelfCard(card);
+      if (BB3.host) bb3CloseAll();
       const b = bb.build ? bbFind(bb.build) : null;
       if (!b) {
         card.appendChild(el("div", { class: "bb-head" }, [
@@ -9846,6 +9866,9 @@
           el("h2", { class: "bb-title", text: "\uD83E\uDDF1 Brick by Brick" })
         ]));
         card.appendChild(el("p", { class: "bb-tag", text: "Big builds happen one brick at a time." }));
+        card.appendChild(el("button", { type: "button", class: "bb-myshelf", onClick: function () { bb.shelf = true; render(); window.scrollTo(0, 0); } }, [
+          document.createTextNode("\uD83C\uDFC6 My Shelf"), el("span", { class: "n", text: bb3Count() + " / 12 built" })
+        ]));
         card.appendChild(el("p", { class: "bb-label", text: "Pick your math" }));
         const ops = el("div", { class: "bb-ops", role: "group", "aria-label": "Math" });
         BB_OPS.forEach(function (o) {
@@ -9886,7 +9909,7 @@
         cele.appendChild(art);
         cele.appendChild(el("p", { class: "bb-grit", text: "You didn\u2019t quit. Look what you built!" }));
         cele.appendChild(el("p", { class: "bb-tag", text: "It is on your shelf now." }));
-        cele.appendChild(el("button", { type: "button", class: "bb-go", text: "See my shelf", onClick: function () { bb.build = null; bb.celebrate = false; bb.lock = false; render(); window.scrollTo(0, 0); } }));
+        cele.appendChild(el("button", { type: "button", class: "bb-go", text: "See my shelf", onClick: function () { bb.build = null; bb.celebrate = false; bb.lock = false; bb.shelf = true; render(); window.scrollTo(0, 0); } }));
         card.appendChild(cele);
         return card;
       }
@@ -9912,6 +9935,247 @@
         answers.appendChild(el("button", { type: "button", class: cls, onClick: function () { bbAnswer(c); } }, [el("span", { text: String(c) })]));
       });
       card.appendChild(answers);
+      return card;
+    }
+    // ===== Brick by Brick 3D shelf: three.js is loaded only when the shelf opens. Flat pictures if WebGL is missing. =====
+    const BB3 = { T: null, Orbit: null, loading: null, failed: false, host: null, shelf: null, pop: null };
+    function bb3Url(f) { try { return new URL("assets/vendor/three/" + f, document.baseURI).href; } catch (e) { return "assets/vendor/three/" + f; } }
+    function bb3HasGL() {
+      try { const c = document.createElement("canvas"); return !!(window.WebGLRenderingContext && (c.getContext("webgl2") || c.getContext("webgl"))); } catch (e) { return false; }
+    }
+    function bb3Load() {
+      if (!BB3.loading) {
+        const t0 = performance.now();
+        BB3.loading = Promise.all([import(bb3Url("three.module.min.js")), import(bb3Url("OrbitControls.js"))]).then(function (m) {
+          BB3.T = m[0]; BB3.Orbit = m[1].OrbitControls; BB3.loadMs = Math.round(performance.now() - t0); return BB3;
+        }).catch(function (e) { BB3.failed = true; throw e; });
+      }
+      return BB3.loading;
+    }
+    function bb3AllBuilds() { const out = []; BB_LEVELS.forEach(function (l) { BB_BUILDS[l[0]].forEach(function (b) { out.push(b); }); }); return out; }
+    function bb3Count() { return bb3AllBuilds().filter(function (b) { return bbSave.done[b.id]; }).length; }
+    // One build as two instanced meshes (brick bodies + studs). Bricks are 1 wide, 0.8 tall, 1.6 deep with 2 studs.
+    function bb3Model(T, b, ghost) {
+      const BH = 0.8, BD = 1.6;
+      if (!BB3.geo) {
+        BB3.geo = { body: new T.BoxGeometry(0.96, BH * 0.97, BD * 0.97), stud: new T.CylinderGeometry(0.26, 0.26, 0.18, 14) };
+        BB3.mat = { plastic: new T.MeshStandardMaterial({ roughness: 0.32, metalness: 0.0 }),
+          ghost: new T.MeshStandardMaterial({ color: 0x9c8fd0, roughness: 0.9, transparent: true, opacity: 0.16, depthWrite: false }) };
+      }
+      const bricks = bbBricks(b), rows = b.art.length, cols = b.art[0].length;
+      const filled = {}; bricks.forEach(function (k) { filled[k.x + "," + k.y] = 1; });
+      const tops = bricks.filter(function (k) { return !filled[k.x + "," + (k.y + 1)]; });
+      const g = new T.Group();
+      const mat = ghost ? BB3.mat.ghost : BB3.mat.plastic;
+      const body = new T.InstancedMesh(BB3.geo.body, mat, bricks.length);
+      const stud = ghost ? null : new T.InstancedMesh(BB3.geo.stud, mat, tops.length * 2);
+      const m = new T.Matrix4(), c = new T.Color();
+      const ox = (cols - 1) / 2;
+      bricks.forEach(function (k, i) {
+        m.makeTranslation(k.x - ox, k.y * BH + BH / 2, 0);
+        body.setMatrixAt(i, m);
+        if (!ghost) body.setColorAt(i, c.set(k.col));
+      });
+      if (stud) tops.forEach(function (k, i) {
+        [-0.4, 0.4].forEach(function (z, j) {
+          m.makeTranslation(k.x - ox, (k.y + 1) * BH + 0.09, z);
+          stud.setMatrixAt(i * 2 + j, m);
+          stud.setColorAt(i * 2 + j, c.set(k.col));
+        });
+      });
+      [body, stud].forEach(function (mesh) { if (!mesh) return; mesh.castShadow = !ghost; mesh.receiveShadow = !ghost; mesh.userData.build = b.id; g.add(mesh); });
+      g.userData = { w: cols, h: rows * BH + 0.2, build: b.id };
+      return g;
+    }
+    function bb3Wood(T) {
+      const cv = document.createElement("canvas"); cv.width = 256; cv.height = 64;
+      const x = cv.getContext("2d");
+      x.fillStyle = "#b07a45"; x.fillRect(0, 0, 256, 64);
+      for (let i = 0; i < 40; i++) { x.strokeStyle = "rgba(90,50,20," + (0.08 + Math.random() * 0.12) + ")"; x.lineWidth = 1 + Math.random() * 2; x.beginPath(); const y = Math.random() * 64; x.moveTo(0, y); x.bezierCurveTo(80, y + 6 * Math.random() - 3, 170, y + 6 * Math.random() - 3, 256, y); x.stroke(); }
+      const t = new T.CanvasTexture(cv); t.wrapS = t.wrapT = T.RepeatWrapping; t.colorSpace = T.SRGBColorSpace;
+      return t;
+    }
+    function bb3Lights(T, scene, size) {
+      scene.add(new T.HemisphereLight(0xfff4e6, 0x3a2a55, 1.2));
+      const sun = new T.DirectionalLight(0xffffff, 1.8);
+      sun.position.set(size * 0.6, size * 1.2, size * 1.4);
+      sun.castShadow = true;
+      sun.shadow.mapSize.set(1024, 1024);
+      sun.shadow.radius = 4;
+      const sc = sun.shadow.camera; sc.left = -size; sc.right = size; sc.top = size; sc.bottom = -size; sc.near = 0.5; sc.far = size * 5;
+      scene.add(sun);
+      return sun;
+    }
+    function bb3Renderer(T, canvas) {
+      const r = new T.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true, powerPreference: "low-power" });
+      r.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      r.shadowMap.enabled = true; r.shadowMap.type = T.PCFSoftShadowMap;
+      r.outputColorSpace = T.SRGBColorSpace;
+      return r;
+    }
+    // Loop that only runs while the canvas is on screen and the tab is visible.
+    function bb3Loop(st, frame) {
+      st.visible = true;
+      const tick = function (t) { st.raf = 0; if (!st.alive) return; if (st.visible && !document.hidden) frame(t); if (st.anim) st.raf = requestAnimationFrame(tick); };
+      st.kick = function () { if (!st.raf && st.alive) st.raf = requestAnimationFrame(tick); };
+      if ("IntersectionObserver" in window) { st.io = new IntersectionObserver(function (e) { st.visible = e[0].isIntersecting; if (st.visible) st.kick(); }); st.io.observe(st.canvas); }
+      st.onVis = function () { if (!document.hidden) st.kick(); };
+      document.addEventListener("visibilitychange", st.onVis);
+      st.kick();
+    }
+    function bb3Stop(st) { if (!st) return; st.alive = false; if (st.raf) cancelAnimationFrame(st.raf); if (st.io) st.io.disconnect(); document.removeEventListener("visibilitychange", st.onVis); if (st.controls) st.controls.dispose(); if (st.r) { st.r.dispose(); st.r.forceContextLoss(); } }
+    function bb3Shelf(host) {
+      const T = BB3.T, still = bbStill();
+      const canvas = el("canvas", { class: "bb3-canvas", "aria-label": "Your shelf of builds", role: "img" });
+      host.replaceChildren(canvas);
+      const st = { canvas: canvas, alive: true, anim: !still };
+      const r = st.r = bb3Renderer(T, canvas);
+      const scene = new T.Scene();
+      const COLS = 4, SW = 3.4, RH = 3.6, W = COLS * SW, H = 3 * RH;
+      const wood = bb3Wood(T);
+      const woodMat = new T.MeshStandardMaterial({ map: wood, roughness: 0.75 });
+      const backMat = new T.MeshStandardMaterial({ color: 0x5a3a24, roughness: 0.9 });
+      const back = new T.Mesh(new T.BoxGeometry(W + 0.6, H + 0.6, 0.3), backMat); back.position.set(0, H / 2, -1.4); back.receiveShadow = true; scene.add(back);
+      [-1, 1].forEach(function (s) { const p = new T.Mesh(new T.BoxGeometry(0.4, H + 0.6, 3), woodMat); p.position.set(s * (W / 2 + 0.2), H / 2, 0); p.castShadow = p.receiveShadow = true; scene.add(p); });
+      for (let i = 0; i <= 3; i++) { const bd = new T.Mesh(new T.BoxGeometry(W + 0.8, 0.3, 3), woodMat); bd.position.set(0, i * RH - 0.15, 0); bd.castShadow = bd.receiveShadow = true; scene.add(bd); }
+      const models = [];
+      bb3AllBuilds().forEach(function (b, idx) {
+        const row = 2 - Math.floor(idx / COLS), col = idx % COLS, done = !!bbSave.done[b.id];
+        const g = bb3Model(T, b, !done);
+        const s = Math.min((SW - 0.7) / g.userData.w, (RH - 0.7) / g.userData.h);
+        g.scale.setScalar(s);
+        g.position.set((col - (COLS - 1) / 2) * SW, row * RH, 0);
+        g.userData.base = g.rotation.y = done ? -0.35 : 0;
+        g.userData.done = done; g.userData.phase = idx;
+        scene.add(g); models.push(g);
+      });
+      bb3Lights(T, scene, W);
+      const cam = new T.PerspectiveCamera(30, 1, 0.5, 200);
+      function size() {
+        const w = host.clientWidth || 340, h = Math.round(w * (H + 1.2) / (W + 1.6));
+        r.setSize(w, h, true);
+        cam.aspect = w / h;
+        const d = ((W + 1.6) / 2) / Math.tan(T.MathUtils.degToRad(cam.fov / 2)) / cam.aspect;
+        cam.position.set(0, H / 2 + 1.2, d + 1.5); cam.lookAt(0, H / 2 - 0.1, 0); cam.updateProjectionMatrix();
+        if (!st.anim) frame(0);
+      }
+      function frame(t) {
+        if (st.anim) models.forEach(function (g) { if (g.userData.done) g.rotation.y = g.userData.base + Math.sin(t / 1400 + g.userData.phase) * 0.4; });
+        r.render(scene, cam);
+        st.frames = (st.frames || 0) + 1;
+      }
+      st.frame = frame;
+      size();
+      st.onResize = function () { if (st.alive) size(); };
+      window.addEventListener("resize", st.onResize);
+      // Tap a finished build to pop it up big.
+      const ray = new T.Raycaster(), v = new T.Vector2();
+      let down = null;
+      canvas.addEventListener("pointerdown", function (e) { down = [e.clientX, e.clientY]; });
+      canvas.addEventListener("pointerup", function (e) {
+        if (!down || Math.hypot(e.clientX - down[0], e.clientY - down[1]) > 10) return;
+        const rc = canvas.getBoundingClientRect();
+        v.set((e.clientX - rc.left) / rc.width * 2 - 1, -((e.clientY - rc.top) / rc.height) * 2 + 1);
+        ray.setFromCamera(v, cam);
+        const hit = ray.intersectObjects(models.filter(function (g) { return g.userData.done; }), true)[0];
+        if (hit) bb3Pop(bbFind(hit.object.userData.build));
+      });
+      bb3Loop(st, frame);
+      if (!st.anim) frame(0);
+      return st;
+    }
+    function bb3Pop(b) {
+      if (!b || !BB3.T || BB3.pop) return;
+      const T = BB3.T, still = bbStill();
+      const canvas = el("canvas", { class: "bb3-pop-canvas", "aria-label": b.name + " in 3D. Drag to spin." });
+      const close = el("button", { type: "button", class: "bb-go bb3-close", text: "Close" });
+      const ov = el("div", { class: "bb3-pop", role: "dialog", "aria-modal": "true", "aria-label": b.name }, [
+        el("h2", { class: "bb-title bb3-pop-title", text: b.name }), canvas,
+        el("p", { class: "bb3-hint", text: "Drag to spin. Pinch to zoom." }), close
+      ]);
+      document.body.appendChild(ov);
+      const st = BB3.pop = { canvas: canvas, alive: true, anim: true };
+      const r = st.r = bb3Renderer(T, canvas);
+      const scene = new T.Scene();
+      const g = bb3Model(T, b, false);
+      const s = 6 / Math.max(g.userData.w, g.userData.h);
+      g.scale.setScalar(s); scene.add(g);
+      const ground = new T.Mesh(new T.CircleGeometry(5.5, 40), new T.ShadowMaterial({ opacity: 0.35 }));
+      ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; scene.add(ground);
+      const disc = new T.Mesh(new T.CylinderGeometry(4.6, 4.8, 0.3, 40), new T.MeshStandardMaterial({ map: bb3Wood(T), roughness: 0.7 }));
+      disc.position.y = -0.16; disc.receiveShadow = true; scene.add(disc);
+      bb3Lights(T, scene, 8);
+      const cam = new T.PerspectiveCamera(35, 1, 0.3, 100);
+      const midY = g.userData.h * s / 2;
+      cam.position.set(6, midY + 4, 12);
+      const ctl = st.controls = new BB3.Orbit(cam, canvas);
+      ctl.target.set(0, midY, 0);
+      ctl.enablePan = false; ctl.enableDamping = true; ctl.dampingFactor = 0.08;
+      ctl.minPolarAngle = 0.15; ctl.maxPolarAngle = Math.PI / 2 - 0.05;
+      ctl.autoRotate = !still; ctl.autoRotateSpeed = 1.6;
+      ctl.addEventListener("start", function () { ctl.autoRotate = false; });
+      ctl.update();
+      function size() {
+        const w = canvas.clientWidth || 340, h = canvas.clientHeight || 340; r.setSize(w, h, false); cam.aspect = w / h; cam.updateProjectionMatrix();
+        // Fit the whole build (about 6 units across) in the narrower side.
+        const d = 4.4 / Math.tan(T.MathUtils.degToRad(cam.fov / 2)) / Math.min(1, cam.aspect);
+        ctl.minDistance = d * 0.45; ctl.maxDistance = d * 1.5;
+        if (!st.fitted) { st.fitted = true; const dir = new T.Vector3(0.45, 0.35, 1).normalize(); cam.position.copy(ctl.target).addScaledVector(dir, d); ctl.update(); }
+      }
+      size();
+      st.onResize = size; window.addEventListener("resize", size);
+      bb3Loop(st, function () { ctl.update(); r.render(scene, cam); st.frames = (st.frames || 0) + 1; });
+      window.__bb3pop = { controls: ctl, state: st };
+      function shut() { bb3Stop(st); window.removeEventListener("resize", size); ov.remove(); BB3.pop = null; window.__bb3pop = null; document.removeEventListener("keydown", onKey, true); }
+      function onKey(e) { if (e.key === "Escape") { e.preventDefault(); shut(); } }
+      close.addEventListener("click", shut);
+      document.addEventListener("keydown", onKey, true);
+      close.focus({ preventScroll: true });
+    }
+    function bb3Leave() { try { if (BB3.host && (state.phase !== "setup" || currentPage() !== "bricks")) { bb3CloseAll(); bb.shelf = false; } } catch (e) {} }
+    function bb3CloseAll() {
+      if (BB3.shelf) { bb3Stop(BB3.shelf); window.removeEventListener("resize", BB3.shelf.onResize); BB3.shelf = null; }
+      BB3.host = null;
+      if (BB3.pop) { const ov = document.querySelector(".bb3-pop"); bb3Stop(BB3.pop); if (ov) ov.remove(); BB3.pop = null; }
+    }
+    function bb3Flat(host) {
+      const grid = el("div", { class: "bb-shelf bb3-flat" });
+      bb3AllBuilds().forEach(function (x) {
+        const done = !!bbSave.done[x.id];
+        const art = el("span", { class: "bb-shelf-art", "aria-hidden": "true" });
+        art.innerHTML = bbSvg(x, bbBricks(x).length, done ? { full: true } : { shadow: true });
+        grid.appendChild(el("div", { class: "bb-tile" + (done ? " done" : "") }, [art, el("span", { class: "bb-tile-name", text: x.name })]));
+      });
+      host.replaceChildren(grid);
+    }
+    function shelfCard(card) {
+      card.appendChild(el("div", { class: "bb-head" }, [
+        el("button", { type: "button", class: "bb-back", text: "\u2039 Back", onClick: function () { bb3CloseAll(); bb.shelf = false; render(); window.scrollTo(0, 0); } }),
+        el("h2", { class: "bb-title", text: "\uD83C\uDFC6 My Shelf" })
+      ]));
+      card.appendChild(el("p", { class: "bb-tag bb3-count", text: bb3Count() + " / 12 built" }));
+      if (!BB3.host) {
+        BB3.host = el("div", { class: "bb3-host" }, [el("p", { class: "bb3-loading", text: "Loading your shelf\u2026" })]);
+        const host = BB3.host;
+        if (!bb3HasGL()) bb3Flat(host);
+        else bb3Load().then(function () { if (BB3.host === host) BB3.shelf = bb3Shelf(host); }).catch(function () { if (BB3.host === host) bb3Flat(host); });
+      }
+      card.appendChild(BB3.host);
+      const list = el("div", { class: "bb3-list" });
+      BB_LEVELS.forEach(function (l) {
+        list.appendChild(el("p", { class: "bb-label", text: l[1] }));
+        const row = el("div", { class: "bb3-row" });
+        BB_BUILDS[l[0]].forEach(function (b) {
+          const done = !!bbSave.done[b.id];
+          const chip = el("button", { type: "button", class: "bb3-chip" + (done ? " done" : ""),
+            text: (done ? "\u2713 " : "") + b.name, onClick: function () { if (BB3.T && BB3.shelf) bb3Pop(b); } });
+          if (!done) chip.disabled = true;
+          row.appendChild(chip);
+        });
+        list.appendChild(row);
+      });
+      card.appendChild(list);
+      card.appendChild(el("p", { class: "bb3-hint", text: bb3Count() ? "Tap a build to see it up close." : "Finish a build to put it on your shelf." }));
       return card;
     }
     // Reset picker: Game, Avatar, or Both. Leaderboard points are never touched.
