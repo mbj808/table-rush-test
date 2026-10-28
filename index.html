@@ -1396,6 +1396,18 @@
       color: #fff7ea; text-shadow: 0 1px 3px rgba(0,0,0,0.8);
     }
     body.has-boombox main { padding-bottom: calc(clamp(10px, 3.05vw, 15px) * 12.5); }
+    /* Phones, game screen: a slim beat bar instead of the full boom box. */
+    @media (max-width: 600px) {
+      body.play-screen .boombox:not(.home-box) { width: auto; height: auto; display: flex; align-items: center; padding: 6px 8px; gap: 0; border-radius: 16px; }
+      body.play-screen .boombox:not(.home-box) .bb-spk, body.play-screen .boombox:not(.home-box) .bb-handle,
+      body.play-screen .boombox:not(.home-box) .bb-top, body.play-screen .boombox:not(.home-box) .bb-deck { display: none; }
+      body.play-screen .boombox:not(.home-box) .bb-mid { display: flex; flex-direction: row; height: auto; align-items: center; gap: 8px; margin: 0; }
+      body.play-screen .boombox:not(.home-box) .bb-lcd { width: 8.5rem; height: 40px; margin: 0; box-sizing: border-box; }
+      body.play-screen .boombox:not(.home-box) .bb-name { font-size: 0.9rem; }
+      body.play-screen .boombox:not(.home-box) .bb-keys { display: flex; gap: 6px; margin: 0; height: auto; }
+      body.play-screen .boombox:not(.home-box) button.bb-key { flex: 0 0 auto; width: 44px; height: 42px; }
+      body.play-screen.has-boombox main { padding-bottom: 72px; }
+    }
     a.maze-reward {
       display: flex;
       align-items: center;
