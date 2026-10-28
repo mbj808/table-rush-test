@@ -9696,20 +9696,20 @@
       small: [
         { id: "house", name: "House", art: ["..R..", ".RRR.", "RRRRR", "YLYLY", "YYDYY"] },
         { id: "car", name: "Car", art: ["..BBB..", ".BLBLB.", "YBBBBBR", "BBBBBBB", ".K...K."] },
-        { id: "tree", name: "Tree", art: ["..G..", ".GGG.", "GGGGG", "GGGGG", ".GGG.", "..T..", "..T.."] },
+        { id: "tree", name: "Tree", art: ["..GGG..", ".GGRGGG", "GRGGGGG", "GGGGGRG", ".GGGGG.", "..TTT..", "..TTT.."] },
         { id: "boat", name: "Boat", art: ["...W...", "..WW...", ".WWW...", "...T...", "RRRRRRR", ".RRRRR."] }
       ],
       medium: [
-        { id: "rocket", name: "Rocket", art: ["..R..", ".RRR.", ".WWW.", ".WLW.", ".WWW.", ".WWW.", ".WLW.", ".WWW.", "RWWWR", "RWWWR", "RYOYR"] },
-        { id: "tower", name: "Castle Tower", art: ["...R...", "...T...", "S.S.S.S", "SSSSSSS", ".SSSSS.", ".SSLSS.", ".SSSSS.", ".SSSSS.", ".SSDSS."] },
+        { id: "turtle", name: "Sea Turtle", art: ["...TTTTT....", "..TDTTTDT.GG", ".TTTDTDTTTGE", "GTTTTTTTTTGG", ".GG.....GG..", "LLLLLLLLLLLL"] },
+        { id: "tower", name: "Castle Tower", art: ["...R.....", "...T.....", "S.S.S.S.S", "SSSSSSSSS", "SSSSLSSSS", "SSSSSSSSS", "SSSSDSSSS"] },
         { id: "robot", name: "Robot", art: ["...Y...", "..SSS..", "..ESE..", "..SSS..", "BBBBBBB", "B.BBB.B", "B.BYB.B", "S.BBB.S", "..BBB..", "..B.B..", ".KK.KK."] },
         { id: "canoe", name: "Canoe", art: ["....T....", "...YYY.T.", "...RRR.T.", "OOOOOOOOO", ".OOOOOOO.", "..OOOOO..", "LLLLLLLLL"] }
       ],
       big: [
         { id: "volcano", name: "Volcano Island", art: ["...O.R.O...", "....RRR....", "....KRK....", "...KKKKK...", "..KKKRKKK..", ".KKKKKKKKK.", ".GKKKKKKKG.", "GGKKKKKKKGG", "YYYYYYYYYYY", "LLLLLLLLLLL"] },
-        { id: "lighthouse", name: "Lighthouse", art: ["....Y....", "...RRR...", "...YYY...", "..KKKKK..", "...WWW...", "...RRR...", "...WWW...", "...RRR...", "...WWW...", "..RRRRR..", "..WWWWW..", "..WWDWW..", ".GGGGGGG.", "KKKKKKKKK", "LLLLLLLLL"] },
+        { id: "pirate", name: "Pirate Ship", art: ["...KK....KK..", "...T.....T...", "..WWW...WWW..", ".WWWWW.WWWWW.", "D..T.....T..D", "DDDDDDDDDDDDD", ".DYDDYDDYDDD.", "..DDDDDDDDD..", "LLLLLLLLLLLLL"] },
         { id: "dragon", name: "Dragon", art: ["........GG.", ".......GEGG", "..W....GGGO", ".WW...GG..O", "WWW..GGG...", "WWWGGGGG...", ".GGGGGGGG..", "GGGGGGGGG..", "G.GGYYYGG..", "G.GG...GG..", "..KK...KK.."] },
-        { id: "city", name: "City Skyline", art: ["......R....", "..B...S....", "..B...S...G", ".BLB..L..GG", ".BBB.SSS.GL", ".BLB.SLS.GG", "RBBB.SSSYGL", "RLBBRSLSYGG", "RRBBRSSSYGL", "KKKKKKKKKKK"] }
+        { id: "city", name: "City Skyline", art: ["..........G", ".BLB..L..GG", ".BBB.SSS.GL", ".BLB.SLS.GG", "RBBB.SSSYGL", "RLBBRSLSYGG", "RRBBRSSSYGL", "KKKKKKKKKKK"] }
       ]
     };
     // ===== Brick by Brick: practice game. Right answer = one brick on, wrong answer = two bricks off. No points. =====
@@ -9718,7 +9718,7 @@
     const BB_LEVELS = [["small", "Small"], ["medium", "Medium"], ["big", "Big"]];
     const BB_OPS = [["mul", "\u00D7"], ["div", "\u00F7"], ["add", "+"], ["sub", "\u2212"], ["mix", "Mix"]];
     let bbSave = (function () { try { const d = JSON.parse(localStorage.getItem(BB_KEY) || "null"); if (d && typeof d === "object") return d; } catch (e) {} return null; })() || {};
-    bbSave.done = bbSave.done || {}; bbSave.prog = bbSave.prog || {}; bbSave.op = bbSave.op || "mul"; bbSave.level = bbSave.level || "small"; bbSave.grade = bbSave.grade || 3;
+    bbSave.done = bbSave.done || {}; bbSave.prog = bbSave.prog || {}; ["done", "prog"].forEach(function (k) { if (typeof bbSave[k] !== "object" || !bbSave[k]) bbSave[k] = {}; Object.keys(bbSave[k]).forEach(function (id) { if (!bbFind(id)) delete bbSave[k][id]; }); }); bbSave.op = bbSave.op || "mul"; bbSave.level = bbSave.level || "small"; bbSave.grade = bbSave.grade || 3;
     const bb = { build: null, prob: null, lock: false, picked: null, add: -1, fall: [], at: 0, celebrate: false };
     function bbStore() { try { localStorage.setItem(BB_KEY, JSON.stringify(bbSave)); } catch (e) {} }
     function bbReset() { bbSave = { done: {}, prog: {}, op: "mul", level: "small", grade: bbSave.grade || 3 }; bb.build = null; try { localStorage.removeItem(BB_KEY); } catch (e) {} }
