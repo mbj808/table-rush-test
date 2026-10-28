@@ -6923,6 +6923,7 @@
       if (!mine.length || Math.random() >= 0.3) return null;
       return mine[Math.floor(Math.random() * mine.length)];
     }
+    const factBag = {};
     function makeProblem(avoid) {
       if (isMultiples()) return buildMultiplesProblem();
       if (isRounding()) {
@@ -6996,20 +6997,16 @@
       cleanMathTables();
       const pickable = state.tables.filter(function (n) { return n >= MIN_OPERAND; });
       const tables = pickable.length ? pickable : (isAdd() || isSubtract() ? defaultAddTables() : defaultMathTables());
-      let a = tables[Math.floor(Math.random() * tables.length)];
-      let b;
-      if (isAdd() || isSubtract()) {
-        const maxB = Math.max.apply(null, tables.concat([0]));
-        const poolB = [];
-        for (let n = 0; n <= Math.max(maxB, 12); n++) poolB.push(n);
-        // Prefer second addend also from selected set when possible
-        const fromTables = tables.slice();
-        b = fromTables.length
-          ? fromTables[Math.floor(Math.random() * fromTables.length)]
-          : poolB[Math.floor(Math.random() * poolB.length)];
-      } else {
-        b = MIN_OPERAND + Math.floor(Math.random() * (13 - MIN_OPERAND));
-      }
+      // Picked number x pairs with every number 2..12 (shuffled bag per pick, so all facts come up).
+      // + and x: x can be first or second. - : (x+n) - x or (x+n) - n. / : (x*n) / x.
+      const pickFact = function () {
+        const x = tables[Math.floor(Math.random() * tables.length)];
+        const bag = factBag[x] && factBag[x].length ? factBag[x] : (factBag[x] = shuffle([2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]));
+        const n = bag.pop();
+        if (isDivide()) return [x, n];
+        return Math.random() < 0.5 ? [x, n] : [n, x];
+      };
+      let ab = pickFact(), a = ab[0], b = ab[1];
       if (state.drill && state.drill.length) {
         const pair = state.drill[Math.floor(Math.random() * state.drill.length)];
         a = pair.a;
@@ -7022,16 +7019,13 @@
       }
       let problem = build(a, b, state.mode);
       let guard = 0;
-      while (avoid && problem.key === avoid && guard < 6) {
+      while (avoid && problem.key === avoid && guard < 8) {
         if (state.drill && state.drill.length > 1) {
           const pair = state.drill[Math.floor(Math.random() * state.drill.length)];
           a = pair.a;
           b = pair.b;
         } else if (!state.drill) {
-          if (isAdd() || isSubtract()) {
-            b = tables[Math.floor(Math.random() * tables.length)];
-            a = tables[Math.floor(Math.random() * tables.length)];
-          } else b = MIN_OPERAND + Math.floor(Math.random() * (13 - MIN_OPERAND));
+          ab = pickFact(); a = ab[0]; b = ab[1];
         }
         problem = build(a, b, state.mode);
         guard += 1;
