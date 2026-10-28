@@ -3151,6 +3151,10 @@
     .reset-opt.reset-cancel { justify-content: center; min-height: 2.9rem; background: rgba(255,255,255,0.14); }
     .reset-opt:active { transform: translateY(2px); }
     .reset-confirm-card h2 { font-size: clamp(1.6rem, 6.5vw, 2.4rem); line-height: 1.15; }
+    .reset-math { display: flex; align-items: center; justify-content: center; gap: 0.6rem; margin: 0.6rem 0 0.2rem; }
+    .reset-math-q { font: 700 2rem/1 var(--ui-font); white-space: nowrap; }
+    .reset-math-in { width: 4.2rem; height: 3.2rem; border-radius: 0.8rem; border: 2px solid rgba(255,255,255,0.6); background: #fff; color: #1a1233; font: 700 1.8rem/1 var(--ui-font); text-align: center; }
+    .reset-math-note { min-height: 1.3rem; margin: 0.2rem 0 0; font: 700 1rem/1.3 var(--ui-font); color: #ffd34e; }
     .reset-sure-text { font: 600 1.05rem/1.35 var(--ui-font); }
     @media (prefers-reduced-motion: reduce) { .reset-opt { transition: none; } .reset-opt:active { transform: none; } }
     /* ===== TEST SITE: design-review fixes ===== */
@@ -9590,16 +9594,31 @@
         card.appendChild(list);
         card.querySelector(".reset-cancel").focus();
       }
-      function sure(kind) {
+      function sure(kind, again) {
         card.replaceChildren();
         card.appendChild(el("h2", { id: "reset-confirm-title", text: WHAT[kind].title }));
         card.appendChild(el("p", { class: "reset-sure-text", text: WHAT[kind].text }));
+        // Math check: a simple sum under 20.
+        const x = 1 + Math.floor(Math.random() * 9);
+        const y = 1 + Math.floor(Math.random() * Math.min(9, 19 - x));
+        const q = el("label", { class: "reset-math", for: "reset-math-in" });
+        q.appendChild(el("span", { class: "reset-math-q", text: x + " + " + y + " = ?" }));
+        const input = el("input", { id: "reset-math-in", class: "reset-math-in", type: "text", inputmode: "numeric", pattern: "[0-9]*", maxlength: "2", autocomplete: "off", "aria-label": "Answer to " + x + " plus " + y });
+        q.appendChild(input);
+        card.appendChild(q);
+        const note = el("p", { class: "reset-math-note", role: "status", text: again ? "Not quite, try again." : "" });
+        card.appendChild(note);
         const row = el("div", { class: "reset-confirm-actions" });
-        const yes = el("button", { type: "button", class: "reset-yes", text: "Yes", onClick: function () { doReset(kind); } });
-        const no = el("button", { type: "button", class: "reset-no", text: "No", onClick: picker });
+        const check = function () {
+          if (input.value.trim() === "") { input.focus(); return; }
+          if (Number(input.value.trim()) === x + y) doReset(kind); else sure(kind, true);
+        };
+        input.addEventListener("keydown", function (event) { if (event.key === "Enter") { event.preventDefault(); check(); } });
+        const yes = el("button", { type: "button", class: "reset-yes", text: "Reset", onClick: check });
+        const no = el("button", { type: "button", class: "reset-no", text: "Cancel", onClick: function () { close(); } });
         row.appendChild(yes); row.appendChild(no);
         card.appendChild(row);
-        no.focus();
+        input.focus();
       }
       function done(text, then) {
         card.replaceChildren();
