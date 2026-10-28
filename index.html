@@ -2928,6 +2928,10 @@
       display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 0.45rem; box-sizing: border-box;
       font-family: "Titan One", "Arial Black", Impact, sans-serif; font-size: 1.15rem; font-weight: 900; letter-spacing: 0.03em; line-height: 1.05; text-align: center; }
     .home-fc-row > .home-lb { grid-column: 1 / -1; }
+    .home-fc-row, .home-fc-row.has-av { grid-template-columns: 1fr !important; }
+    .home-fc-row > .home-tc { background: linear-gradient(135deg, #3fcf7f 0%, #1e7a4d 100%); color: #fff; }
+    .home-fc-row > .home-tc .hb-label { text-shadow: 0 1px 2px rgba(0,0,0,0.25); }
+    .home-fc-row > .home-timed { grid-column: 1 / -1; padding: 0.2rem 0; }
     .home-fc-row .menu-fc-text { font-size: inherit; letter-spacing: 0.03em; white-space: nowrap; }
     .home-fc-row .menu-fc-play { font-size: 0.8em; }
     .home-fc-row .menu-lb-ico { font-size: 1.3em; line-height: 1; }
@@ -9261,6 +9265,33 @@
       fc.appendChild(el("span", { class: "menu-fc-text hb-label", text: "Fact Challenge" }));
       fc.appendChild(el("span", { class: "hb-go", "aria-hidden": "true", text: "\u203A" }));
       fcRow.appendChild(fc);
+      // Timed Challenge: a home button that opens the 60 Seconds / All Facts picker in place
+      if (!state.heroPick) {
+        fcRow.appendChild(el("button", { type: "button", class: "menu-lb home-tc", onClick: function () {
+          state.heroPick = true;
+          render();
+          const first = document.querySelector(".home-timed .mode-pick button");
+          if (first) { first.focus({ preventScroll: true }); document.querySelector(".home-timed").scrollIntoView({ block: "nearest" }); }
+        } }, [
+          el("span", { class: "menu-lb-ico", "aria-hidden": "true", text: "\u23F1\uFE0F" }),
+          el("span", { class: "hb-label", text: "Timed Challenge" }),
+          el("span", { class: "hb-go", "aria-hidden": "true", text: "\u203A" })
+        ]));
+      } else {
+        const timed = el("div", { class: "home-timed picking" });
+        const pick = el("div", { class: "mode-pick", role: "group", "aria-label": "Choose a challenge" });
+        pick.appendChild(el("button", { class: "start mode-btn mode-timed", type: "button", onClick: function () { startQuiz("timed"); } }, [
+          el("span", { class: "mode-name", text: QUIZ_SECONDS + " Seconds" }),
+          el("span", { class: "mode-note", text: state.quizBest ? "Best " + state.quizBest + " right" : "Answer as many as you can" })
+        ]));
+        pick.appendChild(el("button", { class: "start mode-btn mode-all", type: "button", onClick: function () { startQuiz("all"); } }, [
+          el("span", { class: "mode-name", text: "All Facts" }),
+          el("span", { class: "mode-note", text: state.quizBestAllMs ? "Fastest " + formatClock(state.quizBestAllMs) : "Every fact once, against the clock" })
+        ]));
+        timed.appendChild(pick);
+        timed.appendChild(el("button", { class: "mode-cancel", type: "button", text: "Cancel", onClick: function () { state.heroPick = false; render(); } }));
+        fcRow.appendChild(timed);
+      }
       fcRow.appendChild(el("button", { type: "button", class: "menu-lb menu-closet", "aria-label": "Avatar", onClick: function () { goPage("closet"); } }, [
         avHas() ? avNode(avatar, 40, "menu-av") : el("span", { class: "menu-lb-ico", "aria-hidden": "true", text: "\uD83D\uDC55" }),
         el("span", { class: "hb-label", text: "Avatar" }),
@@ -9291,30 +9322,6 @@
         grid.appendChild(btn);
       });
       sec.appendChild(grid);
-      // 5. Timed Challenge: one button that opens the two choices (60 Seconds / All Facts), as before
-      const timed = el("div", { class: "home-timed" + (state.heroPick ? " picking" : "") });
-      if (!state.heroPick) {
-        timed.appendChild(el("button", { class: "start start-challenge", type: "button", text: "Timed Challenge", onClick: function () {
-          state.heroPick = true;
-          render();
-          const first = document.querySelector(".home-timed .mode-pick button");
-          if (first) { first.focus({ preventScroll: true }); document.querySelector(".home-timed").scrollIntoView({ block: "nearest" }); }
-        } }));
-        timed.appendChild(el("p", { class: "challenge-sub", text: state.quizBest ? QUIZ_SECONDS + " seconds \u00B7 Best " + state.quizBest + " right" : "Times tables 2 to 12" }));
-      } else {
-        const pick = el("div", { class: "mode-pick", role: "group", "aria-label": "Choose a challenge" });
-        pick.appendChild(el("button", { class: "start mode-btn mode-timed", type: "button", onClick: function () { startQuiz("timed"); } }, [
-          el("span", { class: "mode-name", text: QUIZ_SECONDS + " Seconds" }),
-          el("span", { class: "mode-note", text: state.quizBest ? "Best " + state.quizBest + " right" : "Answer as many as you can" })
-        ]));
-        pick.appendChild(el("button", { class: "start mode-btn mode-all", type: "button", onClick: function () { startQuiz("all"); } }, [
-          el("span", { class: "mode-name", text: "All Facts" }),
-          el("span", { class: "mode-note", text: state.quizBestAllMs ? "Fastest " + formatClock(state.quizBestAllMs) : "Every fact once, against the clock" })
-        ]));
-        timed.appendChild(pick);
-        timed.appendChild(el("button", { class: "mode-cancel", type: "button", text: "Cancel", onClick: function () { state.heroPick = false; render(); } }));
-      }
-      sec.appendChild(timed);
       // 6. Reset (small, under Timed Challenge)
       sec.appendChild(el("div", { class: "home-reset" }, [el("button", { type: "button", class: "reset-challenge", "aria-label": "Reset", onClick: function (event) { confirmResetChallenge(event && event.currentTarget); } }, [
         el("span", { "aria-hidden": "true", text: "\u21BA " }), document.createTextNode("Reset")])]));
