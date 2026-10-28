@@ -2643,8 +2643,8 @@
     @media (prefers-reduced-motion: reduce) { .prize-ov { animation: none; } .pz-item.can:active { transform: none; } .prize-pick:active { transform: none; } }
     .buddy-row { display: flex; align-items: center; gap: 0.5rem; }
     .buddy-row > :first-child { flex: 1 1 auto; min-width: 0; }
-    .game-buddy { position: relative; flex: 0 0 auto; width: 96px; line-height: 0; transform-origin: 50% 100%; pointer-events: none; }
-    .game-buddy svg { display: block; width: 96px; height: auto; }
+    .game-buddy { position: relative; flex: 0 0 auto; width: 128px; line-height: 0; transform-origin: 50% 100%; pointer-events: none; }
+    .game-buddy svg { display: block; width: 128px; height: auto; }
     .gb-bob { animation: gbBob 3.2s ease-in-out infinite; transform-origin: 50% 100%; }
     .gb-hop { animation: gbHop 0.55s ease-out both; }
     .gb-shake { animation: gbShake 0.4s ease-in-out both; }
@@ -2659,8 +2659,8 @@
     .buddy-row .streak-banner { margin-bottom: 0.75rem; }
     .buddy-row .quiz-score { margin: 0; }
     @media (max-width: 480px) { .buddy-row .streak-next { font-size: 1rem; } }
-    @media (min-width: 700px) { .game-buddy, .game-buddy svg { width: 128px; } }
-    @media (max-width: 699px) { .buddy-row .quiz-score + .game-buddy, .buddy-row .quiz-score + .game-buddy svg { width: 70px; } .buddy-row:has(.quiz-score) { margin: -6px 0; } }
+    @media (min-width: 700px) { .game-buddy, .game-buddy svg { width: 190px; } }
+    @media (max-width: 699px) { .buddy-row .quiz-score + .game-buddy, .buddy-row .quiz-score + .game-buddy svg { width: 96px; } .buddy-row:has(.quiz-score) { margin: -6px 0; } }
     @media (prefers-reduced-motion: reduce) { .gb-bob, .gb-hop, .gb-shake, .gb-cheer { animation: none; } .gb-spark { display: none; } }
     .page-head { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem; margin: 0.2rem 0 0.1rem; }
     .page-head .page-title { flex: 1 1 100%; text-align: center; font-size: 0; line-height: 0; text-shadow: none; }
@@ -9164,7 +9164,7 @@
       const bob = el("div", { class: "gb-bob" });
       // A right answer shows the big smile for a moment.
       const look = mood === "hop" || mood === "cheer" ? Object.assign({}, avatar, { face: "grin" }) : avatar;
-      bob.appendChild(avNode(look, 96));
+      bob.appendChild(avNode(look, 190));
       wrap.appendChild(bob);
       if (mood === "cheer") ["s1", "s2", "s3"].forEach(function (k) { wrap.appendChild(el("span", { class: "gb-spark " + k, text: "\u2728" })); });
       row.appendChild(wrap);
