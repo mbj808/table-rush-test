@@ -3179,6 +3179,10 @@
     .bb-ops { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.45rem; }
     .bb-op, .bb-level { min-height: 3.2rem; border-radius: 0.9rem; border: 2px solid rgba(255,255,255,0.4); background: #1d1736; color: #fff; font: 700 1.6rem/1 var(--ui-font); cursor: pointer; }
     .bb-op:last-child { font-size: 1.1rem; }
+    .bb-grades { display: grid; grid-template-columns: repeat(6, 1fr); gap: 0.4rem; }
+    .bb-grades .bb-op:last-child { font-size: 1.6rem; }
+    .bb-op.off { opacity: 0.35; cursor: default; }
+    .bb-note { margin: -0.2rem 0 0; font: 600 0.95rem/1.2 var(--ui-font); color: #fff7ea; text-shadow: 0 1px 3px rgba(0,0,0,0.7); }
     .bb-op.on, .bb-level.on { background: linear-gradient(180deg, #ffe08a, #e0a43a); color: #2a1800; border-color: #fff6dc; }
     .bb-levels { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.45rem; }
     .bb-level { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.2rem; min-height: 3.8rem; font-size: 1.15rem; }
@@ -9714,10 +9718,10 @@
     const BB_LEVELS = [["small", "Small"], ["medium", "Medium"], ["big", "Big"]];
     const BB_OPS = [["mul", "\u00D7"], ["div", "\u00F7"], ["add", "+"], ["sub", "\u2212"], ["mix", "Mix"]];
     let bbSave = (function () { try { const d = JSON.parse(localStorage.getItem(BB_KEY) || "null"); if (d && typeof d === "object") return d; } catch (e) {} return null; })() || {};
-    bbSave.done = bbSave.done || {}; bbSave.prog = bbSave.prog || {}; bbSave.op = bbSave.op || "mul"; bbSave.level = bbSave.level || "small";
+    bbSave.done = bbSave.done || {}; bbSave.prog = bbSave.prog || {}; bbSave.op = bbSave.op || "mul"; bbSave.level = bbSave.level || "small"; bbSave.grade = bbSave.grade || 3;
     const bb = { build: null, prob: null, lock: false, picked: null, add: -1, fall: [], at: 0, celebrate: false };
     function bbStore() { try { localStorage.setItem(BB_KEY, JSON.stringify(bbSave)); } catch (e) {} }
-    function bbReset() { bbSave = { done: {}, prog: {}, op: "mul", level: "small" }; bb.build = null; try { localStorage.removeItem(BB_KEY); } catch (e) {} }
+    function bbReset() { bbSave = { done: {}, prog: {}, op: "mul", level: "small", grade: bbSave.grade || 3 }; bb.build = null; try { localStorage.removeItem(BB_KEY); } catch (e) {} }
     function bbStill() { return !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches); }
     function bbBricks(b) {
       if (b._bricks) return b._bricks;
@@ -9760,14 +9764,28 @@
       return s + "</svg>";
     }
     function bbRand(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
+    // Grade -> difficulty. sum = biggest + answer / biggest number in a take-away; tab/by = times table range. No 0 or 1 facts.
+    const BB_GRADES = {
+      1: { sum: 10, tab: 0 },
+      2: { sum: 20, tab: 0 },
+      3: { sum: 100, tab: 5, by: 10 },
+      4: { sum: 500, tab: 10, by: 10 },
+      5: { sum: 1000, tab: 12, by: 12 },
+      6: { sum: 10000, tab: 12, by: 12 }
+    };
+    function bbGrade() { return BB_GRADES[bbSave.grade] ? bbSave.grade : 3; }
+    function bbOpOk(op) { return (op !== "mul" && op !== "div") || BB_GRADES[bbGrade()].tab > 0; }
     function bbProblem() {
-      let op = bbSave.op === "mix" ? ["mul", "div", "add", "sub"][bbRand(0, 3)] : bbSave.op;
+      const G = BB_GRADES[bbGrade()];
+      const pool = G.tab ? ["mul", "div", "add", "sub"] : ["add", "sub"];
+      let op = bbSave.op === "mix" || !bbOpOk(bbSave.op) ? pool[bbRand(0, pool.length - 1)] : bbSave.op;
       let a, b, ans, text;
-      if (op === "mul") { a = bbRand(2, 12); b = bbRand(2, 12); ans = a * b; text = a + " \u00D7 " + b; }
-      else if (op === "div") { a = bbRand(2, 12); b = bbRand(2, 12); ans = b; text = (a * b) + " \u00F7 " + a; }
-      else if (op === "add") { a = bbRand(2, 20); b = bbRand(2, 20); ans = a + b; text = a + " + " + b; }
-      else { a = bbRand(4, 20); b = bbRand(2, a - 2); ans = a - b; text = a + " \u2212 " + b; }
-      const set = [ans], steps = op === "mul" ? [a, -a, b, -b, 1, -1, 2, 10] : [1, -1, 2, -2, 3, -3, 10, -10];
+      if (op === "mul") { a = bbRand(2, G.tab); b = bbRand(2, G.by); if (Math.random() < 0.5) { const t = a; a = b; b = t; } ans = a * b; text = a + " \u00D7 " + b; }
+      else if (op === "div") { a = bbRand(2, G.tab); b = bbRand(2, G.by); ans = b; text = (a * b) + " \u00F7 " + a; }
+      else if (op === "add") { const lo = G.sum >= 1000 ? Math.round(G.sum / 20) : 2; ans = bbRand(lo * 2, G.sum); a = bbRand(lo, ans - lo); b = ans - a; text = a + " + " + b; }
+      else { const lo = G.sum >= 1000 ? Math.round(G.sum / 20) : 2; a = bbRand(lo + 2, G.sum); b = bbRand(lo, a - 2); ans = a - b; text = a + " \u2212 " + b; }
+      const big = op === "add" || op === "sub" ? (G.sum >= 1000 ? [10, -10, 100, -100, 1, -1] : G.sum >= 100 ? [1, -1, 10, -10, 2, -2] : [1, -1, 2, -2, 3, -3]) : null;
+      const set = [ans], steps = op === "mul" ? [a, -a, b, -b, 1, -1, 2, 10] : big || [1, -1, 2, -2, 3, -3, 10, -10];
       for (let t = 0; set.length < 4 && t < 60; t++) {
         const v = ans + steps[bbRand(0, steps.length - 1)];
         if (v >= 2 && set.indexOf(v) < 0) set.push(v);
@@ -9869,12 +9887,27 @@
         card.appendChild(el("button", { type: "button", class: "bb-myshelf", onClick: function () { bb.shelf = true; render(); window.scrollTo(0, 0); } }, [
           document.createTextNode("\uD83C\uDFC6 My Shelf"), el("span", { class: "n", text: bb3Count() + " / 12 built" })
         ]));
+        card.appendChild(el("p", { class: "bb-label", text: "Pick your grade" }));
+        const gr = el("div", { class: "bb-grades", role: "group", "aria-label": "Grade" });
+        [1, 2, 3, 4, 5, 6].forEach(function (g) {
+          const on = bbGrade() === g;
+          gr.appendChild(el("button", { type: "button", class: "bb-op bb-grade" + (on ? " on" : ""), "aria-pressed": on ? "true" : "false", "aria-label": "Grade " + g, text: String(g), onClick: function () {
+            bbSave.grade = g;
+            if (!bbOpOk(bbSave.op)) bbSave.op = "add";
+            bbStore(); render();
+          } }));
+        });
+        card.appendChild(gr);
         card.appendChild(el("p", { class: "bb-label", text: "Pick your math" }));
         const ops = el("div", { class: "bb-ops", role: "group", "aria-label": "Math" });
         BB_OPS.forEach(function (o) {
-          ops.appendChild(el("button", { type: "button", class: "bb-op" + (bbSave.op === o[0] ? " on" : ""), "aria-pressed": bbSave.op === o[0] ? "true" : "false", text: o[1], onClick: function () { bbSave.op = o[0]; bbStore(); render(); } }));
+          const ok = bbOpOk(o[0]);
+          const btn = el("button", { type: "button", class: "bb-op" + (bbSave.op === o[0] ? " on" : "") + (ok ? "" : " off"), "aria-pressed": bbSave.op === o[0] ? "true" : "false", text: o[1], onClick: function () { if (!ok) return; bbSave.op = o[0]; bbStore(); render(); } });
+          if (!ok) btn.disabled = true;
+          ops.appendChild(btn);
         });
         card.appendChild(ops);
+        if (!BB_GRADES[bbGrade()].tab) card.appendChild(el("p", { class: "bb-note", text: "\u00D7 and \u00F7 start in Grade 3." }));
         card.appendChild(el("p", { class: "bb-label", text: "Pick a size" }));
         const lv = el("div", { class: "bb-levels", role: "group", "aria-label": "Size" });
         BB_LEVELS.forEach(function (l) {
