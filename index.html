@@ -3163,6 +3163,14 @@
     .reset-math-note { min-height: 1.3rem; margin: 0.2rem 0 0; font: 700 1rem/1.3 var(--ui-font); color: #ffd34e; }
     .reset-sure-text { font: 600 1.05rem/1.35 var(--ui-font); }
     @media (prefers-reduced-motion: reduce) { .reset-opt { transition: none; } .reset-opt:active { transform: none; } }
+    /* ===== Leaderboard compact header ===== */
+    body[data-page="leaders"] header h1, body[data-page="leaders"] .page-head { display: none; }
+    body[data-page="leaders"] .lb-card { padding-top: 0.6rem; gap: 0.6rem; }
+    .lb-back, .bb-back { flex: 0 0 auto; min-height: 2.6rem; padding: 0.15rem 0.9rem; border-radius: 0.9rem; border: 1px solid rgba(255,255,255,0.4); background: rgba(255,255,255,0.14); color: #fff; font: 700 1.05rem/1 var(--ui-font); cursor: pointer; }
+    .lb-head { display: flex; align-items: center; gap: 0.7rem; }
+    .lb-title { margin: 0; flex: 1 1 auto; font: 700 1.45rem/1.1 var(--ui-font); color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.5); }
+    body[data-page="leaders"] .lb-me { margin: 0; font-family: var(--ui-font); }
+    body[data-page="leaders"] .lb-tab { font-family: var(--ui-font); font-weight: 700; min-height: 2.7rem; }
     /* ===== Avatar page redesign ===== */
     body[data-page="closet"] header h1, body[data-page="closet"] .page-head { display: none; }
     .closet-card { max-width: 34rem; gap: 0; padding-top: 0; color: #fff; }
@@ -8600,6 +8608,10 @@
     }
     function leaderboardCard() {
       const card = el("div", { class: "card lb-card" });
+      card.appendChild(el("div", { class: "lb-head" }, [
+        el("button", { type: "button", class: "av-back lb-back", text: "\u2039 Back", onClick: function () { goPage("menu"); } }),
+        el("h2", { class: "lb-title", text: "\uD83C\uDFC6 Leaderboard" })
+      ]));
       if (!LEADERBOARD_URL) { card.appendChild(el("p", { class: "lb-big lb-offline", text: "Test site: offline" })); return card; }
       if (!lb.board && !lb.loading && !lb.failed) lbRefresh();
       const me = lbMe();
