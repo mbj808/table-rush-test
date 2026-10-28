@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <meta name="robots" content="noindex">
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Mad Facts Challenge</title>
+  <title>TEST · Mad Facts Challenge</title>
   <meta name="description" content="Mad Facts Challenge (Table Rush). Practice multiplication, division, addition, subtraction, oceans, sports, Hawaiian islands, capitals, state maps, elements, flags, rhyming, and synonyms & antonyms; piano notes; instruments; vehicles; wonders of the world. No account needed." />
   <style>
     :root {
@@ -3139,7 +3140,63 @@
       74% { opacity: 1; transform: translate(-50%, -50%) scale(1.08); }
       100% { opacity: 0; transform: translate(-50%, -54%) scale(1.16); }
     }
-  </style>
+      /* ===== TEST SITE: design-review fixes ===== */
+    :root { --ui-font: ui-rounded, "SF Pro Rounded", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+    .test-badge { position: fixed; top: 0.4rem; right: 0.4rem; z-index: 9999; pointer-events: none; padding: 0.15rem 0.45rem; border-radius: 0.4rem;
+      background: #ffd34e; color: #2a1d00; font: 700 0.62rem/1.3 var(--ui-font); letter-spacing: 0.08em; opacity: 0.85; }
+    /* c. one clean body font; the cartoon font stays only in the page-title art */
+    body, button, input, select, textarea, .prompt, .answers button, .answers button small, .score, .miss li, .quiz-fact, .wave-bg,
+    .answers.multiples-answers button, .menu-fc-text, .page-back, #back.icon, .streak-banner, .streak-count, .lb-row, .game-name, .menu-label { font-family: var(--ui-font); }
+    body { font-weight: 600; }
+    .ops .choice.game-name { font-weight: 600; text-shadow: 0 1px 1px rgba(0,0,0,0.35); }
+    .menu-label { font-weight: 700; }
+    /* d. leftover buttons match the home buttons */
+    .home-timed .start-challenge, .challenge-hero .start-challenge { font-family: var(--ui-font); font-weight: 600; font-size: 1.5rem; border-radius: 1.15rem;
+      border: 1px solid rgba(255,255,255,0.35); color: #fff; background: linear-gradient(135deg, #2fbf7f 0%, #1e7a4d 100%);
+      box-shadow: 0 3px 0 rgba(0,0,0,0.22), 0 8px 18px rgba(10,4,30,0.28), inset 0 1px 0 rgba(255,255,255,0.35); text-shadow: 0 1px 2px rgba(0,0,0,0.25); }
+    .home-timed .start-challenge:active { transform: translateY(2px); box-shadow: 0 1px 0 rgba(0,0,0,0.22), 0 3px 8px rgba(10,4,30,0.25); }
+    .mode-pick .mode-btn { font-family: var(--ui-font); font-weight: 600; border-radius: 1.15rem; border: 1px solid rgba(255,255,255,0.35);
+      box-shadow: 0 3px 0 rgba(0,0,0,0.22), 0 8px 18px rgba(10,4,30,0.28), inset 0 1px 0 rgba(255,255,255,0.35); }
+    .page-back, #back.icon, .quiz-back { font-family: var(--ui-font); font-weight: 600; font-size: 1.05rem; border-radius: 0.9rem; min-height: 2.75rem;
+      padding: 0.2rem 1rem; border: 1px solid rgba(255,255,255,0.35); color: #fff; text-shadow: none;
+      background: linear-gradient(135deg, rgba(255,255,255,0.22), rgba(255,255,255,0.10)); box-shadow: 0 3px 0 rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.3); }
+    #back.icon { min-width: 0; height: 2.75rem; }
+    .page-back:active, #back.icon:active, .quiz-back:active { transform: translateY(2px); box-shadow: 0 1px 0 rgba(0,0,0,0.22); }
+    /* Backgrounds tile: the photo shows, the gray "developing" veil only flickers briefly */
+    @keyframes mt-develop { 0%, 78%, 100% { opacity: 0; } 86% { opacity: 0.45; } }
+    .art-svg .veil { opacity: 0; }
+    /* a. leaderboard names never cut off */
+    .lb-row { grid-template-columns: 2.2rem minmax(0, 1fr) auto; gap: 0.4rem; padding: 0.35rem 0.7rem; font-weight: 700; }
+    .lb-name > span:last-child { white-space: normal; overflow: visible; text-overflow: clip; overflow-wrap: anywhere; line-height: 1.15; }
+    .lb-streak { white-space: nowrap; font-weight: 800; }
+    .lb-tab { white-space: nowrap; font-size: 0.95rem; padding-left: 0.3rem; padding-right: 0.3rem; }
+    .lb-offline { text-align: center; padding: 1.2rem 0; }
+    /* e. readable Points / Timed toggle */
+    .lb-view { color: #fff; font-weight: 700; }
+    .lb-view.on { background: #ffd34e; color: #2a1d00; text-shadow: none; }
+    /* e. Key 1 / Key 2 only on keyboards */
+    @media (hover: none) and (pointer: coarse) { .key-hint { display: none !important; } }
+    /* e. Reset sits apart at the bottom, plain and small */
+    .reset-zone { margin-top: 2.5rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.2); display: flex; flex-direction: column; align-items: center; gap: 0.35rem; }
+    .reset-note { margin: 0; padding: 0.1rem 0.5rem; border-radius: 0.4rem; background: rgba(10,4,30,0.55); font-size: 0.8rem; color: #fff; }
+    .reset-zone .reset-challenge { background: rgba(10,4,30,0.55); border: 1px solid rgba(255,255,255,0.45); box-shadow: none; text-shadow: none; font-family: var(--ui-font);
+      font-weight: 600; font-size: 0.8rem; min-height: 2rem; padding: 0.2rem 0.9rem; backdrop-filter: none; -webkit-backdrop-filter: none; }
+    /* e. headings in the Fact Challenge list */
+    .ops .ops-head { flex: 1 1 100%; margin: 0.9rem 0 0.1rem 0.2rem; font: 700 1.05rem/1.2 var(--ui-font); color: #fff; letter-spacing: 0.04em; text-transform: uppercase; opacity: 0.9; text-shadow: 0 1px 3px rgba(0,0,0,0.6); }
+    .ops .ops-head:first-child { margin-top: 0.2rem; }
+    /* b. game screen: big question and answers, centered between the top bar and the boom box */
+    body.play-screen main { display: flex; flex-direction: column; }
+    body.play-screen #app { flex: 1 1 auto; display: flex; flex-direction: column; min-height: 0; }
+    body.play-screen #app > .eq { margin-top: auto; }
+    body.play-screen #app > :last-child { margin-bottom: auto; }
+    body.play-screen .prompt { font-size: clamp(3.4rem, 15vw, 6rem); line-height: 1.05; }
+    body.play-screen .prompt.round-prompt, body.play-screen .prompt.dec-prompt, body.play-screen .prompt.multiples-prompt { font-size: clamp(1.6rem, 7vw, 2.6rem); }
+    body.play-screen .answers { gap: 0.9rem; margin-top: 1rem; }
+    body.play-screen .answers button { min-height: 6rem; font-size: clamp(2.4rem, 12vw, 3.6rem); font-weight: 700; border-radius: 1.15rem; }
+    body.play-screen .answers.quiz-answers button, body.play-screen .answers.ocean-answers button, body.play-screen .answers.quiz-choice-answers button { font-size: clamp(1.15rem, 5vw, 1.7rem); min-height: 4.8rem; }
+    @media (min-width: 700px) { body.play-screen .answers button { min-height: 9rem; font-size: 4.6rem; } body.play-screen .prompt { font-size: 7.5rem; } body.play-screen main { max-width: 46rem; } }
+    @media (prefers-reduced-motion: reduce) { .art-svg .veil { animation: none; opacity: 0; } }
+</style>
 </head>
 <body>
   <div class="wave-bg" data-level="0" aria-hidden="true">
@@ -3442,6 +3499,7 @@
     </div>
     </div>
   </div>
+  <div class="test-badge" aria-hidden="true">TEST SITE</div>
   <main>
     <p id="live" class="sr" aria-live="polite"></p>
     <header>
@@ -7569,7 +7627,7 @@
         const wrong = shown && choice === q.picked && choice !== product;
         const btn = el("button", { type: "button", class: right ? "right" : wrong ? "wrong" : "", onClick: function () { quizPick(choice); } });
         btn.appendChild(el("span", { text: String(choice) }));
-        btn.appendChild(el("small", { text: "Key " + (index + 1) }));
+        btn.appendChild(el("small", { class: "key-hint", text: "Key " + (index + 1) }));
         answers.appendChild(btn);
       });
       app.appendChild(answers);
@@ -8307,8 +8365,9 @@
         }
         panel.appendChild(startBtn);
         const ops = opsCard.querySelector(".ops");
-        const buttons = ops.querySelectorAll(".choice");
-        const idx = OPS.findIndex(function (o) { return o.id === state.operation; });
+        const openBtn = ops.querySelector(".choice.op-" + state.operation);
+        const buttons = Array.prototype.filter.call(ops.querySelectorAll(".choice"), function (b) { return b.className.indexOf("gcat-" + gameCategory(state.operation)) >= 0; });
+        const idx = buttons.indexOf(openBtn);
         const rowEnd = Math.min(buttons.length - 1, idx % 2 === 0 ? idx + 1 : idx);
         ops.insertBefore(panel, buttons[rowEnd].nextSibling);
       } else {
@@ -8322,7 +8381,9 @@
     // ---- Pages: home (first screen + menu), #menu, #beats, #backgrounds, #games, #minigames ----
 
     // ---- Class leaderboard (Google Apps Script web app). Empty URL = feature hidden. ----
-    const LEADERBOARD_URL = "https://script.google.com/macros/s/AKfycbwWw6Nk_gqn1hiJ7f_eFGqkxiR17uQWBo8LJgLFkl6d_MBaVksRmqQ1oC-68dTinm4w2Q/exec";
+    // TEST SITE: paste the TEST Apps Script /exec URL here. Blank = offline (no sync, no errors).
+    const TEST_SCRIPT_URL = "";
+    const LEADERBOARD_URL = TEST_SCRIPT_URL;
     const LB_KEY = "mad-facts-lb";
     const lb = { names: null, board: null, view: "points", tab: "today", game: "__all", loading: false, failed: false, msg: "" };
     function lbMe() {
@@ -8473,6 +8534,7 @@
     }
     function leaderboardCard() {
       const card = el("div", { class: "card lb-card" });
+      if (!LEADERBOARD_URL) { card.appendChild(el("p", { class: "lb-big lb-offline", text: "Test site: offline" })); return card; }
       if (!lb.board && !lb.loading && !lb.failed) lbRefresh();
       const me = lbMe();
       if (!me) {
@@ -8530,7 +8592,7 @@
         list.appendChild(el("li", { class: "lb-row" + (mine ? " me" : "") + (i < 3 ? " top" + (i + 1) : "") }, [
           el("span", { class: "lb-rank", text: i < 3 ? ["\uD83E\uDD47", "\uD83E\uDD48", "\uD83E\uDD49"][i] : String(i + 1) }),
           el("span", { class: "lb-name" }, [avNode(mine ? avatar : (lb.board.avatars && lb.board.avatars[r.name]) || { color: "#c9c9d6" }, 30, "lb-av"), el("span", { text: r.name })]),
-          el("span", { class: "lb-streak", text: usePts ? r.points + (r.points === 1 ? " point" : " points") : String(r.streak) + " \uD83D\uDD25" })
+          el("span", { class: "lb-streak", text: usePts ? r.points + " pts" : String(r.streak) + " \uD83D\uDD25" })
         ]));
       });
       card.appendChild(list);
@@ -9060,7 +9122,7 @@
         el("span", { class: "hb-go", "aria-hidden": "true", text: "\u203A" })
       ]));
       // 3. Leaderboard spans the full row under them
-      if (LEADERBOARD_URL) {
+      {
         fcRow.appendChild(el("button", { type: "button", class: "menu-lb home-lb", onClick: function () { goPage("leaders"); } }, [
           el("span", { class: "menu-lb-ico", "aria-hidden": "true", text: "\uD83C\uDFC6" }),
           el("span", { class: "hb-label", text: "Leaderboard" }),
@@ -9325,7 +9387,8 @@
       });
       card.appendChild(row);
       if (includeReset) {
-        const resetWrap = el("div", { class: "beat-actions" });
+        const resetWrap = el("div", { class: "beat-actions reset-zone" });
+        resetWrap.appendChild(el("p", { class: "reset-note", text: "For teachers" }));
         resetWrap.appendChild(el("button", {
           class: "reset-challenge",
           type: "button",
@@ -9551,7 +9614,12 @@
       const card = el("div", { class: "card" });
       card.appendChild(el("p", { class: "label", text: "Games" }));
       const row = el("div", { class: "ops" });
-      OPS.forEach(function (op) {
+      const CAT_ORDER = ["math", "words", "world", "sports", "stuff"];
+      const CAT_NAME = { math: "Math", words: "Words", world: "World", sports: "Sports", stuff: "More" };
+      let lastCat = "";
+      OPS.slice().sort(function (a, b) { return CAT_ORDER.indexOf(gameCategory(a.id)) - CAT_ORDER.indexOf(gameCategory(b.id)); }).forEach(function (op) {
+        const cat = gameCategory(op.id);
+        if (cat !== lastCat) { lastCat = cat; row.appendChild(el("h3", { class: "ops-head ops-head-" + cat, text: CAT_NAME[cat] })); }
         const open = !!state.gameOpen && state.operation === op.id;
         if (opLocked(op.id)) {
           const lb = button(op.label, "choice game-name game-locked op-" + op.id, false, function (event) { openCodeBox({ kind: "op", beatId: op.id, opener: event && event.currentTarget }); });
@@ -10583,7 +10651,7 @@
         const wrong = locked && state.picked === choice && choice !== problem.answer;
         const btn = el("button", { type: "button", class: right ? "right" : wrong ? "wrong" : "", onClick: function () { answer(choice); } });
         btn.appendChild(el("span", { text: String(choice) }));
-        btn.appendChild(el("small", { text: problem.choiceLabels ? problem.choiceLabels[index] : "Key " + (index + 1) }));
+        btn.appendChild(el("small", { class: problem.choiceLabels ? "" : "key-hint", text: problem.choiceLabels ? problem.choiceLabels[index] : "Key " + (index + 1) }));
         answers.appendChild(btn);
       });
       app.appendChild(answers);
@@ -10873,8 +10941,7 @@
     if (currentPage() !== "home") setTimeout(afterPageChange, 60);
     primeHomeMusicAutoplay();
     render();
-    loadHitCount();
+    // TEST SITE: visitor counter off.
   </script>
-<script data-goatcounter="https://mbj808.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </body>
 </html>
