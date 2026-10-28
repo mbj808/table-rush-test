@@ -3182,6 +3182,7 @@
     /* ===== Brick by Brick ===== */
     body[data-page="bricks"] header h1, body[data-page="bricks"] .page-head { display: none; }
     .home-fc-row > .home-bb { grid-column: 1 / -1; background: linear-gradient(135deg, #ff8a5c 0%, #e0453a 100%); color: #fff; }
+    .home-fc-row > .home-h2h { background: linear-gradient(135deg, #5c8dff 0%, #6a3ae0 100%); }
     .home-fc-row > .home-bb .hb-label { text-shadow: 0 1px 2px rgba(0,0,0,0.25); }
     .bb-card { max-width: 34rem; margin: 0 auto; width: 100%; display: flex; flex-direction: column; gap: 0.7rem; color: #fff; font-family: var(--ui-font); padding-top: 0.6rem; }
     .bb-head { display: flex; align-items: center; gap: 0.7rem; }
@@ -3239,6 +3240,40 @@
       .bb-bar-fill { transition: none; }
     }
     @keyframes bbFade { from { opacity: 1; } to { opacity: 0; } }
+    /* Head to Head */
+    .h2h-mode { display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto auto; column-gap: 0.8rem; align-items: center; text-align: left; min-height: 4.6rem; padding: 0.7rem 1rem; border-radius: 1.1rem; border: 2px solid rgba(255,255,255,0.4); background: #1d1736; color: #fff; cursor: pointer; font-family: var(--ui-font); }
+    .h2h-mode-ico { grid-row: 1 / 3; font-size: 2rem; }
+    .h2h-mode-t { font: 700 1.35rem/1.1 var(--ui-font); }
+    .h2h-mode-n { font: 600 0.9rem/1.2 var(--ui-font); opacity: 0.8; }
+    .h2h-pick { width: 100%; min-height: 4.2rem; }
+    .h2h-joinrow { display: flex; gap: 0.5rem; }
+    .h2h-input { flex: 1 1 auto; min-width: 0; min-height: 3.6rem; border-radius: 1rem; border: 2px solid #fff6dc; background: #fffef6; color: #1a1233; text-align: center; font: 800 1.8rem/1 var(--ui-font); letter-spacing: 0.3em; text-transform: uppercase; }
+    .h2h-code { margin: 0.2rem 0; text-align: center; font: 800 4rem/1 var(--ui-font); letter-spacing: 0.25em; color: #ffe39a; text-shadow: 0 2px 8px rgba(0,0,0,0.6); }
+    body.h2h-on header, body.h2h-on .page-head, body.h2h-on footer, body.h2h-on .boombox, body.h2h-on .test-banner { display: none !important; }
+    .h2h-full { position: fixed; inset: 0; z-index: 9000; max-width: none; margin: 0; padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom); gap: 0; background: #140f28; display: flex; flex-direction: column; }
+    .h2h-half { flex: 1 1 50%; min-height: 0; display: flex; flex-direction: column; justify-content: center; gap: 0.4rem; padding: 0.8rem 1rem; box-sizing: border-box; transition: background 0.2s; }
+    .h2h-p1 { background: #2a1f52; }
+    .h2h-p2 { background: #1e3350; }
+    .h2h-remote .h2h-half { background: #1e3350; }
+    .h2h-half.win { background: #1f5a36; }
+    .h2h-half.oops { background: #5a2430; }
+    @media (hover: none), (max-width: 1100px) { .h2h-full:not(.h2h-remote) .h2h-p1 { transform: rotate(180deg); } }
+    .h2h-top { display: flex; justify-content: space-between; align-items: center; font: 700 1.15rem/1 var(--ui-font); }
+    .h2h-score { padding: 0.35rem 0.8rem; border-radius: 999px; background: rgba(255,255,255,0.15); font-size: 1.3rem; }
+    .h2h-q { margin: 0; text-align: center; font: 800 clamp(2.2rem, 7vh, 4rem)/1.1 var(--ui-font); }
+    .h2h-msg { margin: 0; min-height: 1.2rem; text-align: center; font: 700 1.05rem/1.2 var(--ui-font); color: #ffb3a8; }
+    .h2h-ans { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; width: 100%; max-width: 36rem; margin: 0 auto; }
+    .h2h-btn { min-height: clamp(3.6rem, 9vh, 6rem); border-radius: 1rem; border: 0; background: #fffef6; color: #1a1233; font: 800 2rem/1 var(--ui-font); cursor: pointer; touch-action: manipulation; }
+    .h2h-btn:disabled { opacity: 0.4; }
+    .h2h-quit { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 2; width: 3rem; height: 3rem; border-radius: 50%; border: 2px solid #fff; background: #140f28; color: #fff; font: 700 1.2rem/1 var(--ui-font); cursor: pointer; }
+    .h2h-bar { display: flex; align-items: center; gap: 0.8rem; padding: 0.7rem 1rem; }
+    .h2h-quit-r { position: static; transform: none; flex: 0 0 auto; }
+    .h2h-vs { font: 800 1.5rem/1 var(--ui-font); }
+    .h2h-end { margin: auto; display: flex; flex-direction: column; align-items: center; gap: 1rem; text-align: center; padding: 1rem; }
+    .h2h-big { margin: 0; font: 800 2.4rem/1.15 var(--ui-font); color: #ffe39a; }
+    .h2h-final { margin: 0; font: 700 1.5rem/1 var(--ui-font); }
+    .h2h-done { min-height: 3.2rem; padding: 0 2rem; }
+    @media (prefers-reduced-motion: reduce) { .h2h-half { transition: none; } }
     /* ===== Brick by Brick 3D shelf ===== */
     .bb-myshelf { min-height: 3.6rem; border-radius: 1.1rem; border: 2px solid #fff6dc; background: linear-gradient(135deg, #ffe39a 0%, #f0b545 100%); color: #3a2400; font: 700 1.25rem/1 var(--ui-font); cursor: pointer; box-shadow: 0 3px 0 rgba(0,0,0,0.22), 0 8px 18px rgba(10,4,30,0.28); }
     .bb-myshelf .n { font-weight: 600; font-size: 0.95rem; opacity: 0.8; margin-left: 0.4rem; }
@@ -8060,6 +8095,7 @@
       if (muteBtn && headerActions && muteBtn.parentElement !== headerActions) headerActions.appendChild(muteBtn);
       document.body.classList.toggle("setup-screen", state.phase === "setup");
       document.body.dataset.page = state.phase === "setup" ? currentPage() : "play";
+      if (document.body.dataset.page !== "h2h" && typeof h2h !== "undefined" && h2h.mode) h2hReset();
       // Remember where each sideways item row was scrolled so a tap doesn't snap it back to the start.
       const keepPage = document.body.dataset.page + "|" + state.phase;
       const rowScroll = render.keep === keepPage ? Array.prototype.map.call(app.querySelectorAll(".closet-opts, .pz-grid"), function (r) { return r.scrollLeft; }) : [];
@@ -8407,6 +8443,7 @@
       if (page === "backgrounds") stack.appendChild(backgroundsCard());
       if (page === "closet") { stack.appendChild(closetCard()); app.appendChild(stack); return; }
       if (page === "bricks") { stack.appendChild(bricksCard()); app.appendChild(stack); return; }
+      if (page === "h2h") { stack.appendChild(h2hCard()); app.appendChild(stack); return; }
       if (page === "leaders") { stack.appendChild(leaderboardCard()); app.appendChild(stack); return; }
       const opsCard = operationCard();
       if (page === "games" && learnList.length) stack.appendChild(learnCard());
@@ -9431,8 +9468,8 @@
       }
       return card;
     }
-    const PAGES = ["menu", "beats", "backgrounds", "games", "minigames", "leaders", "closet", "bricks"];
-    const PAGE_TITLES = { beats: "Beats", backgrounds: "Backgrounds", games: "Fact Challenge", minigames: "Mini Games", leaders: "Leaders", closet: "Avatar", bricks: "Brick by Brick" };
+    const PAGES = ["menu", "beats", "backgrounds", "games", "minigames", "leaders", "closet", "bricks", "h2h"];
+    const PAGE_TITLES = { beats: "Beats", backgrounds: "Backgrounds", games: "Fact Challenge", minigames: "Mini Games", leaders: "Leaders", closet: "Avatar", bricks: "Brick by Brick", h2h: "Head to Head" };
     let menuSmooth = false;
     function currentPage() {
       const h = (location.hash || "").replace(/^#/, "");
@@ -9522,6 +9559,11 @@
         fcRow.appendChild(el("button", { type: "button", class: "menu-lb home-bb", onClick: function () { bb.build = null; bb.celebrate = false; bb.lock = false; bb.shelf = false; goPage("bricks"); } }, [
           el("span", { class: "menu-lb-ico", "aria-hidden": "true", text: "\uD83E\uDDF1" }),
           el("span", { class: "hb-label", text: "Brick by Brick" }),
+          el("span", { class: "hb-go", "aria-hidden": "true", text: "\u203A" })
+        ]));
+        fcRow.appendChild(el("button", { type: "button", class: "menu-lb home-bb home-h2h", onClick: function () { h2hReset(); goPage("h2h"); } }, [
+          el("span", { class: "menu-lb-ico", "aria-hidden": "true", text: "\uD83E\uDD1C\uD83E\uDD1B" }),
+          el("span", { class: "hb-label", text: "Head to Head" }),
           el("span", { class: "hb-go", "aria-hidden": "true", text: "\u203A" })
         ]));
       }
@@ -10161,6 +10203,185 @@
         answers.appendChild(el("button", { type: "button", class: cls, onClick: function () { bbAnswer(c); } }, [el("span", { text: String(c) })]));
       });
       card.appendChild(answers);
+      return card;
+    }
+    // ===== Head to Head: two kids race the same facts. Practice only: no beats, items, points or streaks. =====
+    const H2H_WIN = 10;
+    const h2h = { mode: null, seed: 0, i: 0, prob: null, s: [0, 0], lock: [0, 0], flash: [null, null], over: 0, room: "", me: 0, joined: false, wait: "", err: "", poll: 0, busy: false, joinCode: "", grade: 3, op: "mul" };
+    function h2hRng(seed) { let t = seed >>> 0; return function () { t = (t + 0x6D2B79F5) >>> 0; let r = Math.imul(t ^ (t >>> 15), 1 | t); r = (r + Math.imul(r ^ (r >>> 7), 61 | r)) ^ r; return ((r ^ (r >>> 14)) >>> 0) / 4294967296; }; }
+    // Same seed + same number = same problem on both devices. Reuses the Brick by Brick maker.
+    function h2hProblem(seed, i, grade, op) {
+      const keep = Math.random, kg = bbSave.grade, ko = bbSave.op;
+      Math.random = h2hRng(seed * 1000 + i * 7919 + 13);
+      bbSave.grade = grade; bbSave.op = op;
+      try { return bbProblem(); } finally { Math.random = keep; bbSave.grade = kg; bbSave.op = ko; }
+    }
+    function h2hStop() { if (h2h.poll) clearInterval(h2h.poll); h2h.poll = 0; }
+    function h2hReset() { h2hStop(); h2h.mode = null; h2h.room = ""; h2h.me = 0; h2h.joined = false; h2h.err = ""; h2h.wait = ""; h2h.over = 0; h2h.s = [0, 0]; h2h.lock = [0, 0]; h2h.flash = [null, null]; document.body.classList.remove("h2h-on"); }
+    function h2hStartLocal() {
+      h2h.mode = "local"; h2h.grade = bbGrade(); h2h.op = bbSave.op; h2h.seed = Math.floor(Math.random() * 1e6);
+      h2h.i = 0; h2h.s = [0, 0]; h2h.over = 0; h2h.lock = [0, 0]; h2h.flash = [null, null];
+      h2h.prob = h2hProblem(h2h.seed, 0, h2h.grade, h2h.op);
+      render(); window.scrollTo(0, 0);
+    }
+    function h2hTap(p, choice) {
+      if (h2h.over || !h2h.prob || h2h.busy) return;
+      if (Date.now() < h2h.lock[p]) return;
+      if (h2h.mode === "remote" && p !== h2h.me - 1) return;
+      if (choice === h2h.prob.answer) {
+        bbSound("snap");
+        h2h.flash = [null, null]; h2h.flash[p] = "win";
+        setTimeout(function () { if (h2h.flash[p] === "win") { h2h.flash[p] = null; if (h2h.mode && !h2h.over) render(); } }, 600);
+        if (h2h.mode === "remote") { h2hSend("roomHit", "&p=" + h2h.me + "&q=" + h2h.i); return; }
+        h2h.s[p]++;
+        if (h2h.s[p] >= H2H_WIN) { h2h.over = p + 1; bbSound("win"); render(); bbBurst(); return; }
+        h2h.i++; h2h.prob = h2hProblem(h2h.seed, h2h.i, h2h.grade, h2h.op);
+        say("Player " + (p + 1) + " got it.");
+        render();
+      } else {
+        h2h.lock[p] = Date.now() + 1500; h2h.flash[p] = "oops";
+        render();
+        setTimeout(function () { if (h2h.flash[p] === "oops") h2h.flash[p] = null; if (h2h.mode) render(); }, 1550);
+      }
+    }
+    // --- Two devices: rooms live on the Apps Script (GET only, so no preflight). Poll about once a second. ---
+    function h2hApply(d) {
+      if (!d || !d.ok) { h2h.err = d && d.error === "room" ? "No game with that code." : "Could not reach the game. Trying again…"; render(); return; }
+      h2h.err = "";
+      const newGame = d.seed !== h2h.seed;
+      h2h.seed = d.seed; h2h.grade = d.grade; h2h.op = d.op; h2h.joined = !!d.joined;
+      if (newGame || d.q !== h2h.i || !h2h.prob) { h2h.i = d.q; h2h.prob = h2hProblem(h2h.seed, h2h.i, h2h.grade, h2h.op); h2h.lock = [0, 0]; if (!newGame && d.last && d.last !== h2h.me) h2h.flash = [null, null]; }
+      const was = h2h.over;
+      h2h.s = [d.s[0] | 0, d.s[1] | 0]; h2h.over = d.done | 0;
+      if (h2h.over && !was) { bbSound("win"); if (h2h.over === h2h.me) bbBurst(); }
+      if (currentPage() === "h2h" && h2h.mode === "remote") render();
+    }
+    function h2hSend(action, extra) {
+      h2h.busy = true;
+      return lbGet("action=" + action + "&room=" + encodeURIComponent(h2h.room) + (extra || ""))
+        .then(h2hApply).catch(function () { h2h.err = "Could not reach the game. Trying again…"; render(); })
+        .then(function () { h2h.busy = false; });
+    }
+    function h2hPoll() {
+      h2hStop();
+      h2h.poll = setInterval(function () {
+        if (currentPage() !== "h2h" || h2h.mode !== "remote") { h2hStop(); return; }
+        if (!h2h.busy) h2hSend("roomGet");
+      }, 1000);
+    }
+    function h2hCreate() {
+      h2h.mode = "remote"; h2h.me = 1; h2h.wait = "Making a game…"; h2h.seed = 0; h2h.i = 0; h2h.prob = null; h2h.over = 0; render();
+      lbGet("action=roomNew&grade=" + bbGrade() + "&op=" + encodeURIComponent(bbSave.op))
+        .then(function (d) { h2h.wait = ""; if (!d || !d.ok) throw 0; h2h.room = d.room; h2hApply(d); h2hPoll(); })
+        .catch(function () { h2h.wait = ""; h2h.mode = "two"; h2h.err = "Could not make a game. Try again."; render(); });
+    }
+    function h2hJoin(code) {
+      code = String(code || "").trim().toUpperCase();
+      if (!/^[A-Z]{4}$/.test(code)) { h2h.err = "Type the 4 letters."; render(); return; }
+      h2h.mode = "remote"; h2h.me = 2; h2h.room = code; h2h.wait = "Joining…"; h2h.seed = 0; h2h.i = 0; h2h.prob = null; h2h.over = 0; render();
+      lbGet("action=roomJoin&room=" + code)
+        .then(function (d) { h2h.wait = ""; if (!d || !d.ok) { h2h.mode = "two"; h2h.err = d && d.error === "full" ? "That game already has 2 players." : "No game with that code."; render(); return; } h2hApply(d); h2hPoll(); })
+        .catch(function () { h2h.wait = ""; h2h.mode = "two"; h2h.err = "Could not reach the game. Try again."; render(); });
+    }
+    function h2hHalf(p, label) {
+      const half = el("div", { class: "h2h-half h2h-p" + (p + 1) + (h2h.flash[p] ? " " + h2h.flash[p] : "") });
+      half.appendChild(el("div", { class: "h2h-top" }, [el("span", { class: "h2h-who", text: label }), el("span", { class: "h2h-score", "aria-label": label + " score", text: h2h.s[p] + " / " + H2H_WIN })]));
+      half.appendChild(el("p", { class: "h2h-q", text: h2h.prob ? h2h.prob.text : "" }));
+      const locked = Date.now() < h2h.lock[p];
+      half.appendChild(el("p", { class: "h2h-msg", text: locked ? "Oops! Wait…" : "\u00A0" }));
+      const g = el("div", { class: "h2h-ans" });
+      (h2h.prob ? h2h.prob.choices : []).forEach(function (c) {
+        const b = el("button", { type: "button", class: "h2h-btn", text: String(c), onClick: function () { h2hTap(p, c); } });
+        if (locked) b.disabled = true;
+        g.appendChild(b);
+      });
+      half.appendChild(g);
+      return half;
+    }
+    function h2hOver(card, mine) {
+      const w = h2h.over;
+      let line = "Player " + w + " wins!";
+      if (h2h.mode === "remote") line = w === h2h.me ? "You win!" : "Your friend wins!";
+      card.appendChild(el("div", { class: "h2h-end" }, [
+        el("p", { class: "h2h-big", text: "\uD83C\uDFC6 " + line }),
+        el("p", { class: "h2h-final", text: h2h.s[0] + " to " + h2h.s[1] }),
+        el("button", { type: "button", class: "bb-go", text: "Rematch", onClick: function () {
+          if (h2h.mode === "remote") { h2h.flash = [null, null]; h2hSend("roomRematch"); } else h2hStartLocal();
+        } }),
+        el("button", { type: "button", class: "bb-back h2h-done", text: "Done", onClick: function () { h2hReset(); render(); } })
+      ]));
+    }
+    function h2hCard() {
+      const card = el("div", { class: "bb-card h2h-card" });
+      const head = function (back) {
+        card.appendChild(el("div", { class: "bb-head" }, [
+          el("button", { type: "button", class: "bb-back", text: "\u2039 Back", onClick: back }),
+          el("h2", { class: "bb-title", text: "\uD83E\uDD1C\uD83E\uDD1B Head to Head" })
+        ]));
+      };
+      document.body.classList.toggle("h2h-on", h2h.mode === "local" || (h2h.mode === "remote" && h2h.joined && !!h2h.prob));
+      if (h2h.mode === "local") {
+        card.classList.add("h2h-full");
+        if (h2h.over) { h2hOver(card); return card; }
+        card.appendChild(h2hHalf(0, "Player 1"));
+        card.appendChild(el("button", { type: "button", class: "h2h-quit", "aria-label": "Stop game", text: "\u2715", onClick: function () { h2hReset(); render(); } }));
+        card.appendChild(h2hHalf(1, "Player 2"));
+        return card;
+      }
+      if (h2h.mode === "remote") {
+        if (h2h.wait) { head(function () { h2hReset(); render(); }); card.appendChild(el("p", { class: "bb-tag", text: h2h.wait })); return card; }
+        if (!h2h.joined || !h2h.prob) {
+          head(function () { h2hReset(); render(); });
+          card.appendChild(el("p", { class: "bb-tag", text: "Tell your friend this code:" }));
+          card.appendChild(el("p", { class: "h2h-code", text: h2h.room }));
+          card.appendChild(el("p", { class: "bb-note", text: "Waiting for your friend to join…" }));
+          if (h2h.err) card.appendChild(el("p", { class: "bb-oops", text: h2h.err }));
+          return card;
+        }
+        card.classList.add("h2h-full", "h2h-remote");
+        if (h2h.over) { h2hOver(card); return card; }
+        const me = h2h.me - 1, them = 1 - me;
+        card.appendChild(el("div", { class: "h2h-bar" }, [
+          el("button", { type: "button", class: "h2h-quit h2h-quit-r", "aria-label": "Stop game", text: "\u2715", onClick: function () { h2hReset(); render(); } }),
+          el("span", { class: "h2h-vs", text: "You " + h2h.s[me] + "  \u2022  Friend " + h2h.s[them] })
+        ]));
+        card.appendChild(h2hHalf(me, "You"));
+        if (h2h.err) card.appendChild(el("p", { class: "bb-oops", text: h2h.err }));
+        return card;
+      }
+      if (h2h.mode === "two") {
+        head(function () { h2h.mode = null; h2h.err = ""; render(); });
+        card.appendChild(el("button", { type: "button", class: "bb-go h2h-pick", text: "Make a game", onClick: h2hCreate }));
+        card.appendChild(el("p", { class: "bb-label", text: "Or join your friend" }));
+        const inp = el("input", { type: "text", class: "h2h-input", maxlength: "4", autocapitalize: "characters", autocomplete: "off", spellcheck: "false", placeholder: "CODE", "aria-label": "Game code", value: h2h.joinCode });
+        inp.addEventListener("input", function () { inp.value = inp.value.toUpperCase().replace(/[^A-Z]/g, "").slice(0, 4); h2h.joinCode = inp.value; });
+        inp.addEventListener("keydown", function (e) { if (e.key === "Enter") h2hJoin(inp.value); });
+        card.appendChild(el("div", { class: "h2h-joinrow" }, [inp, el("button", { type: "button", class: "bb-go", text: "Join", onClick: function () { h2hJoin(inp.value); } })]));
+        if (h2h.err) card.appendChild(el("p", { class: "bb-oops", text: h2h.err }));
+        return card;
+      }
+      head(function () { goPage("menu"); });
+      card.appendChild(el("p", { class: "bb-tag", text: "Race a friend. First to 10 wins!" }));
+      card.appendChild(el("p", { class: "bb-label", text: "Pick your grade" }));
+      const gr = el("div", { class: "bb-grades", role: "group", "aria-label": "Grade" });
+      [1, 2, 3, 4, 5, 6].forEach(function (g) {
+        const on = bbGrade() === g;
+        gr.appendChild(el("button", { type: "button", class: "bb-op bb-grade" + (on ? " on" : ""), "aria-pressed": on ? "true" : "false", "aria-label": "Grade " + g, text: String(g), onClick: function () { bbSave.grade = g; if (!bbOpOk(bbSave.op)) bbSave.op = "add"; bbStore(); render(); } }));
+      });
+      card.appendChild(gr);
+      card.appendChild(el("p", { class: "bb-label", text: "Pick your math" }));
+      const ops = el("div", { class: "bb-ops", role: "group", "aria-label": "Math" });
+      BB_OPS.forEach(function (o) {
+        const ok = bbOpOk(o[0]);
+        const btn = el("button", { type: "button", class: "bb-op" + (bbSave.op === o[0] ? " on" : "") + (ok ? "" : " off"), "aria-pressed": bbSave.op === o[0] ? "true" : "false", text: o[1], onClick: function () { if (!ok) return; bbSave.op = o[0]; bbStore(); render(); } });
+        if (!ok) btn.disabled = true;
+        ops.appendChild(btn);
+      });
+      card.appendChild(ops);
+      if (!BB_GRADES[bbGrade()].tab) card.appendChild(el("p", { class: "bb-note", text: "\u00D7 and \u00F7 start in Grade 3." }));
+      card.appendChild(el("p", { class: "bb-label", text: "How do you want to play?" }));
+      card.appendChild(el("button", { type: "button", class: "h2h-mode", onClick: h2hStartLocal }, [el("span", { class: "h2h-mode-ico", text: "\uD83D\uDCF1" }), el("span", { class: "h2h-mode-t", text: "One device" }), el("span", { class: "h2h-mode-n", text: "Sit across from each other" })]));
+      card.appendChild(el("button", { type: "button", class: "h2h-mode", onClick: function () { h2h.mode = "two"; h2h.err = ""; render(); } }, [el("span", { class: "h2h-mode-ico", text: "\uD83D\uDCF1\uD83D\uDCF1" }), el("span", { class: "h2h-mode-t", text: "Two devices" }), el("span", { class: "h2h-mode-n", text: "Each kid uses their own" })]));
       return card;
     }
     // ===== Brick by Brick 3D shelf: three.js is loaded only when the shelf opens. Flat pictures if WebGL is missing. =====
