@@ -3287,6 +3287,17 @@
     .si-sub { margin: 0; font: 600 1.1rem/1.3 var(--ui-font); color: #fff7ea; }
     .si-names { display: grid; grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr)); gap: 0.55rem; }
     .si-name { min-height: 3.6rem; padding: 0.4rem 0.6rem; border-radius: 1rem; border: 2px solid rgba(255,255,255,0.45); background: #1d1736; color: #fff; font: 800 1.15rem/1.15 var(--ui-font); cursor: pointer; }
+    .si-classes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.55rem; }
+    .si-class { min-height: 4.4rem; border-radius: 1rem; border: 2px solid rgba(255,255,255,0.5); background: #2a1d5a; color: #fff; font: 800 1.35rem/1.1 var(--ui-font); cursor: pointer; }
+    .si-class.on { background: #ffd34e; color: #1a1233; border-color: #fff3c2; }
+    .si-code-row { display: flex; gap: 0.5rem; }
+    .si-code-row .si-input { flex: 1 1 auto; min-width: 0; text-transform: uppercase; }
+    .si-code-row .si-go { flex: 0 0 auto; min-width: 5rem; }
+    .si-cls-tag { display: inline-block; margin-left: 0.4rem; padding: 0.1rem 0.55rem; border-radius: 999px; background: #ffd34e; color: #1a1233; font: 800 0.9rem/1.4 var(--ui-font); vertical-align: middle; }
+    .lb-classes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.4rem; margin: 0 0 0.7rem; }
+    .lb-class { min-height: 3rem; font: 800 1.1rem/1 var(--ui-font); border-radius: 0.9rem; border: 2px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.08); color: #fff; cursor: pointer; }
+    .lb-class.on { background: #7ee07a; color: #10301a; border-color: #d6ffd2; }
+    .lb-class-h { margin: 0 0 0.5rem; text-align: center; font: 800 1.25rem/1.2 var(--ui-font); color: #fff7ea; }
     .si-input { min-height: 3.6rem; border-radius: 1rem; border: 2px solid #fff6dc; background: #fffef6; color: #1a1233; padding: 0 1rem; font: 800 1.5rem/1 var(--ui-font); }
     .si-go { min-height: 3.6rem; }
     .si-msg { margin: 0; min-height: 1.3rem; font: 700 1.05rem/1.3 var(--ui-font); color: #ffe39a; }
@@ -8790,6 +8801,11 @@
     function lbMe() {
       try { const v = JSON.parse(localStorage.getItem(LB_KEY) || "null"); return v && v.name && v.code && v.pw ? v : null; } catch (e) { return null; }
     }
+    // ---- Three classes. Codes are checked by the sheet script (v7). Older scripts: default codes A/B/C here, everyone counts as Class A. ----
+    const LB_CLASSES = [{ id: "A", name: "Class A" }, { id: "B", name: "Class B" }, { id: "C", name: "Class C" }];
+    function lbClassName(id) { const l = (lb.board && lb.board.classes) || LB_CLASSES; const c = l.filter(function (x) { return x.id === id; })[0]; return c ? c.name : "Class " + id; }
+    function lbClassOf(name) { const m = lb.board && lb.board.classOf; if (!m) return "A"; for (const k in m) if (k.toLowerCase() === String(name).toLowerCase()) return m[k]; return "A"; }
+    function lbLocalCode(code) { const k = String(code || "").toUpperCase().replace(/[^A-Z0-9]/g, "").replace(/^CLASS(?=[ABC]$)/, ""); return /^[ABC]$/.test(k) ? k : null; }
     function lbForget() { lbFlush(true); try { localStorage.removeItem(LB_KEY); localStorage.removeItem(LB_PTS_KEY); } catch (e) {} }
     // ---- Points: 1 for each right answer, minus 1 for each wrong one. Sent in small batches. ----
     // lb.mode: "points" once the sheet script says it can total points (version 2), "streak" for the old script.
@@ -8888,7 +8904,7 @@
       const me = lbMe();
       avPull();
       Promise.all([me ? Promise.resolve(lb.names) : lbGet("action=roster").then(function (d) { return (d && d.names) || []; }), lbGet("action=board")])
-        .then(function (res) { lb.names = res[0]; lb.board = res[1] && res[1].ok ? res[1] : null; lb.failed = false; if (lb.board && lb.board.timed && !lb.timedOk) { lb.timedOk = true; lbTimedFlush(); } if (lb.board && lb.board.points && lb.mode !== "points") { lb.mode = "points"; lbFlush(); } })
+        .then(function (res) { lb.names = res[0]; lb.board = res[1] && res[1].ok ? res[1] : null; if (me && lb.board && lb.board.classOf) { const c = lbClassOf(me.name); if (me.cls !== c) { me.cls = c; try { localStorage.setItem(LB_KEY, JSON.stringify(me)); } catch (e) {} if (!lb.clsTouched) lb.cls = c; } } lb.failed = false; if (lb.board && lb.board.timed && !lb.timedOk) { lb.timedOk = true; lbTimedFlush(); } if (lb.board && lb.board.points && lb.mode !== "points") { lb.mode = "points"; lbFlush(); } })
         .catch(function () { lb.failed = true; })
         .then(function () { lb.loading = false; if (state.phase === "setup" && currentPage() === "leaders") render(); });
     }
@@ -8916,7 +8932,7 @@
        ["all", "Fastest All Facts", function (r) { return formatClock(r.ms); }]].forEach(function (s) {
         wrap.appendChild(el("h3", { class: "lb-timed-h", text: s[1] }));
         const list = el("ol", { class: "lb-list" });
-        const rows = (t && t[s[0]]) || [];
+        const rows = ((t && t[s[0]]) || []).filter(function (r) { return lbClassOf(r.name) === lb.cls; });
         if (!lb.board) list.appendChild(el("li", { class: "lb-empty", text: lb.failed ? "Can\u2019t load the board right now." : "Loading\u2026" }));
         else if (!t) list.appendChild(el("li", { class: "lb-empty", text: "Coming soon!" }));
         else if (!rows.length) list.appendChild(el("li", { class: "lb-empty", text: "No scores yet. Be the first!" }));
@@ -8934,15 +8950,16 @@
       return wrap;
     }
     // ===== Sign in: pick your name, then your own password. The sheet script checks it; the page only keeps a token. =====
-    const si = { step: "name", name: "", hasPw: false, msg: "", busy: false };
+    const si = { step: "class", cls: "", clsName: "", clsNames: null, name: "", hasPw: false, msg: "", busy: false };
     function siPost(obj) {
       return fetch(LEADERBOARD_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(obj) })
         .then(function (r) { if (!r.ok) throw new Error("si " + r.status); return r.json(); });
     }
-    function siOpen() { si.step = "name"; si.name = ""; si.msg = ""; si.busy = false; goPage("signin"); }
-    function siDone(name, token) {
-      try { localStorage.setItem(LB_KEY, JSON.stringify({ name: name, code: token, pw: 1 })); } catch (e) {}
-      lb.msg = ""; si.step = "name"; si.msg = "";
+    function siOpen() { si.step = "class"; si.cls = ""; si.clsNames = null; si.name = ""; si.msg = ""; si.busy = false; goPage("signin"); }
+    function siDone(name, token, cls) {
+      try { localStorage.setItem(LB_KEY, JSON.stringify({ name: name, code: token, pw: 1, cls: cls || si.cls || "A" })); } catch (e) {}
+      lb.cls = cls || si.cls || "A";
+      lb.msg = ""; si.step = "class"; si.msg = "";
       if (avOwner() && avOwner() !== name) avSwitchKid(name);
       avPull(true); lbCaps(); lb.board = null;
       goPage("menu");
@@ -8972,19 +8989,32 @@
     function siInput(label) { return el("input", { class: "si-input", type: "text", autocomplete: "off", autocapitalize: "off", autocorrect: "off", spellcheck: "false", maxlength: "40", "aria-label": label, placeholder: label }); }
     function siCard() {
       const card = el("div", { class: "card si-card" });
-      const back = function () { if (si.step === "name") goPage("menu"); else { si.step = "name"; si.msg = ""; render(); } };
+      const back = function () { if (si.step === "class") goPage("menu"); else { si.step = si.step === "pw" ? "name" : "class"; si.msg = ""; render(); } };
       card.appendChild(el("div", { class: "lb-head" }, [
         el("button", { type: "button", class: "av-back lb-back", text: "\u2039 Back", onClick: back }),
         el("h2", { class: "lb-title", text: "\uD83D\uDC64 Sign in" })
       ]));
       const note = el("p", { class: "si-msg", role: "status", text: si.msg });
       if (!LEADERBOARD_URL) { card.appendChild(el("p", { class: "si-big", text: "Sign in is off here." })); return card; }
+      if (si.step === "class") {
+        card.appendChild(el("p", { class: "si-big", text: "What is your class code?" }));
+        const c = siInput("Class code");
+        c.setAttribute("maxlength", "20"); c.setAttribute("autocapitalize", "characters");
+        const go = function () { siTryCode(c.value, note); };
+        c.addEventListener("keydown", function (e) { if (e.key === "Enter") go(); });
+        card.appendChild(el("div", { class: "si-code-row" }, [c, el("button", { type: "button", class: "lb-go si-go", text: "Go", onClick: go })]));
+        card.appendChild(note);
+        card.appendChild(el("p", { class: "si-sub si-ask", text: "Don\u2019t know it? Ask your teacher." }));
+        return card;
+      }
       if (si.step === "name") {
-        if (!lb.names && !si.msg) siOpenNames();
-        card.appendChild(el("p", { class: "si-big", text: "Tap your name" }));
+        const names = si.clsNames || lb.names;
+        if (!names && !si.msg) siOpenNames();
+        card.appendChild(el("p", { class: "si-big" }, [document.createTextNode("Tap your name"), el("span", { class: "si-cls-tag", text: si.clsName || lbClassName(si.cls || "A") })]));
         const list = el("div", { class: "si-names" });
-        (lb.names || []).forEach(function (n) { list.appendChild(el("button", { type: "button", class: "si-name", text: n, onClick: function () { if (!si.busy) siPickName(n); } })); });
-        if (!lb.names && !si.msg) card.appendChild(el("p", { class: "si-msg", text: "Loading\u2026" }));
+        if (names && !names.length) list.appendChild(el("p", { class: "si-sub", text: "No names in this class yet. Ask your teacher." }));
+        (names || []).forEach(function (n) { list.appendChild(el("button", { type: "button", class: "si-name", text: n, onClick: function () { if (!si.busy) siPickName(n); } })); });
+        if (!names && !si.msg) card.appendChild(el("p", { class: "si-msg", text: "Loading\u2026" }));
         card.appendChild(list);
         card.appendChild(note);
         return card;
@@ -8999,7 +9029,7 @@
           si.busy = true; note.textContent = "Checking\u2026";
           siPost({ type: "pwCheck", name: si.name, password: a.value }).then(function (d) {
             si.busy = false;
-            if (d && d.ok && d.token) siDone(d.name, d.token);
+            if (d && d.ok && d.token) siDone(d.name, d.token, d.cls || si.cls);
             else if (d && d.error === "tries") note.textContent = "Too many tries. Wait 5 minutes.";
             else if (d && d.error === "none") { note.textContent = "Ask your teacher for a password."; a.value = ""; }
             else { note.textContent = "That\u2019s not it. Try again."; a.value = ""; a.focus(); }
@@ -9013,6 +9043,20 @@
       }
       return card;
     }
+    // Class code: the sheet script checks it (v7) and sends back only that class's names.
+    // An older script ignores the code: then A/B/C are checked here and the full list shows.
+    function siTryCode(code, note) {
+      if (si.busy) return;
+      if (!String(code || "").trim()) { note.textContent = "Type your class code."; return; }
+      si.busy = true; note.textContent = "Checking\u2026";
+      lbGet("action=roster&code=" + encodeURIComponent(String(code).trim())).then(function (d) {
+        si.busy = false;
+        if (d && d.ok && d.cls) { si.cls = d.cls; si.clsName = d.clsName || lbClassName(d.cls); si.clsNames = d.names || []; si.step = "name"; si.msg = ""; render(); return; }
+        const local = d && d.ok && d.names ? lbLocalCode(code) : null;
+        if (local) { si.cls = local; si.clsName = lbClassName(local); si.clsNames = d.names; lb.names = d.names; si.step = "name"; si.msg = ""; render(); return; }
+        note.textContent = "That code didn\u2019t work. Try again.";
+      }).catch(function () { si.busy = false; note.textContent = "Can\u2019t connect right now."; });
+    }
     function siOpenNames() {
       if (si.loading) return;
       si.loading = true;
@@ -9024,7 +9068,7 @@
       if (!LEADERBOARD_URL) return null;
       const me = lbMe();
       if (me) return el("div", { class: "si-bar" }, [
-        el("span", { class: "si-hi", text: "Hi, " + me.name + "!" }),
+        el("span", { class: "si-hi" }, [document.createTextNode("Hi, " + me.name + "!"), el("span", { class: "si-cls-tag", text: lbClassName(me.cls || "A") })]),
         el("button", { type: "button", class: "si-out", text: "Not you?", onClick: siAskOut })
       ]);
       return el("div", { class: "si-bar" }, [
@@ -9057,6 +9101,13 @@
         views.appendChild(el("button", { type: "button", role: "tab", class: "lb-view" + (lb.view === t[0] ? " on" : ""), "aria-selected": String(lb.view === t[0]), text: t[1], onClick: function () { lb.view = t[0]; render(); } }));
       });
       card.appendChild(views);
+      if (!lb.cls) lb.cls = (me && me.cls) || "A";
+      const cls = el("div", { class: "lb-classes", role: "tablist", "aria-label": "Class" });
+      LB_CLASSES.forEach(function (c) {
+        cls.appendChild(el("button", { type: "button", role: "tab", class: "lb-class lb-class-" + c.id + (lb.cls === c.id ? " on" : ""), "aria-selected": String(lb.cls === c.id), text: lbClassName(c.id), onClick: function () { lb.cls = c.id; lb.clsTouched = true; render(); } }));
+      });
+      card.appendChild(cls);
+      card.appendChild(el("p", { class: "lb-class-h", text: "\uD83C\uDFEB " + lbClassName(lb.cls) + " board" }));
       if (lb.view === "timed") { card.appendChild(lbTimedLists(me)); return card; }
       const tabs = el("div", { class: "lb-tabs", role: "tablist" });
       [["today", "Today"], ["week", "This Week"], ["all", "All Time"]].forEach(function (t) {
@@ -9071,7 +9122,7 @@
       card.appendChild(sel);
       const usePts = !!(lb.board && lb.board.points);
       const part = lb.board && (usePts ? lb.board.points[lb.tab] : lb.board[lb.tab]);
-      const rows = part ? (lb.game === "__all" ? part.overall : (part.games && part.games[lb.game]) || []) : [];
+      const rows = (part ? (lb.game === "__all" ? part.overall : (part.games && part.games[lb.game]) || []) : []).filter(function (r) { return lbClassOf(r.name) === lb.cls; });
       const list = el("ol", { class: "lb-list" });
       if (!lb.board) list.appendChild(el("li", { class: "lb-empty", text: lb.failed ? "Can\u2019t load the board right now." : "Loading\u2026" }));
       else if (!rows.length) list.appendChild(el("li", { class: "lb-empty", text: usePts ? "No points yet. Be the first!" : "No streaks yet. Be the first!" }));
