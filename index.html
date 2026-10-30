@@ -3379,11 +3379,11 @@
     /* Head to Head */
     body.h2h-on header, body.h2h-on .page-head, body.h2h-on footer, body.h2h-on .boombox, body.h2h-on .test-banner { display: none !important; }
     .h2h-full { position: fixed; inset: 0; z-index: 9000; max-width: none; margin: 0; padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom); gap: 0; background: #140f28; display: flex; flex-direction: column; }
-    .plus1 { position: fixed; left: 0; top: 0; z-index: 9999; pointer-events: none; font: 900 1.9rem/1 var(--ui-font); color: #2fd15a; text-shadow: 0 2px 0 #0b4a1c, 0 0 2px #0b4a1c; opacity: 0; will-change: transform, opacity; }
+    .plus1 { position: fixed; left: 0; top: 0; z-index: 9999; pointer-events: none; font: 900 3.8rem/1 var(--ui-font); color: #2fd15a; text-shadow: 0 3px 0 #0b4a1c, 0 0 3px #0b4a1c; opacity: 0; will-change: transform, opacity; }
     .plus1.go { animation: plus1Up 0.9s ease-out forwards; }
     .plus1.flip.go { animation-name: plus1Down; }
-    @keyframes plus1Up { 0% { opacity: 0; transform: translate(-50%, 0) scale(0.8); } 15% { opacity: 1; transform: translate(-50%, -10px) scale(1.1); } 100% { opacity: 0; transform: translate(-50%, -72px) scale(1); } }
-    @keyframes plus1Down { 0% { opacity: 0; transform: translate(-50%, 0) rotate(180deg) scale(0.8); } 15% { opacity: 1; transform: translate(-50%, 10px) rotate(180deg) scale(1.1); } 100% { opacity: 0; transform: translate(-50%, 72px) rotate(180deg); } }
+    @keyframes plus1Up { 0% { opacity: 0; transform: translate(-50%, 0) scale(0.8); } 15% { opacity: 1; transform: translate(-50%, -16px) scale(1.1); } 100% { opacity: 0; transform: translate(-50%, -120px) scale(1); } }
+    @keyframes plus1Down { 0% { opacity: 0; transform: translate(-50%, 0) rotate(180deg) scale(0.8); } 15% { opacity: 1; transform: translate(-50%, 16px) rotate(180deg) scale(1.1); } 100% { opacity: 0; transform: translate(-50%, 120px) rotate(180deg); } }
     @keyframes plus1Fade { 0% { opacity: 0; } 20% { opacity: 1; } 100% { opacity: 0; } }
     @media (prefers-reduced-motion: reduce) { .plus1.go, .plus1.flip.go { animation: plus1Fade 0.6s linear forwards; transform: translate(-50%, -20px); } .plus1.flip.go { transform: translate(-50%, 20px) rotate(180deg); } }
     .pts-line { margin: 0; font: 800 1.2rem/1.3 var(--ui-font); color: #fff; background: rgba(20,120,50,0.85); border-radius: 0.8rem; padding: 0.35rem 0.9rem; }
@@ -9067,7 +9067,7 @@
       plusEl.classList.remove("go");
       plusEl.classList.toggle("flip", flip);
       plusEl.style.left = Math.round(r.left + r.width / 2) + "px";
-      plusEl.style.top = Math.round(flip ? r.bottom - 4 : r.top - 30) + "px";
+      plusEl.style.top = Math.round(flip ? r.bottom - 8 : r.top - 56) + "px";
       void plusEl.offsetWidth;
       plusEl.classList.add("go");
     }
