@@ -2604,6 +2604,10 @@
     .lb-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.45rem; }
     .lb-row { display: grid; grid-template-columns: 2.6rem 1fr auto; align-items: center; gap: 0.5rem; min-height: 3rem; padding: 0 0.9rem; border-radius: 0.9rem; background: rgba(18, 10, 38, 0.82); border: 2px solid rgba(255,255,255,0.18); font-size: 1.15rem; font-weight: 800; }
     .lb-row.top1 { border-color: rgba(255, 211, 106, 0.85); } .lb-row.top2 { border-color: rgba(220, 225, 235, 0.75); } .lb-row.top3 { border-color: rgba(214, 140, 80, 0.75); }
+    .lb-row.lb-bump { animation: lbBump 1.6s ease-out; }
+    @keyframes lbBump { 0% { background: rgba(80, 220, 120, 0.75); } 100% { } }
+    .lb-updated { margin: 0.1rem 0 0; font: 600 0.8rem/1.2 var(--ui-font); color: rgba(255,255,255,0.75); text-align: center; }
+    @media (prefers-reduced-motion: reduce) { .lb-row.lb-bump { animation: none; outline: 2px solid #5fe08a; } }
     .lb-row.me { background: rgba(95, 242, 255, 0.18); border-color: #5ff2ff; }
     .lb-rank { font-size: 1.35rem; text-align: center; }
     .lb-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -3375,6 +3379,19 @@
     /* Head to Head */
     body.h2h-on header, body.h2h-on .page-head, body.h2h-on footer, body.h2h-on .boombox, body.h2h-on .test-banner { display: none !important; }
     .h2h-full { position: fixed; inset: 0; z-index: 9000; max-width: none; margin: 0; padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom); gap: 0; background: #140f28; display: flex; flex-direction: column; }
+    .plus1 { position: fixed; left: 0; top: 0; z-index: 9999; pointer-events: none; font: 900 1.9rem/1 var(--ui-font); color: #2fd15a; text-shadow: 0 2px 0 #0b4a1c, 0 0 2px #0b4a1c; opacity: 0; will-change: transform, opacity; }
+    .plus1.go { animation: plus1Up 0.9s ease-out forwards; }
+    .plus1.flip.go { animation-name: plus1Down; }
+    @keyframes plus1Up { 0% { opacity: 0; transform: translate(-50%, 0) scale(0.8); } 15% { opacity: 1; transform: translate(-50%, -10px) scale(1.1); } 100% { opacity: 0; transform: translate(-50%, -72px) scale(1); } }
+    @keyframes plus1Down { 0% { opacity: 0; transform: translate(-50%, 0) rotate(180deg) scale(0.8); } 15% { opacity: 1; transform: translate(-50%, 10px) rotate(180deg) scale(1.1); } 100% { opacity: 0; transform: translate(-50%, 72px) rotate(180deg); } }
+    @keyframes plus1Fade { 0% { opacity: 0; } 20% { opacity: 1; } 100% { opacity: 0; } }
+    @media (prefers-reduced-motion: reduce) { .plus1.go, .plus1.flip.go { animation: plus1Fade 0.6s linear forwards; transform: translate(-50%, -20px); } .plus1.flip.go { transform: translate(-50%, 20px) rotate(180deg); } }
+    .pts-line { margin: 0; font: 800 1.2rem/1.3 var(--ui-font); color: #fff; background: rgba(20,120,50,0.85); border-radius: 0.8rem; padding: 0.35rem 0.9rem; }
+    .pts-line.off { background: rgba(40,40,60,0.8); font-weight: 700; }
+    .h2h-kids { display: flex; flex-direction: column; gap: 0.5rem; margin: 0.3rem 0; }
+    .h2h-kid { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; font: 700 1.05rem/1.3 var(--ui-font); color: #fff7ea; }
+    .h2h-kid button { min-height: 44px; padding: 0.4rem 0.9rem; border-radius: 0.8rem; border: 2px solid #fff; background: #3a7bd5; color: #fff; font: 800 1rem var(--ui-font); }
+    .streak-count.reset { color: #ffd9a0; }
     .h2h-half { flex: 1 1 50%; min-height: 0; display: flex; flex-direction: column; justify-content: center; gap: 0.4rem; padding: 0.8rem 1rem; box-sizing: border-box; transition: background 0.2s; }
     .h2h-p1 { background: #2a1f52; }
     .h2h-p2 { background: #1e3350; }
@@ -8068,6 +8085,7 @@
       q.flash = { right: right, text: right ? "Right!" : q.fact.a + " \u00d7 " + q.fact.b + " = " + (q.fact.a * q.fact.b) };
       q.lockUntil = Date.now() + (right ? 250 : 900);
       render();
+      if (right) plusOne(".quiz-fact");
       clearTimeout(feedback);
       feedback = setTimeout(function () {
         if (state.phase !== "quiz") return;
@@ -9037,6 +9055,57 @@
     document.addEventListener("visibilitychange", function () { if (document.visibilityState === "hidden") lbFlush(true); });
     // Load a named kid's avatar from the sheet right away, not only when the Leaders page opens.
     if (LEADERBOARD_URL) setTimeout(function () { if (lbMe()) { lbCaps(); avPull(); } }, 300);
+    // ---- +1 pop: one reused element, floats up from the question and fades. Never blocks taps. ----
+    let plusEl = null;
+    function plusOne(anchor) {
+      if (typeof anchor === "string") anchor = document.querySelector(anchor);
+      if (!anchor || !anchor.getBoundingClientRect) return;
+      const r = anchor.getBoundingClientRect();
+      if (!plusEl) { plusEl = document.createElement("div"); plusEl.className = "plus1"; plusEl.setAttribute("aria-hidden", "true"); plusEl.textContent = "+1"; document.body.appendChild(plusEl); }
+      let flip = false;
+      for (let n = anchor; n && n !== document.body; n = n.parentElement) { const t = getComputedStyle(n).transform; if (t && t !== "none" && /^matrix\(-1/.test(t)) { flip = !flip; } }
+      plusEl.classList.remove("go");
+      plusEl.classList.toggle("flip", flip);
+      plusEl.style.left = Math.round(r.left + r.width / 2) + "px";
+      plusEl.style.top = Math.round(flip ? r.bottom - 4 : r.top - 30) + "px";
+      void plusEl.offsetWidth;
+      plusEl.classList.add("go");
+    }
+    // ---- Game sessions (Brick by Brick, Head to Head): one save per finished game, queued here and retried until the sheet takes it. ----
+    const LB_SESS_KEY = "mad-facts-sess";
+    const lbSessBusy = {};
+    function lbSessRead() { try { const v = JSON.parse(localStorage.getItem(LB_SESS_KEY) || "[]"); return Array.isArray(v) ? v : []; } catch (e) { return []; } }
+    function lbSessWrite(v) { try { localStorage.setItem(LB_SESS_KEY, JSON.stringify(v)); } catch (e) {} }
+    function lbSession(kid, game, pts) {
+      if (!LEADERBOARD_URL || !kid || !kid.name || !kid.code || !(pts > 0)) return false;
+      const v = lbSessRead();
+      v.push({ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 7), name: kid.name, code: kid.code, game: game, pts: Math.min(200, Math.floor(pts)) });
+      lbSessWrite(v); lbSessFlush();
+      return true;
+    }
+    function lbSessFlush() {
+      if (!LEADERBOARD_URL) return;
+      lbSessRead().forEach(function (s) {
+        if (lbSessBusy[s.id]) return;
+        lbSessBusy[s.id] = 1;
+        const done = function () { lbSessWrite(lbSessRead().filter(function (x) { return x.id !== s.id; })); };
+        try {
+          fetch(LEADERBOARD_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, keepalive: true,
+            body: JSON.stringify({ type: "points", name: s.name, code: s.code, game: s.game, right: s.pts, wrong: 0 }) })
+            .then(function (r) { return r.json(); })
+            .then(function (d) { if (d && (d.ok || d.error === "code" || d.error === "name" || d.error === "points" || d.error === "game")) done(); })
+            .catch(function () {})
+            .then(function () { delete lbSessBusy[s.id]; });
+        } catch (e) { delete lbSessBusy[s.id]; }
+      });
+    }
+    window.addEventListener("online", lbSessFlush);
+    if (LEADERBOARD_URL) setTimeout(lbSessFlush, 1500);
+    function ptsLine(kid, pts, saved) {
+      if (!LEADERBOARD_URL) return null;
+      if (!kid) return el("p", { class: "pts-line off", text: "Sign in to save points" });
+      return el("p", { class: "pts-line", text: (kid.label ? kid.label + ": " : "") + "+" + pts + " points \u2713 Saved to leaderboard" });
+    }
     function lbGet(params) {
       return fetch(LEADERBOARD_URL + (LEADERBOARD_URL.indexOf("?") >= 0 ? "&" : "?") + params, { cache: "no-store" })
         .then(function (r) { if (!r.ok) throw new Error("lb " + r.status); return r.json(); });
@@ -9047,10 +9116,56 @@
       const me = lbMe();
       avPull();
       Promise.all([me ? Promise.resolve(lb.names) : lbGet("action=roster").then(function (d) { return (d && d.names) || []; }), lbGet("action=board")])
-        .then(function (res) { lb.names = res[0]; lb.board = res[1] && res[1].ok ? res[1] : null; if (me && lb.board && lb.board.classOf) { const c = lbClassOf(me.name); if (me.cls !== c) { me.cls = c; try { localStorage.setItem(LB_KEY, JSON.stringify(me)); } catch (e) {} if (!lb.clsTouched) lb.cls = c; } } lb.failed = false; if (lb.board && lb.board.timed && !lb.timedOk) { lb.timedOk = true; lbTimedFlush(); } if (lb.board && lb.board.points && lb.mode !== "points") { lb.mode = "points"; lbFlush(); } })
+        .then(function (res) { lb.names = res[0]; lb.board = res[1] && res[1].ok ? res[1] : null; if (lb.board) lb.updated = Date.now(); if (me && lb.board && lb.board.classOf) { const c = lbClassOf(me.name); if (me.cls !== c) { me.cls = c; try { localStorage.setItem(LB_KEY, JSON.stringify(me)); } catch (e) {} if (!lb.clsTouched) lb.cls = c; } } lb.failed = false; if (lb.board && lb.board.timed && !lb.timedOk) { lb.timedOk = true; lbTimedFlush(); } if (lb.board && lb.board.points && lb.mode !== "points") { lb.mode = "points"; lbFlush(); } })
         .catch(function () { lb.failed = true; })
         .then(function () { lb.loading = false; if (state.phase === "setup" && currentPage() === "leaders") render(); });
     }
+    // ---- Live board for a classroom TV: while Leaders is open and visible, fetch the board every 5 s (never two at once). ----
+    // Rows whose score changed get a short green glow; rows that move slide to their new place. Tabs, class and scroll stay put.
+    let lbShown = {}, lbShownKey = "", lbShownNext = {}, lbBumpOn = false;
+    function lbShownStart() {
+      const key = [lb.view, lb.tab, lb.game, lb.cls].join("|");
+      if (key !== lbShownKey) { lbShown = {}; lbBumpOn = false; } else lbShown = Object.assign({}, lbShown, lbShownNext);
+      lbShownKey = key; lbShownNext = {};
+    }
+    function lbChanged(name, val) {
+      lbShownNext[name] = val;
+      const was = lbShown[name];
+      return lbBumpOn && was !== undefined && was !== val;
+    }
+    let lbLastTick = Date.now();
+    function lbPoll() {
+      const now = Date.now(), slept = now - lbLastTick > 15000;
+      lbLastTick = now;
+      if (slept || !LEADERBOARD_URL || lb.loading || lb.polling) return;
+      if (document.visibilityState !== "visible" || state.phase !== "setup" || currentPage() !== "leaders") return;
+      lb.polling = true;
+      lbGet("action=board").then(function (d) {
+        if (!d || !d.ok || currentPage() !== "leaders" || state.phase !== "setup") return;
+        lb.board = d; lb.failed = false; lb.updated = Date.now();
+        const a = document.activeElement;
+        if (a && a.tagName === "SELECT") return;
+        const before = {};
+        document.querySelectorAll(".lb-row[data-n]").forEach(function (r) { before[r.getAttribute("data-n")] = r.getBoundingClientRect().top; });
+        const y = window.scrollY;
+        lbBumpOn = true;
+        render();
+        if (Math.abs(window.scrollY - y) > 1) window.scrollTo(0, y);
+        lbBumpOn = false;
+        if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+        document.querySelectorAll(".lb-row[data-n]").forEach(function (r) {
+          const t = before[r.getAttribute("data-n")];
+          if (t == null) return;
+          const dy = t - r.getBoundingClientRect().top;
+          if (Math.abs(dy) < 2) return;
+          r.style.transform = "translateY(" + dy + "px)";
+          r.style.transition = "none";
+          requestAnimationFrame(function () { requestAnimationFrame(function () { r.style.transition = "transform 0.5s ease"; r.style.transform = ""; }); });
+        });
+      }).catch(function () {}).then(function () { lb.polling = false; });
+    }
+    setInterval(lbPoll, 5000);
+    document.addEventListener("visibilitychange", function () { if (document.visibilityState === "visible") lbLastTick = Date.now(); });
     function lbGameLabel(op) { return opLabel(op) || String(op || ""); }
     function lbStreakEnded(streak, op) {
       if (!LEADERBOARD_URL || !(streak > 0) || lb.mode === "points") return;
@@ -9081,7 +9196,7 @@
         else if (!rows.length) list.appendChild(el("li", { class: "lb-empty", text: "No scores yet. Be the first!" }));
         rows.slice(0, 10).forEach(function (r, i) {
           const mine = me && r.name.toLowerCase() === me.name.toLowerCase();
-          list.appendChild(el("li", { class: "lb-row" + (mine ? " me" : "") + (i < 3 ? " top" + (i + 1) : "") }, [
+          list.appendChild(el("li", { class: "lb-row" + (mine ? " me" : "") + (i < 3 ? " top" + (i + 1) : "") + (lbChanged(s[0] + ":" + r.name, s[2](r)) ? " lb-bump" : ""), "data-n": s[0] + ":" + r.name }, [
             el("span", { class: "lb-rank", text: i < 3 ? ["\uD83E\uDD47", "\uD83E\uDD48", "\uD83E\uDD49"][i] : String(i + 1) }),
             el("span", { class: "lb-name" }, [avNode(mine ? avatar : (lb.board.avatars && lb.board.avatars[r.name]) || { color: "#c9c9d6" }, 30, "lb-av"), el("span", { text: r.name })]),
             el("span", { class: "lb-streak", text: s[2](r) })
@@ -9098,8 +9213,14 @@
       return fetch(LEADERBOARD_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(obj) })
         .then(function (r) { if (!r.ok) throw new Error("si " + r.status); return r.json(); });
     }
-    function siOpen() { si.showCode = false; si.step = "class"; si.cls = ""; si.clsNames = null; si.name = ""; si.msg = ""; si.busy = false; goPage("signin"); }
+    function siOpen() { si.target = ""; si.showCode = false; si.step = "class"; si.cls = ""; si.clsNames = null; si.name = ""; si.msg = ""; si.busy = false; goPage("signin"); }
     function siDone(name, token, cls) {
+      if (si.target === "h2h") {
+        si.target = ""; si.step = "class"; si.msg = "";
+        const me = lbMe();
+        if (!(me && me.name.toLowerCase() === String(name).toLowerCase())) h2h.p2 = { name: name, code: token, cls: cls || si.cls || "A" };
+        goPage("h2h"); return;
+      }
       try { localStorage.setItem(LB_KEY, JSON.stringify({ name: name, code: token, pw: 1, cls: cls || si.cls || "A" })); } catch (e) {}
       lb.cls = cls || si.cls || "A";
       lb.msg = ""; si.step = "class"; si.msg = "";
@@ -9132,10 +9253,10 @@
     function siInput(label) { return el("input", { class: "si-input", type: "text", autocomplete: "off", autocapitalize: "off", autocorrect: "off", spellcheck: "false", maxlength: "40", "aria-label": label, placeholder: label }); }
     function siCard() {
       const card = el("div", { class: "card si-card" });
-      const back = function () { if (si.step === "class") goPage("menu"); else { si.step = si.step === "pw" ? "name" : "class"; si.msg = ""; render(); } };
+      const back = function () { if (si.step === "class") { if (si.target === "h2h") { si.target = ""; goPage("h2h"); } else goPage("menu"); } else { si.step = si.step === "pw" ? "name" : "class"; si.msg = ""; render(); } };
       card.appendChild(el("div", { class: "lb-head" }, [
         el("button", { type: "button", class: "av-back lb-back", text: "\u2039 Back", onClick: back }),
-        el("h2", { class: "lb-title", text: "\uD83D\uDC64 Sign in" })
+        el("h2", { class: "lb-title", text: si.target === "h2h" ? "\uD83D\uDC64 Sign in Player 2" : "\uD83D\uDC64 Sign in" })
       ]));
       const note = el("p", { class: "si-msg", role: "status", text: si.msg });
       if (!LEADERBOARD_URL) { card.appendChild(el("p", { class: "si-big", text: "Sign in is off here." })); return card; }
@@ -9266,6 +9387,8 @@
       });
       card.appendChild(cls);
       card.appendChild(el("p", { class: "lb-class-h", text: "\uD83C\uDFEB " + lbClassName(lb.cls) + " board" }));
+      lbShownStart();
+      if (lb.updated) card.appendChild(el("p", { class: "lb-updated", "aria-live": "off", text: "Updated " + new Date(lb.updated).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }) }));
       if (lb.view === "timed") { card.appendChild(lbTimedLists(me)); return card; }
       const tabs = el("div", { class: "lb-tabs", role: "tablist" });
       [["today", "Today"], ["week", "This Week"], ["all", "All Time"]].forEach(function (t) {
@@ -9286,10 +9409,11 @@
       else if (!rows.length) list.appendChild(el("li", { class: "lb-empty", text: usePts ? "No points yet. Be the first!" : "No streaks yet. Be the first!" }));
       rows.forEach(function (r, i) {
         const mine = me && r.name.toLowerCase() === me.name.toLowerCase();
-        list.appendChild(el("li", { class: "lb-row" + (mine ? " me" : "") + (i < 3 ? " top" + (i + 1) : "") }, [
+        const val = usePts ? r.points + " pts" : String(r.streak) + " \uD83D\uDD25";
+        list.appendChild(el("li", { class: "lb-row" + (mine ? " me" : "") + (i < 3 ? " top" + (i + 1) : "") + (lbChanged(r.name, val) ? " lb-bump" : ""), "data-n": r.name }, [
           el("span", { class: "lb-rank", text: i < 3 ? ["\uD83E\uDD47", "\uD83E\uDD48", "\uD83E\uDD49"][i] : String(i + 1) }),
           el("span", { class: "lb-name" }, [avNode(mine ? avatar : (lb.board.avatars && lb.board.avatars[r.name]) || { color: "#c9c9d6" }, 30, "lb-av"), el("span", { text: r.name })]),
-          el("span", { class: "lb-streak", text: usePts ? r.points + " pts" : String(r.streak) + " \uD83D\uDD25" })
+          el("span", { class: "lb-streak", text: val })
         ]));
       });
       card.appendChild(list);
@@ -10348,16 +10472,16 @@
         { id: "city", name: "City Skyline", art: ["..........G", ".BLB..L..GG", ".BBB.SSS.GL", ".BLB.SLS.GG", "RBBB.SSSYGL", "RLBBRSLSYGG", "RRBBRSSSYGL", "KKKKKKKKKKK"] }
       ]
     };
-    // ===== Brick by Brick: practice game. Right answer = one brick on, wrong answer = two bricks off. No points. =====
+    // ===== Brick by Brick: practice game. Right answer = one brick on, wrong answer = two bricks off. Points: +1 per right, +10 per finished build. =====
     const BB_KEY = "mad-facts-bricks";
     const BB_COLORS = { R: "#e8443a", Y: "#ffcf33", B: "#3a7bd5", G: "#3cba54", W: "#f4f4f4", K: "#5a5f6b", O: "#ff8c1a", T: "#9a6232", D: "#6b3e1f", L: "#7fd3ff", S: "#a3a8b2", E: "#26262e" };
     const BB_LEVELS = [["small", "Small"], ["medium", "Medium"], ["big", "Big"]];
     const BB_OPS = [["mul", "\u00D7"], ["div", "\u00F7"], ["add", "+"], ["sub", "\u2212"], ["mix", "Mix"]];
     let bbSave = (function () { try { const d = JSON.parse(localStorage.getItem(BB_KEY) || "null"); if (d && typeof d === "object") return d; } catch (e) {} return null; })() || {};
-    bbSave.done = bbSave.done || {}; bbSave.prog = bbSave.prog || {}; ["done", "prog"].forEach(function (k) { if (typeof bbSave[k] !== "object" || !bbSave[k]) bbSave[k] = {}; Object.keys(bbSave[k]).forEach(function (id) { if (!bbFind(id)) delete bbSave[k][id]; }); }); bbSave.op = bbSave.op || "mul"; bbSave.level = bbSave.level || "small"; bbSave.grade = bbSave.grade || 3;
+    bbSave.done = bbSave.done || {}; bbSave.prog = bbSave.prog || {}; bbSave.earn = bbSave.earn || {}; ["done", "prog", "earn"].forEach(function (k) { if (typeof bbSave[k] !== "object" || !bbSave[k]) bbSave[k] = {}; Object.keys(bbSave[k]).forEach(function (id) { if (!bbFind(id)) delete bbSave[k][id]; }); }); bbSave.op = bbSave.op || "mul"; bbSave.level = bbSave.level || "small"; bbSave.grade = bbSave.grade || 3;
     const bb = { build: null, prob: null, lock: false, picked: null, add: -1, fall: [], at: 0, celebrate: false };
     function bbStore() { try { localStorage.setItem(BB_KEY, JSON.stringify(bbSave)); } catch (e) {} }
-    function bbReset() { bbSave = { done: {}, prog: {}, op: "mul", level: "small", grade: bbSave.grade || 3 }; bb.build = null; try { localStorage.removeItem(BB_KEY); } catch (e) {} }
+    function bbReset() { bbSave = { done: {}, prog: {}, earn: {}, op: "mul", level: "small", grade: bbSave.grade || 3 }; bb.build = null; try { localStorage.removeItem(BB_KEY); } catch (e) {} }
     function bbStill() { return !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches); }
     function bbBricks(b) {
       if (b._bricks) return b._bricks;
@@ -10459,17 +10583,21 @@
       if (choice === bb.prob.answer) {
         n = Math.min(total, n + 1);
         bbSave.prog[b.id] = n; bb.add = n - 1; bb.fall = [];
+        bbSave.earn[b.id] = (bbSave.earn[b.id] || 0) + 1;
         bbSound("snap");
         say("Right! " + n + " of " + total + " bricks.");
         if (n >= total) {
-          bbSave.done[b.id] = 1; delete bbSave.prog[b.id]; bbStore();
+          // One save per finished build: +1 per right answer on it, +10 for putting it on the shelf.
+          const pts = (bbSave.earn[b.id] || 0) + 10, me = lbMe();
+          bbSave.done[b.id] = 1; delete bbSave.prog[b.id]; delete bbSave.earn[b.id]; bbStore();
+          bb.pts = pts; bb.ptsKid = me && lbSession(me, "Brick by Brick", pts) ? me : null;
           bb.lock = true; bb.celebrate = true; bb.add = -1;
           bbSound("win"); render(); bbBurst();
           return;
         }
         bbStore();
         bb.prob = bbProblem(); bb.picked = null;
-        render();
+        render(); plusOne(".bb-q");
       } else {
         const left = Math.max(0, n - 2);
         bb.fall = []; for (let i = left; i < n; i++) bb.fall.push(i);
@@ -10578,6 +10706,7 @@
         cele.appendChild(art);
         cele.appendChild(el("p", { class: "bb-grit", text: "You didn\u2019t quit. Look what you built!" }));
         cele.appendChild(el("p", { class: "bb-tag", text: "It is on your shelf now." }));
+        const pl = ptsLine(bb.ptsKid, bb.pts); if (pl) cele.appendChild(pl);
         cele.appendChild(el("button", { type: "button", class: "bb-go", text: "See my shelf", onClick: function () { bb.build = null; bb.celebrate = false; bb.lock = false; bb.shelf = true; render(); window.scrollTo(0, 0); } }));
         card.appendChild(cele);
         return card;
@@ -10606,9 +10735,9 @@
       card.appendChild(answers);
       return card;
     }
-    // ===== Head to Head: two kids race the same facts. Practice only: no beats, items, points or streaks. =====
+    // ===== Head to Head: two kids race the same facts. No beats or items. Points: +1 per right, +15 to the winner, saved for signed-in players. =====
     const H2H_WIN = 10;
-    const h2h = { mode: null, seed: 0, i: 0, prob: null, s: [0, 0], lock: [0, 0], flash: [null, null], over: 0, grade: 3, op: "mul" };
+    const h2h = { kids: [null, null], p2: null, res: null, mode: null, seed: 0, i: 0, prob: null, s: [0, 0], lock: [0, 0], flash: [null, null], over: 0, grade: 3, op: "mul" };
     function h2hRng(seed) { let t = seed >>> 0; return function () { t = (t + 0x6D2B79F5) >>> 0; let r = Math.imul(t ^ (t >>> 15), 1 | t); r = (r + Math.imul(r ^ (r >>> 7), 61 | r)) ^ r; return ((r ^ (r >>> 14)) >>> 0) / 4294967296; }; }
     // Same seed + same number = same problem on both devices. Reuses the Brick by Brick maker.
     function h2hProblem(seed, i, grade, op) {
@@ -10620,6 +10749,7 @@
     function h2hReset() { h2h.mode = null; h2h.over = 0; h2h.s = [0, 0]; h2h.lock = [0, 0]; h2h.flash = [null, null]; document.body.classList.remove("h2h-on"); }
     function h2hStartLocal() {
       h2h.mode = "local"; h2h.grade = bbGrade(); h2h.op = bbSave.op; h2h.seed = Math.floor(Math.random() * 1e6);
+      h2h.kids = [lbMe(), h2h.p2]; h2h.res = null;
       h2h.i = 0; h2h.s = [0, 0]; h2h.over = 0; h2h.lock = [0, 0]; h2h.flash = [null, null];
       h2h.prob = h2hProblem(h2h.seed, 0, h2h.grade, h2h.op);
       render(); window.scrollTo(0, 0);
@@ -10632,15 +10762,23 @@
         h2h.flash = [null, null]; h2h.flash[p] = "win";
         setTimeout(function () { if (h2h.flash[p] === "win") { h2h.flash[p] = null; if (h2h.mode && !h2h.over) render(); } }, 600);
         h2h.s[p]++;
-        if (h2h.s[p] >= H2H_WIN) { h2h.over = p + 1; bbSound("win"); render(); bbBurst(); return; }
+        if (h2h.s[p] >= H2H_WIN) { h2h.over = p + 1; h2hSave(); bbSound("win"); render(); bbBurst(); return; }
         h2h.i++; h2h.prob = h2hProblem(h2h.seed, h2h.i, h2h.grade, h2h.op);
         say("Player " + (p + 1) + " got it.");
-        render();
+        render(); plusOne(".h2h-p" + (p + 1) + " .h2h-q");
       } else {
         h2h.lock[p] = Date.now() + 1500; h2h.flash[p] = "oops";
         render();
         setTimeout(function () { if (h2h.flash[p] === "oops") h2h.flash[p] = null; if (h2h.mode) render(); }, 1550);
       }
+    }
+    // Each signed-in player gets +1 per right answer, the winner +15. One save per finished game.
+    function h2hSave() {
+      if (h2h.res) return;
+      h2h.res = [0, 1].map(function (i) {
+        const pts = h2h.s[i] + (h2h.over === i + 1 ? 15 : 0), k = h2h.kids[i];
+        return { pts: pts, kid: k && lbSession(k, "Head to Head", pts) ? k : null };
+      });
     }
     function h2hHalf(p, label) {
       const half = el("div", { class: "h2h-half h2h-p" + (p + 1) + (h2h.flash[p] ? " " + h2h.flash[p] : "") });
@@ -10663,6 +10801,10 @@
       card.appendChild(el("div", { class: "h2h-end" }, [
         el("p", { class: "h2h-big", text: "\uD83C\uDFC6 " + line }),
         el("p", { class: "h2h-final", text: h2h.s[0] + " to " + h2h.s[1] }),
+        h2h.res && LEADERBOARD_URL ? el("div", { class: "h2h-kids" }, [0, 1].map(function (i) {
+          const r = h2h.res[i], k = r.kid;
+          return el("p", { class: "pts-line" + (k ? "" : " off"), text: "Player " + (i + 1) + (k ? " (" + k.name + "): +" + r.pts + " points \u2713" : ": Sign in to save points") });
+        })) : null,
         el("button", { type: "button", class: "bb-go", text: "Rematch", onClick: function () {
           h2hStartLocal();
         } }),
@@ -10706,6 +10848,17 @@
       card.appendChild(ops);
       if (!BB_GRADES[bbGrade()].tab) card.appendChild(el("p", { class: "bb-note", text: "\u00D7 and \u00F7 start in Grade 3." }));
       card.appendChild(el("p", { class: "bb-note", text: "Sit across from each other. Same device." }));
+      if (LEADERBOARD_URL) {
+        const me = lbMe();
+        if (h2h.p2 && me && h2h.p2.name.toLowerCase() === me.name.toLowerCase()) h2h.p2 = null;
+        card.appendChild(el("div", { class: "h2h-kids" }, [
+          el("div", { class: "h2h-kid" }, [document.createTextNode("Player 1: " + (me ? me.name : "not signed in")), me ? null : el("button", { type: "button", text: "Sign in", onClick: siOpen })].filter(Boolean)),
+          el("div", { class: "h2h-kid" }, h2h.p2
+            ? [document.createTextNode("Player 2: " + h2h.p2.name), el("button", { type: "button", text: "Change", onClick: function () { h2h.p2 = null; render(); } })]
+            : [document.createTextNode("Player 2: not signed in"), el("button", { type: "button", class: "h2h-p2-in", text: "Sign in Player 2", onClick: function () { siOpen(); si.target = "h2h"; } })]),
+          el("p", { class: "bb-note", text: "Signed-in players save points." })
+        ]));
+      }
       card.appendChild(el("button", { type: "button", class: "bb-go h2h-start", text: "Start", onClick: h2hStartLocal }));
       return card;
     }
@@ -11395,7 +11548,7 @@
       const banner = el("div", { class: "streak-banner" });
       banner.setAttribute("aria-live", "polite");
       banner.setAttribute("aria-atomic", "true");
-      banner.appendChild(el("p", { class: "streak-count", text: "Streak " + state.streak }));
+      banner.appendChild(el("p", { class: "streak-count" + (state.streakReset && !state.streak ? " reset" : ""), text: "Streak " + state.streak + (state.streakReset && !state.streak ? " \u00B7 start again!" : "") }));
       if (isKq()) {
         banner.appendChild(el("p", { class: "streak-next soft", text: "Practice game \u00B7 no beats here" }));
       } else if (moreUnlocks) {
@@ -12461,11 +12614,14 @@
         var streakRewardId = kqNoPrize ? "" : maybeUnlockStreakReward();
         var mazeNote = justReward ? " Congratulations. " + justBeat.label + " is unlocked. " + justReward.speak : "";
         if (streakRewardId) mazeNote += " Congratulations. " + BEAT_REWARDS[streakRewardId].bar + " is unlocked. " + BEAT_REWARDS[streakRewardId].speak;
+        state.streakReset = false;
+        setTimeout(function () { plusOne(".prompt"); }, 0);
         say("Correct. " + spokenFact(problem) + (justBeat ? " " + justBeat.label + " unlocked." : "") + mazeNote);
       } else {
         lbStreakEnded(state.streak, problem.operation || state.operation);
         lbPoint(false, problem.operation || state.operation);
         buddyMood("shake");
+        state.streakReset = state.streak > 0;
         state.streak = 0;
         state.gain = null;
         if (isMultiples() || problem.operation === "multiples") {
