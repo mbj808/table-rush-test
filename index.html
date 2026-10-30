@@ -638,6 +638,45 @@
     }
     .wave-bg .ghost-dust.d1 { left: -6vh; }
     .wave-bg .ghost-dust.d2 { left: 1.5vh; animation-delay: 0.04s; }
+    /* Lantern Trail (level 15): calm hills, a path lit by lanterns, a few fireflies. Only
+       opacity/transform animate (cheap on phones); no filters or blur. */
+    .wave-bg .lt-scene { display: none; }
+    .wave-bg.scene-lantern {
+      background: linear-gradient(180deg, #070a1c 0%, #141a3f 38%, #2c2a5c 58%, #4a3a63 70%, #0c1428 100%);
+    }
+    .wave-bg.scene-lantern .lt-scene { display: block; position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+    .wave-bg .lt-moon {
+      position: absolute; left: 22vw; top: 18vh; width: min(18vmin, 8rem); aspect-ratio: 1; border-radius: 50%;
+      transform: translate(-50%, -50%);
+      background: radial-gradient(circle at 40% 38%, #fffbe6 0%, #f4ecc8 55%, #d9cfa6 100%);
+      box-shadow: 0 0 30px rgba(255, 244, 200, 0.6), 0 0 90px rgba(255, 230, 160, 0.25);
+    }
+    .wave-bg.scene-lantern .lt-land { display: block; position: absolute; left: 0; top: auto; bottom: 0; width: 100%; height: 55vh; min-height: 0; animation: none; will-change: auto; }
+    .wave-bg .lt-lamp {
+      position: absolute; width: 0.9rem; height: 1.2rem; border-radius: 40% 40% 30% 30%;
+      transform: translate(-50%, -100%);
+      background: radial-gradient(circle at 50% 55%, #fff6c4 0%, #ffc44d 55%, #d9781c 100%);
+      box-shadow: 0 0 14px 4px rgba(255, 196, 77, 0.55);
+      animation: lt-lamp 3.6s ease-in-out infinite;
+    }
+    .wave-bg .lt-lamp::after { content: ""; position: absolute; left: 50%; top: 100%; width: 3px; height: 1.6rem; margin-left: -1.5px; background: #2a2236; }
+    .wave-bg .lt-lamp:nth-of-type(2n) { animation-delay: -1.8s; }
+    @keyframes lt-lamp { 0%, 100% { opacity: 0.85; } 50% { opacity: 1; } }
+    .wave-bg .lt-fly {
+      position: absolute; width: 6px; height: 6px; border-radius: 50%;
+      background: #fff6a8; box-shadow: 0 0 8px 3px rgba(255, 240, 140, 0.6);
+      animation: lt-fly var(--d) ease-in-out var(--dl) infinite;
+    }
+    @keyframes lt-fly {
+      0%, 100% { transform: translate(0, 0); opacity: 0.2; }
+      40% { opacity: 1; }
+      50% { transform: translate(var(--dx), -4vh); opacity: 0.9; }
+      80% { opacity: 0.3; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .wave-bg .lt-lamp, .wave-bg .lt-fly { animation: none !important; }
+      .wave-bg .lt-fly { opacity: 0.7; }
+    }
     /* Graveyard (level 14): a cemetery on a hill, built in depth from public-domain
        silhouettes. Each layer is recoloured flat by an SVG filter: far hills pale, blue and
        hazy, then darker and sharper toward the foreground crest. Fog bands drift between. */
@@ -3673,6 +3712,21 @@
       </div>
     </div>
 
+    <!-- Lantern Trail (beat 16): hand-made SVG hills and a winding path with glowing lanterns and drifting fireflies. -->
+    <div class="lt-scene" aria-hidden="true">
+      <div class="lt-moon"></div>
+      <svg class="lt-land night-art" viewBox="0 0 400 200" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0 92 Q60 62 130 84 T270 76 T400 86 V200 H0Z" fill="#1d2a4f"/>
+        <path d="M0 120 Q90 92 190 112 T400 106 V200 H0Z" fill="#14203d"/>
+        <path d="M0 148 Q110 126 220 142 T400 138 V200 H0Z" fill="#0c1428"/>
+        <path d="M232 112 C214 124 250 132 214 146 C176 162 238 176 170 200 L236 200 C282 176 222 164 254 148 C282 134 244 126 246 112Z" fill="#3a3550" opacity=".85"/>
+      </svg>
+      <span class="lt-lamp" style="left:65vw;top:80vh"></span>
+      <span class="lt-lamp" style="left:46vw;top:86vh"></span>
+      <span class="lt-lamp" style="left:63vw;top:92vh"></span>
+      <span class="lt-lamp" style="left:37vw;top:98vh"></span>
+      <i class="lt-fly" style="left:12vw;top:48vh;--d:7.0s;--dl:-1.0s;--dx:4vw"></i><i class="lt-fly" style="left:24vw;top:60vh;--d:9.0s;--dl:-3.0s;--dx:-3vw"></i><i class="lt-fly" style="left:38vw;top:44vh;--d:8.0s;--dl:-5.0s;--dx:3vw"></i><i class="lt-fly" style="left:52vw;top:66vh;--d:10.0s;--dl:-2.0s;--dx:-4vw"></i><i class="lt-fly" style="left:63vw;top:50vh;--d:7.5s;--dl:-4.0s;--dx:3vw"></i><i class="lt-fly" style="left:76vw;top:62vh;--d:9.5s;--dl:-6.0s;--dx:-3vw"></i><i class="lt-fly" style="left:86vw;top:46vh;--d:8.5s;--dl:-2.5s;--dx:4vw"></i><i class="lt-fly" style="left:30vw;top:72vh;--d:11.0s;--dl:-7.0s;--dx:2vw"></i>
+    </div>
     <!-- Graveyard: public-domain (CC0) FreeSVG silhouettes in assets/halloween/graveyard/:
          far-graveyard https://freesvg.org/1537887427, hill-graves https://freesvg.org/silhouette-vector-drawing-of-graveyard,
          celtic-cross https://freesvg.org/headstone-symbol, gable-stone https://freesvg.org/curved-gable,
@@ -3874,7 +3928,8 @@
       { id: "spooked", label: "Spooked", file: "assets/audio/spooked.mp3", unlockAt: BEAT_UNLOCK_STEP },
       { id: "belfry", label: "Belfry", file: "assets/audio/belfry.mp3", unlockAt: BEAT_UNLOCK_STEP },
       { id: "moonwalk", label: "Moon Walk", file: "assets/audio/moonwalk.mp3", unlockAt: BEAT_UNLOCK_STEP },
-      { id: "graveyard", label: "Graveyard", file: "assets/audio/graveyard.mp3", unlockAt: BEAT_UNLOCK_STEP }
+      { id: "graveyard", label: "Graveyard", file: "assets/audio/graveyard.mp3", unlockAt: BEAT_UNLOCK_STEP },
+      { id: "lantern", label: "Lantern Trail", file: "assets/audio/lantern.mp3", unlockAt: BEAT_UNLOCK_STEP }
     ];
     // Mini games: one unlocks every streak of MINI_UNLOCK_STEP (20, 40 ... 160), separate from beats.
     // Keys stay as before (bitwave/bat/graveyard for the first three) so saved unlocks keep working.
@@ -5493,7 +5548,7 @@
       best: 0,
       muted: false,
       playMusicId: "replay",
-      beatsUnlocked: { "replay": true, "rise": false, "spark": false, "square": false, "bitwave": false, "cry": false, "thunder": false, "howl": false, "cauldron": false, "bat": false, "bats": false, "spooked": false, "belfry": false, "moonwalk": false, "graveyard": false },
+      beatsUnlocked: { "replay": true, "rise": false, "spark": false, "square": false, "bitwave": false, "cry": false, "thunder": false, "howl": false, "cauldron": false, "bat": false, "bats": false, "spooked": false, "belfry": false, "moonwalk": false, "graveyard": false, "lantern": false },
       beatJustUnlocked: "",
       newBest: false,
       drill: null,
@@ -8200,6 +8255,7 @@
       bg.classList.toggle("scene-belfry", level === 12);
       bg.classList.toggle("scene-moonwalk", level === 13);
       bg.classList.toggle("scene-graveyard", level === 14);
+      bg.classList.toggle("scene-lantern", level === 15);
     }
     function render() {
       cleanMathTables();
