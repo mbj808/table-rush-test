@@ -3498,6 +3498,18 @@
     @media (max-height: 700px) and (max-width: 759px) { .av-big .av svg { width: 130px; height: 130px; } }
     @media (prefers-reduced-motion: reduce) { .av-big.bounce .av { animation: none; } }
     /* ===== TEST SITE: design-review fixes ===== */
+    .si-steps { display: flex; justify-content: center; gap: 8px; margin: 2px 0 6px; }
+    .si-dot { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,.25); }
+    .si-dot.done { background: rgba(255,255,255,.6); }
+    .si-dot.on { background: #ffd23f; width: 26px; border-radius: 6px; }
+    .si-step-pw .si-input { display: block; width: 100%; box-sizing: border-box; min-height: 56px; font-size: 1.4rem; text-align: center; margin: 6px 0 12px; }
+    .si-step-pw .si-go { display: block; width: 100%; min-height: 56px; font-size: 1.3rem; }
+    .si-go-fwd > :not(.lb-head) { animation: siInR .28s ease-out both; }
+    .si-go-back > :not(.lb-head) { animation: siInL .28s ease-out both; }
+    @keyframes siInR { from { opacity: 0; transform: translateX(28px); } to { opacity: 1; transform: none; } }
+    @keyframes siInL { from { opacity: 0; transform: translateX(-28px); } to { opacity: 1; transform: none; } }
+    @keyframes siFade { from { opacity: 0; } to { opacity: 1; } }
+    @media (prefers-reduced-motion: reduce) { .si-go-fwd > :not(.lb-head), .si-go-back > :not(.lb-head) { animation: siFade .15s linear both; } }
     :root { --ui-font: ui-rounded, "SF Pro Rounded", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
     .test-badge { position: fixed; top: 0.4rem; right: 0.4rem; z-index: 9999; pointer-events: none; padding: 0.15rem 0.45rem; border-radius: 0.4rem;
       background: #ffd34e; color: #2a1d00; font: 700 0.62rem/1.3 var(--ui-font); letter-spacing: 0.08em; opacity: 0.85; }
@@ -9275,19 +9287,22 @@
     }
     function siOut() { if (avPending()) avPush(); lbForget(); avSwitchKid(""); lb.board = null; render(); }
     function siPickName(n) {
-      si.name = n; si.step = "pw"; si.msg = ""; render();
+      si.name = n; si.step = "pw"; si.msg = ""; si.dir = "fwd"; render();
       setTimeout(function () { const i = document.querySelector(".si-input"); if (i) i.focus(); }, 50);
     }
     function siInput(label) { return el("input", { class: "si-input", type: "text", autocomplete: "off", autocapitalize: "off", autocorrect: "off", spellcheck: "false", maxlength: "40", "aria-label": label, placeholder: label }); }
     function siCard() {
-      const card = el("div", { class: "card si-card" });
-      const back = function () { if (si.step === "class") { if (si.target === "h2h") { si.target = ""; goPage("h2h"); } else goPage("menu"); } else { si.step = si.step === "pw" ? "name" : "class"; si.msg = ""; render(); } };
-      card.appendChild(el("div", { class: "lb-head" }, [
-        el("button", { type: "button", class: "av-back lb-back", text: "\u2039 Back", onClick: back }),
+      const card = el("div", { class: "card si-card si-step-" + si.step + (si.dir ? " si-go-" + si.dir : "") });
+      si.dir = "";
+      const back = function () { if (si.step === "class") { if (si.target === "h2h") { si.target = ""; goPage("h2h"); } else goPage("menu"); } else { si.step = si.step === "pw" ? "name" : "class"; si.msg = ""; si.dir = "back"; render(); } };
+      if (si.step !== "class" || si.target === "h2h") card.appendChild(el("div", { class: "lb-head" }, [
+        el("button", { type: "button", class: "av-back lb-back", text: si.step === "class" ? "\u2039 Back" : si.step === "name" ? "\u2039 Classes" : "\u2039 Names", "aria-label": si.step === "class" ? "Back" : si.step === "name" ? "Back to classes" : "Back to names", onClick: back }),
         el("h2", { class: "lb-title", text: si.target === "h2h" ? "\uD83D\uDC64 Sign in Player 2" : "\uD83D\uDC64 Sign in" })
       ]));
       const note = el("p", { class: "si-msg", role: "status", text: si.msg });
       if (!LEADERBOARD_URL) { card.appendChild(el("p", { class: "si-big", text: "Sign in is off here." })); return card; }
+      const stepN = si.step === "class" ? 1 : si.step === "name" ? 2 : 3;
+      card.appendChild(el("div", { class: "si-steps", "aria-label": "Step " + stepN + " of 3" }, [1, 2, 3].map(function (i) { return el("span", { class: "si-dot" + (i === stepN ? " on" : i < stepN ? " done" : "") }); })));
       if (si.step === "class") {
         card.appendChild(el("p", { class: "si-big", text: "Tap your class" }));
         const grid = el("div", { class: "si-cls-grid" });
@@ -9299,19 +9314,7 @@
           grid.appendChild(b);
         });
         card.appendChild(grid);
-        if (!si.showCode) {
-          card.appendChild(note);
-          card.appendChild(el("button", { type: "button", class: "si-code-link", text: "Type a class code instead", onClick: function () { si.showCode = true; render(); setTimeout(function () { const i = document.querySelector(".si-code-row input"); if (i) i.focus(); }, 0); } }));
-          return card;
-        }
-        card.appendChild(el("p", { class: "si-note", text: "Type your class animal, like Eagles or Wolves." }));
-        const c = siInput("Class code");
-        c.setAttribute("maxlength", "20"); c.setAttribute("autocapitalize", "characters");
-        const go = function () { siTryCode(c.value, note); };
-        c.addEventListener("keydown", function (e) { if (e.key === "Enter") go(); });
-        card.appendChild(el("div", { class: "si-code-row" }, [c, el("button", { type: "button", class: "lb-go si-go", text: "Go", onClick: go })]));
         card.appendChild(note);
-        card.appendChild(el("p", { class: "si-sub si-ask", text: "Don\u2019t know it? Ask your teacher." }));
         return card;
       }
       if (si.step === "name") {
@@ -9328,11 +9331,11 @@
       }
       card.appendChild(el("p", { class: "si-big", text: "Hi, " + si.name + "!" }));
       if (si.step === "pw") {
-        card.appendChild(el("p", { class: "si-sub", text: "Type your password." }));
         const a = siInput("Password");
         card.appendChild(a);
         const go = function () {
-          if (si.busy || !a.value) return;
+          if (si.busy) return;
+          if (!a.value.trim()) { note.textContent = "Type your password. No password? Ask your teacher."; a.focus(); return; }
           si.busy = true; note.textContent = "Checking\u2026";
           siPost({ type: "pwCheck", name: si.name, password: a.value }).then(function (d) {
             si.busy = false;
@@ -9343,9 +9346,8 @@
           }).catch(function () { si.busy = false; note.textContent = "Can\u2019t connect right now."; });
         };
         a.addEventListener("keydown", function (e) { if (e.key === "Enter") go(); });
-        card.appendChild(el("button", { type: "button", class: "lb-go si-go", text: "Sign in", onClick: go }));
+        card.appendChild(el("button", { type: "button", class: "lb-go si-go", text: "Go", onClick: go }));
         card.appendChild(note);
-        card.appendChild(el("p", { class: "si-sub si-ask", text: "Forgot it? Ask your teacher." }));
         return card;
       }
       return card;
@@ -9358,9 +9360,9 @@
       si.busy = true; note.textContent = "Checking\u2026";
       lbGet("action=roster&code=" + encodeURIComponent(String(code).trim())).then(function (d) {
         si.busy = false;
-        if (d && d.ok && d.cls) { si.cls = d.cls; si.clsName = d.clsName && !/^Class [A-J]$/.test(d.clsName) ? d.clsName : lbClassName(d.cls); si.clsNames = d.names || []; si.step = "name"; si.msg = ""; render(); return; }
+        if (d && d.ok && d.cls) { si.cls = d.cls; si.clsName = d.clsName && !/^Class [A-J]$/.test(d.clsName) ? d.clsName : lbClassName(d.cls); si.clsNames = d.names || []; si.step = "name"; si.msg = ""; si.dir = "fwd"; render(); return; }
         const local = d && d.ok && d.names ? lbLocalCode(code) : null;
-        if (local) { si.cls = local; si.clsName = lbClassName(local); si.clsNames = d.names; lb.names = d.names; si.step = "name"; si.msg = ""; render(); return; }
+        if (local) { si.cls = local; si.clsName = lbClassName(local); si.clsNames = d.names; lb.names = d.names; si.step = "name"; si.msg = ""; si.dir = "fwd"; render(); return; }
         note.textContent = "That code didn\u2019t work. Try again.";
       }).catch(function () { si.busy = false; note.textContent = "Can\u2019t connect right now."; });
     }
