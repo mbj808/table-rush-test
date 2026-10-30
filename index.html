@@ -3362,7 +3362,8 @@
       .lb-class .cls-art { width: 22px; height: 22px; }
     }
     /* Phones: the sign-in page skips the big title so all 10 class cards fit without scrolling. */
-    @media (max-width: 600px) { body[data-page="signin"] main > header { display: none; } }
+    body[data-page="signin"] header h1, body[data-page="signin"] .page-head,
+    body[data-page="h2h"] header h1, body[data-page="h2h"] .page-head { display: none; }
     @media (prefers-reduced-motion: reduce) { .si-cls-card { transition: none; } .si-cls-card:active { transform: none; } }
     .lb-class.on { background: #7ee07a; color: #10301a; border-color: #d6ffd2; }
     .lb-class-h { margin: 0 0 0.5rem; text-align: center; font: 800 1.25rem/1.2 var(--ui-font); color: #fff7ea; }
@@ -9295,7 +9296,7 @@
       const card = el("div", { class: "card si-card si-step-" + si.step + (si.dir ? " si-go-" + si.dir : "") });
       si.dir = "";
       const back = function () { if (si.step === "class") { if (si.target === "h2h") { si.target = ""; goPage("h2h"); } else goPage("menu"); } else { si.step = si.step === "pw" ? "name" : "class"; si.msg = ""; si.dir = "back"; render(); } };
-      if (si.step !== "class" || si.target === "h2h") card.appendChild(el("div", { class: "lb-head" }, [
+      card.appendChild(el("div", { class: "lb-head" }, [
         el("button", { type: "button", class: "av-back lb-back", text: si.step === "class" ? "\u2039 Back" : si.step === "name" ? "\u2039 Classes" : "\u2039 Names", "aria-label": si.step === "class" ? "Back" : si.step === "name" ? "Back to classes" : "Back to names", onClick: back }),
         el("h2", { class: "lb-title", text: si.target === "h2h" ? "\uD83D\uDC64 Sign in Player 2" : "\uD83D\uDC64 Sign in" })
       ]));
