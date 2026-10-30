@@ -8944,7 +8944,9 @@
       if (/s$/.test(k)) out.push(k.slice(0, -1)); else out.push(k + "s");
       return out;
     }
-    function lbClassName(id) { const l = (lb.board && lb.board.classes) || LB_CLASSES; const c = l.filter(function (x) { return x.id === id; })[0]; return c ? c.name : "Class " + id; }
+    function lbClassName(id) { const l = (lb.board && lb.board.classes) || LB_CLASSES; const c = l.filter(function (x) { return x.id === id; })[0]; const own = LB_CLASSES.filter(function (x) { return x.id === id; })[0];
+      // An older script (v7) still sends "Class A"-style defaults: show the animal name instead.
+      if (c && !/^Class [A-J]$/.test(c.name)) return c.name; return own ? own.name : "Class " + id; }
     function lbClassOf(name) { const m = lb.board && lb.board.classOf; if (!m) return "A"; for (const k in m) if (k.toLowerCase() === String(name).toLowerCase()) return m[k]; return "A"; }
     function lbLocalCode(code) { const k = lbCodeKey(code); if (!k) return null; const hit = LB_CLASSES.filter(function (c) { return c.id.toLowerCase() === k || lbCodeForms(c.name).indexOf(k) >= 0; })[0]; return hit ? hit.id : null; }
     function lbForget() { lbFlush(true); try { localStorage.removeItem(LB_KEY); localStorage.removeItem(LB_PTS_KEY); } catch (e) {} }
@@ -9207,7 +9209,7 @@
       si.busy = true; note.textContent = "Checking\u2026";
       lbGet("action=roster&code=" + encodeURIComponent(String(code).trim())).then(function (d) {
         si.busy = false;
-        if (d && d.ok && d.cls) { si.cls = d.cls; si.clsName = d.clsName || lbClassName(d.cls); si.clsNames = d.names || []; si.step = "name"; si.msg = ""; render(); return; }
+        if (d && d.ok && d.cls) { si.cls = d.cls; si.clsName = d.clsName && !/^Class [A-J]$/.test(d.clsName) ? d.clsName : lbClassName(d.cls); si.clsNames = d.names || []; si.step = "name"; si.msg = ""; render(); return; }
         const local = d && d.ok && d.names ? lbLocalCode(code) : null;
         if (local) { si.cls = local; si.clsName = lbClassName(local); si.clsNames = d.names; lb.names = d.names; si.step = "name"; si.msg = ""; render(); return; }
         note.textContent = "That code didn\u2019t work. Try again.";
