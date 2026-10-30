@@ -3499,6 +3499,16 @@
     @media (max-height: 700px) and (max-width: 759px) { .av-big .av svg { width: 130px; height: 130px; } }
     @media (prefers-reduced-motion: reduce) { .av-big.bounce .av { animation: none; } }
     /* ===== TEST SITE: design-review fixes ===== */
+    .si-head2 { min-height: 0; }
+    .si-who { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; margin: 0 auto; }
+    .si-who .cls-art { width: 84px; height: 84px; padding: 6px; border-radius: 50%; background: var(--cbg); box-shadow: 0 3px 0 rgba(0,0,0,.25); }
+    .si-who-cls { font: 800 1.5rem/1.1 var(--ui-font); color: #fff; }
+    .si-center { text-align: center; font-size: 1.25rem; color: #ffe39a; margin: 0; }
+    .si-card .si-names { grid-template-columns: 1fr 1fr; gap: 0.7rem; }
+    .si-card .si-name { min-height: 4.2rem; background: var(--cbg); color: #1a1233; border: 0; box-shadow: 0 4px 0 rgba(0,0,0,.28); font-size: 1.3rem; overflow-wrap: anywhere; }
+    .si-card .si-name:active { transform: translateY(2px); box-shadow: 0 2px 0 rgba(0,0,0,.28); }
+    .si-card .si-name:focus-visible { outline: 3px solid #ffd84d; outline-offset: 2px; }
+    .si-step-pw .si-msg, .si-step-name .si-msg { text-align: center; }
     .si-steps { display: flex; justify-content: center; gap: 8px; margin: 2px 0 6px; }
     .si-dot { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,.25); }
     .si-dot.done { background: rgba(255,255,255,.6); }
@@ -9296,10 +9306,10 @@
       const card = el("div", { class: "card si-card si-step-" + si.step + (si.dir ? " si-go-" + si.dir : "") });
       si.dir = "";
       const back = function () { if (si.step === "class") { if (si.target === "h2h") { si.target = ""; goPage("h2h"); } else goPage("menu"); } else { si.step = si.step === "pw" ? "name" : "class"; si.msg = ""; si.dir = "back"; render(); } };
-      card.appendChild(el("div", { class: "lb-head" }, [
-        el("button", { type: "button", class: "av-back lb-back", text: si.step === "class" ? "\u2039 Back" : si.step === "name" ? "\u2039 Classes" : "\u2039 Names", "aria-label": si.step === "class" ? "Back" : si.step === "name" ? "Back to classes" : "Back to names", onClick: back }),
-        el("h2", { class: "lb-title", text: si.target === "h2h" ? "\uD83D\uDC64 Sign in Player 2" : "\uD83D\uDC64 Sign in" })
-      ]));
+      const backBtn = el("button", { type: "button", class: "av-back lb-back", text: si.step === "class" ? "\u2039 Back" : si.step === "name" ? "\u2039 Classes" : "\u2039 Names", "aria-label": si.step === "class" ? "Back" : si.step === "name" ? "Back to classes" : "Back to names", onClick: back });
+      if (si.step === "class") card.appendChild(el("div", { class: "lb-head" }, [backBtn,
+        el("h2", { class: "lb-title", text: si.target === "h2h" ? "\uD83D\uDC64 Sign in Player 2" : "\uD83D\uDC64 Sign in" })]));
+      else card.appendChild(el("div", { class: "lb-head si-head2" }, [backBtn]));
       const note = el("p", { class: "si-msg", role: "status", text: si.msg });
       if (!LEADERBOARD_URL) { card.appendChild(el("p", { class: "si-big", text: "Sign in is off here." })); return card; }
       const stepN = si.step === "class" ? 1 : si.step === "name" ? 2 : 3;
@@ -9321,16 +9331,26 @@
       if (si.step === "name") {
         const names = si.clsNames || lb.names;
         if (!names && !si.msg) siOpenNames();
-        card.appendChild(el("p", { class: "si-big" }, [document.createTextNode("Tap your name"), el("span", { class: "si-cls-tag", text: si.clsName || lbClassName(si.cls || "A") })]));
+        const who = el("div", { class: "si-who" });
+        who.style.setProperty("--cbg", CLASS_BG[si.cls] || "#eee");
+        who.appendChild(classArt(si.cls || "A", si.clsName || lbClassName(si.cls || "A")));
+        who.appendChild(el("span", { class: "si-who-cls", text: si.clsName || lbClassName(si.cls || "A") }));
+        card.appendChild(who);
+        card.appendChild(el("p", { class: "si-big si-center", text: "Tap your name" }));
         const list = el("div", { class: "si-names" });
         if (names && !names.length) list.appendChild(el("p", { class: "si-sub", text: "No names in this class yet. Ask your teacher." }));
-        (names || []).forEach(function (n) { list.appendChild(el("button", { type: "button", class: "si-name", text: n, onClick: function () { if (!si.busy) siPickName(n); } })); });
+        (names || []).forEach(function (n) { list.appendChild(el("button", { type: "button", class: "si-name", text: n, style: "--cbg:" + (CLASS_BG[si.cls] || "#eee"), onClick: function () { if (!si.busy) siPickName(n); } })); });
         if (!names && !si.msg) card.appendChild(el("p", { class: "si-msg", text: "Loading\u2026" }));
         card.appendChild(list);
         card.appendChild(note);
         return card;
       }
-      card.appendChild(el("p", { class: "si-big", text: "Hi, " + si.name + "!" }));
+      { const who = el("div", { class: "si-who" });
+        who.style.setProperty("--cbg", CLASS_BG[si.cls] || "#eee");
+        who.appendChild(classArt(si.cls || "A", si.clsName || lbClassName(si.cls || "A")));
+        who.appendChild(el("span", { class: "si-who-cls", text: si.name }));
+        card.appendChild(who); }
+      card.appendChild(el("p", { class: "si-big si-center", text: "Type your password" }));
       if (si.step === "pw") {
         const a = siInput("Password");
         card.appendChild(a);
