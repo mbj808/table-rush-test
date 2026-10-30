@@ -638,20 +638,20 @@
     }
     .wave-bg .ghost-dust.d1 { left: -6vh; }
     .wave-bg .ghost-dust.d2 { left: 1.5vh; animation-delay: 0.04s; }
-    /* Lantern Trail (level 15): calm hills, a path lit by lanterns, a few fireflies. Only
+    /* Meglo (level 15): calm hills, a path lit by lanterns, a few fireflies. Only
        opacity/transform animate (cheap on phones); no filters or blur. */
     .wave-bg .lt-scene { display: none; }
-    .wave-bg.scene-lantern {
+    .wave-bg.scene-meglo {
       background: linear-gradient(180deg, #070a1c 0%, #141a3f 38%, #2c2a5c 58%, #4a3a63 70%, #0c1428 100%);
     }
-    .wave-bg.scene-lantern .lt-scene { display: block; position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+    .wave-bg.scene-meglo .lt-scene { display: block; position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
     .wave-bg .lt-moon {
       position: absolute; left: 22vw; top: 18vh; width: min(18vmin, 8rem); aspect-ratio: 1; border-radius: 50%;
       transform: translate(-50%, -50%);
       background: radial-gradient(circle at 40% 38%, #fffbe6 0%, #f4ecc8 55%, #d9cfa6 100%);
       box-shadow: 0 0 30px rgba(255, 244, 200, 0.6), 0 0 90px rgba(255, 230, 160, 0.25);
     }
-    .wave-bg.scene-lantern .lt-land { display: block; position: absolute; left: 0; top: auto; bottom: 0; width: 100%; height: 55vh; min-height: 0; animation: none; will-change: auto; }
+    .wave-bg.scene-meglo .lt-land { display: block; position: absolute; left: 0; top: auto; bottom: 0; width: 100%; height: 55vh; min-height: 0; animation: none; will-change: auto; }
     .wave-bg .lt-lamp {
       position: absolute; width: 0.9rem; height: 1.2rem; border-radius: 40% 40% 30% 30%;
       transform: translate(-50%, -100%);
@@ -3712,7 +3712,7 @@
       </div>
     </div>
 
-    <!-- Lantern Trail (beat 16): hand-made SVG hills and a winding path with glowing lanterns and drifting fireflies. -->
+    <!-- Meglo (beat 16): hand-made SVG hills and a winding path with glowing lanterns and drifting fireflies. -->
     <div class="lt-scene" aria-hidden="true">
       <div class="lt-moon"></div>
       <svg class="lt-land night-art" viewBox="0 0 400 200" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
@@ -3929,7 +3929,7 @@
       { id: "belfry", label: "Belfry", file: "assets/audio/belfry.mp3", unlockAt: BEAT_UNLOCK_STEP },
       { id: "moonwalk", label: "Moon Walk", file: "assets/audio/moonwalk.mp3", unlockAt: BEAT_UNLOCK_STEP },
       { id: "graveyard", label: "Graveyard", file: "assets/audio/graveyard.mp3", unlockAt: BEAT_UNLOCK_STEP },
-      { id: "lantern", label: "Lantern Trail", file: "assets/audio/lantern.mp3", unlockAt: BEAT_UNLOCK_STEP }
+      { id: "meglo", label: "Meglo", file: "assets/audio/meglo.mp3", unlockAt: BEAT_UNLOCK_STEP }
     ];
     // Mini games: one unlocks every streak of MINI_UNLOCK_STEP (20, 40 ... 160), separate from beats.
     // Keys stay as before (bitwave/bat/graveyard for the first three) so saved unlocks keep working.
@@ -5548,7 +5548,7 @@
       best: 0,
       muted: false,
       playMusicId: "replay",
-      beatsUnlocked: { "replay": true, "rise": false, "spark": false, "square": false, "bitwave": false, "cry": false, "thunder": false, "howl": false, "cauldron": false, "bat": false, "bats": false, "spooked": false, "belfry": false, "moonwalk": false, "graveyard": false, "lantern": false },
+      beatsUnlocked: { "replay": true, "rise": false, "spark": false, "square": false, "bitwave": false, "cry": false, "thunder": false, "howl": false, "cauldron": false, "bat": false, "bats": false, "spooked": false, "belfry": false, "moonwalk": false, "graveyard": false, "meglo": false },
       beatJustUnlocked: "",
       newBest: false,
       drill: null,
@@ -8255,7 +8255,7 @@
       bg.classList.toggle("scene-belfry", level === 12);
       bg.classList.toggle("scene-moonwalk", level === 13);
       bg.classList.toggle("scene-graveyard", level === 14);
-      bg.classList.toggle("scene-lantern", level === 15);
+      bg.classList.toggle("scene-meglo", level === 15);
     }
     function render() {
       cleanMathTables();
