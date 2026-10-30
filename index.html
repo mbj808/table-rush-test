@@ -3561,7 +3561,35 @@
     body.play-screen .answers.quiz-answers button, body.play-screen .answers.ocean-answers button, body.play-screen .answers.quiz-choice-answers button { font-size: clamp(1.15rem, 5vw, 1.7rem); min-height: 4.8rem; }
     @media (min-width: 700px) { body.play-screen .answers button { min-height: 9rem; font-size: 4.6rem; } body.play-screen .prompt { font-size: 7.5rem; } body.play-screen main { max-width: 46rem; } }
     @media (prefers-reduced-motion: reduce) { .art-svg .veil { animation: none; opacity: 0; } }
-</style>
+
+    /* ===== Home glow-up: richer colors, soft glow, sign-in pill under the boom box. Light: gradients + box-shadow only. ===== */
+    .home-stack .menu-player { margin-bottom: 0.2rem; }
+    .home-stack > .si-bar { margin: 0.1rem auto 0.9rem; width: 100%; max-width: 30rem; }
+    .home-stack .si-in { position: relative; overflow: hidden; display: inline-flex; align-items: center; gap: 0.55rem; min-height: 3.6rem; padding: 0 1.6rem 0 1.1rem; border: 2px solid rgba(255,255,255,0.85);
+      background: linear-gradient(135deg, #ffd23f 0%, #ff8a3d 45%, #ff4f9a 100%); color: #3a0d2a; font: 900 1.35rem/1 var(--ui-font);
+      box-shadow: 0 4px 0 #a3305e, 0 0 18px rgba(255, 140, 80, 0.55); }
+    .home-stack .si-in-ico { display: grid; place-items: center; width: 2.3rem; height: 2.3rem; border-radius: 50%; background: rgba(255,255,255,0.55); font-size: 1.25rem; }
+    .home-stack .si-in-sub { font: 700 0.85rem/1 var(--ui-font); color: #5a1840; opacity: 0.9; }
+    .home-stack .si-in::after { content: ""; position: absolute; top: 0; bottom: 0; left: -40%; width: 30%; background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,0.55), rgba(255,255,255,0)); transform: skewX(-20deg); animation: siShine 3.6s ease-in-out infinite; pointer-events: none; }
+    @keyframes siShine { 0%, 60% { left: -40%; } 100% { left: 130%; } }
+    .home-stack .si-in:active { transform: translateY(3px); box-shadow: 0 1px 0 #a3305e, 0 0 12px rgba(255, 140, 80, 0.5); }
+    .home-stack .si-bar:has(.si-hi) { gap: 0.5rem; padding: 0.45rem 0.7rem; border-radius: 1.6rem; width: auto; max-width: calc(100% - 1rem);
+      background: linear-gradient(135deg, #2fd1c5 0%, #3a7bd5 55%, #7a4de0 100%); border: 2px solid rgba(255,255,255,0.75); box-shadow: 0 4px 0 #24306e, 0 0 16px rgba(80, 180, 255, 0.45); }
+    .home-stack .si-hi { display: inline-flex; align-items: center; gap: 0.45rem; font-size: 1.15rem; }
+    .home-stack .si-hi .cls-art { width: 2.6rem; height: 2.6rem; flex: 0 0 auto; border-radius: 50%; background: rgba(255,255,255,0.9); padding: 2px; box-sizing: border-box; }
+    .home-stack .si-hi .si-cls-tag { background: rgba(255,255,255,0.9); color: #24306e; text-shadow: none; }
+    .home-stack .si-out { min-height: 2.75rem; border-color: rgba(255,255,255,0.85); background: rgba(20, 16, 60, 0.35); }
+    .home-fc-row > .menu-fc { background: linear-gradient(135deg, #ff9a2e 0%, #f0457f 50%, #8a3cf0 100%); box-shadow: 0 4px 0 #6b1f6e, 0 0 16px rgba(240, 80, 150, 0.45), inset 0 1px 0 rgba(255,255,255,0.45); }
+    .home-fc-row > .home-tc { background: linear-gradient(135deg, #4cf09a 0%, #18b26a 50%, #0f7a5a 100%); box-shadow: 0 4px 0 #0b5a40, 0 0 16px rgba(60, 220, 140, 0.4), inset 0 1px 0 rgba(255,255,255,0.45); }
+    .home-fc-row > .menu-closet { background: linear-gradient(135deg, #a8fff2 0%, #3fd0e0 50%, #2a9fd6 100%); box-shadow: 0 4px 0 #156f8a, 0 0 16px rgba(70, 210, 230, 0.4), inset 0 1px 0 rgba(255,255,255,0.55); }
+    .home-fc-row > .home-lb { background: linear-gradient(135deg, #fff1a8 0%, #ffcf3f 50%, #ff9f1c 100%); box-shadow: 0 4px 0 #a8620a, 0 0 16px rgba(255, 200, 60, 0.45), inset 0 1px 0 rgba(255,255,255,0.6); }
+    .home-fc-row > .home-bb { background: linear-gradient(135deg, #ffb36b 0%, #ff5a4a 50%, #e0245e 100%); box-shadow: 0 4px 0 #8a1a3a, 0 0 16px rgba(255, 90, 80, 0.45), inset 0 1px 0 rgba(255,255,255,0.45); }
+    .home-fc-row > .home-h2h { background: linear-gradient(135deg, #6fb6ff 0%, #5a6bff 50%, #8a3ae8 100%); box-shadow: 0 4px 0 #34207e, 0 0 16px rgba(110, 120, 255, 0.45), inset 0 1px 0 rgba(255,255,255,0.45); }
+    .home-fc-row > button::before { background: linear-gradient(180deg, rgba(255,255,255,0.3), rgba(255,255,255,0)); }
+    .home-fc-row .menu-lb-ico { background: rgba(255,255,255,0.35); box-shadow: inset 0 1px 0 rgba(255,255,255,0.6); }
+    .home-stack .menu-tile { box-shadow: 0 4px 0 rgba(0,0,0,0.4), 0 0 18px var(--tile-glow, rgba(95,242,255,0.55)); }
+    @media (prefers-reduced-motion: reduce) { .home-stack .si-in::after { animation: none; display: none; } }
+  </style>
 </head>
 <body>
   <div class="wave-bg" data-level="0" aria-hidden="true">
@@ -9347,12 +9375,11 @@
       if (!LEADERBOARD_URL) return null;
       const me = lbMe();
       if (me) return el("div", { class: "si-bar" }, [
-        el("span", { class: "si-hi" }, [document.createTextNode("Hi, " + me.name + "!"), el("span", { class: "si-cls-tag", text: lbClassName(me.cls || "A") })]),
+        el("span", { class: "si-hi" }, [(function () { const a = classArt(me.cls || "A", ""); a.setAttribute("aria-hidden", "true"); return a; })(), document.createTextNode("Hi, " + me.name + "!"), el("span", { class: "si-cls-tag", text: lbClassName(me.cls || "A") })]),
         el("button", { type: "button", class: "si-out", text: "Not you?", onClick: siAskOut })
       ]);
       return el("div", { class: "si-bar" }, [
-        el("button", { type: "button", class: "si-in", text: "\uD83D\uDC64 Sign in", onClick: siOpen }),
-        el("span", { class: "si-hint", text: "Sign in to save" })
+        el("button", { type: "button", class: "si-in", onClick: siOpen }, [el("span", { class: "si-in-ico", "aria-hidden": "true", text: "\uD83D\uDC64" }), el("span", { text: "Sign in" }), el("span", { class: "si-in-sub", text: "save your points" })])
       ]);
     }
     function leaderboardCard() {
@@ -10026,7 +10053,6 @@
     }
     function menuPage() {
       const sec = el("section", { class: "menu-page home-stack", id: "menu-page", "aria-label": "Menu" });
-      { const bar = siBar(); if (bar) sec.appendChild(bar); }
       // 1. Boom box
       const playerCard = el("div", { class: "card beats-card menu-player" });
       const player = el("div", { class: "setup-player" });
@@ -10035,6 +10061,8 @@
       playerCard.appendChild(player);
       sec.appendChild(playerCard);
       setTimeout(function () { if (box.isConnected) fillBoombox(box); }, 0);
+      // Sign in sits right under the boom box.
+      { const bar = siBar(); if (bar) sec.appendChild(bar); }
       // 2. Fact Challenge (all the games, incl. the regular times tables) + Closet with the kid's avatar
       const fcRow = el("div", { class: "home-fc-row" + (avHas() ? " has-av" : "") });
       const fc = el("button", { type: "button", class: "menu-fc", "aria-label": "Fact Challenge", onClick: function () { goPage("games"); } });
