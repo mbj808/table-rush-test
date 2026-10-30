@@ -3336,7 +3336,9 @@
     .si-code-row .si-input { flex: 1 1 auto; min-width: 0; text-transform: uppercase; }
     .si-code-row .si-go { flex: 0 0 auto; min-width: 5rem; }
     .si-cls-tag { display: inline-block; margin-left: 0.4rem; padding: 0.1rem 0.55rem; border-radius: 999px; background: #ffd34e; color: #1a1233; font: 800 0.9rem/1.4 var(--ui-font); vertical-align: middle; }
-    .lb-classes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.4rem; margin: 0 0 0.7rem; }
+    .lb-classes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.4rem; margin: 0 0 0.7rem; }
+    .lb-classes .lb-class { min-width: 0; padding: 0 0.2rem; white-space: nowrap; }
+    @media (max-width: 520px) { .lb-classes .lb-class { font-size: 0.95rem; min-height: 2.9rem; } }
     .lb-class { min-height: 3rem; font: 800 1.1rem/1 var(--ui-font); border-radius: 0.9rem; border: 2px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.08); color: #fff; cursor: pointer; }
     .lb-class.on { background: #7ee07a; color: #10301a; border-color: #d6ffd2; }
     .lb-class-h { margin: 0 0 0.5rem; text-align: center; font: 800 1.25rem/1.2 var(--ui-font); color: #fff7ea; }
@@ -8866,10 +8868,10 @@
       try { const v = JSON.parse(localStorage.getItem(LB_KEY) || "null"); return v && v.name && v.code && v.pw ? v : null; } catch (e) { return null; }
     }
     // ---- Three classes. Codes are checked by the sheet script (v7). Older scripts: default codes A/B/C here, everyone counts as Class A. ----
-    const LB_CLASSES = [{ id: "A", name: "Class A" }, { id: "B", name: "Class B" }, { id: "C", name: "Class C" }];
+    const LB_CLASSES = "ABCDEFGH".split("").map(function (k) { return { id: k, name: "Class " + k }; });
     function lbClassName(id) { const l = (lb.board && lb.board.classes) || LB_CLASSES; const c = l.filter(function (x) { return x.id === id; })[0]; return c ? c.name : "Class " + id; }
     function lbClassOf(name) { const m = lb.board && lb.board.classOf; if (!m) return "A"; for (const k in m) if (k.toLowerCase() === String(name).toLowerCase()) return m[k]; return "A"; }
-    function lbLocalCode(code) { const k = String(code || "").toUpperCase().replace(/[^A-Z0-9]/g, "").replace(/^CLASS(?=[ABC]$)/, ""); return /^[ABC]$/.test(k) ? k : null; }
+    function lbLocalCode(code) { const k = String(code || "").toUpperCase().replace(/[^A-Z0-9]/g, "").replace(/^CLASS(?=[A-H]$)/, ""); return /^[A-H]$/.test(k) ? k : null; }
     function lbForget() { lbFlush(true); try { localStorage.removeItem(LB_KEY); localStorage.removeItem(LB_PTS_KEY); } catch (e) {} }
     // ---- Points: 1 for each right answer, minus 1 for each wrong one. Sent in small batches. ----
     // lb.mode: "points" once the sheet script says it can total points (version 2), "streak" for the old script.
