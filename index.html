@@ -9307,9 +9307,7 @@
       si.dir = "";
       const back = function () { if (si.step === "class") { if (si.target === "h2h") { si.target = ""; goPage("h2h"); } else goPage("menu"); } else { si.step = si.step === "pw" ? "name" : "class"; si.msg = ""; si.dir = "back"; render(); } };
       const backBtn = el("button", { type: "button", class: "av-back lb-back", text: si.step === "class" ? "\u2039 Back" : si.step === "name" ? "\u2039 Classes" : "\u2039 Names", "aria-label": si.step === "class" ? "Back" : si.step === "name" ? "Back to classes" : "Back to names", onClick: back });
-      if (si.step === "class") card.appendChild(el("div", { class: "lb-head" }, [backBtn,
-        el("h2", { class: "lb-title", text: si.target === "h2h" ? "\uD83D\uDC64 Sign in Player 2" : "\uD83D\uDC64 Sign in" })]));
-      else card.appendChild(el("div", { class: "lb-head si-head2" }, [backBtn]));
+      card.appendChild(el("div", { class: "lb-head si-head2" }, si.target === "h2h" ? [backBtn, el("h2", { class: "lb-title", text: "Player 2" })] : [backBtn]));
       const note = el("p", { class: "si-msg", role: "status", text: si.msg });
       if (!LEADERBOARD_URL) { card.appendChild(el("p", { class: "si-big", text: "Sign in is off here." })); return card; }
       const stepN = si.step === "class" ? 1 : si.step === "name" ? 2 : 3;
@@ -10043,7 +10041,7 @@
       return card;
     }
     const PAGES = ["menu", "beats", "backgrounds", "games", "minigames", "leaders", "closet", "bricks", "h2h", "grammar", "signin"];
-    const PAGE_TITLES = { beats: "Beats", backgrounds: "Backgrounds", games: "Fact Challenge", minigames: "Mini Games", leaders: "Leaders", closet: "Avatar", bricks: "Brick by Brick", h2h: "Head to Head", grammar: "Grammar", signin: "Sign in" };
+    const PAGE_TITLES = { beats: "Beats", backgrounds: "Backgrounds", games: "Fact Challenge", minigames: "Mini Games", leaders: "Leaders", closet: "Avatar", bricks: "Brick by Brick", h2h: "Head to Head", grammar: "Grammar", signin: "Your class" };
     let menuSmooth = false;
     function currentPage() {
       const h = (location.hash || "").replace(/^#/, "");
