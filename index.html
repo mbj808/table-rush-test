@@ -3456,6 +3456,9 @@
     .av-status { margin: -0.2rem 0 0; min-height: 1.2rem; text-align: center; font: 700 0.95rem/1.2 var(--ui-font); color: rgba(255,255,255,0.75); }
     .av-status.saved { color: #8ff0a4; }
     .av-status.offline { color: #ffd34e; }
+    .av-print { display: flex; align-items: center; justify-content: center; min-height: 48px; padding: 0 1rem; border-radius: 999px; background: #fff7ea; color: #24306e; font: 800 1.05rem/1 var(--ui-font); text-decoration: none; box-shadow: 0 3px 0 rgba(0,0,0,.25); }
+    .av-print:active { transform: translateY(2px); box-shadow: 0 1px 0 rgba(0,0,0,.25); }
+    .av-print:focus-visible { outline: 3px solid #ffd84d; outline-offset: 2px; }
     .av-loading, .av-tip { margin: 0; text-align: center; font: 700 1.05rem/1.35 var(--ui-font); color: #fff; }
     .av-loading { padding: 2rem 0; font-size: 1.25rem; }
     .av-tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 0.6rem; padding-top: 0.35rem; }
@@ -9977,6 +9980,7 @@
         tabs.appendChild(el("button", { type: "button", role: "tab", class: "lb-tab" + (closetTab === t[0] ? " on" : ""), "aria-selected": String(closetTab === t[0]), text: t[1], onClick: function () { closetTab = t[0]; render(); window.scrollTo(0, 0); } }));
       });
       top.appendChild(tabs);
+      top.appendChild(el("a", { class: "av-print", href: "./print.html", target: "_blank", rel: "noopener", text: "\uD83D\uDDA8\uFE0F Print avatars" }));
       card.appendChild(top);
       setTimeout(function () { avShowStatus(avStatus); }, 0);
       const items = el("div", { class: "av-items" });
