@@ -3201,7 +3201,7 @@
         0 0 64px rgba(255, 196, 60, 0.98),
         0 0 120px rgba(255, 120, 20, 0.85),
         0 2px 0 #3b1d6e;
-      animation: supernova-type 5s ease-out forwards;
+      animation: supernova-type 2.5s ease-out forwards;
     }
     @keyframes supernova-type {
       0% { opacity: 0; transform: translate(-50%, -46%) scale(0.72); }
@@ -5812,13 +5812,13 @@
       root.appendChild(canvas);
       var label = document.createElement("p");
       label.className = "supernova-label";
-      label.textContent = beatId + " unlocked";
+      label.textContent = "Good job!";
       root.appendChild(label);
       document.body.appendChild(root);
 
       var ctx = canvas.getContext("2d");
       if (!ctx) {
-        setTimeout(function () { if (root.parentNode) root.remove(); }, 5000);
+        setTimeout(function () { if (root.parentNode) root.remove(); }, 2500);
         return;
       }
       var dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -5842,11 +5842,11 @@
         });
       }
       var start = performance.now();
-      var duration = 5000;
-      state.burstUntil = start + 3600;
+      var duration = 2500; // half the old 5 s; the frame clock runs 2x so the whole burst plays faster
+      state.burstUntil = start + 1800;
       var raf = 0;
       function frame(now) {
-        var t = (now - start) / 1000;
+        var t = (now - start) / 500;
         var cw = canvas.width;
         var ch = canvas.height;
         var cx = cw / 2;
@@ -5960,9 +5960,10 @@
         if (state.codeBeats) delete state.codeBeats[track.id];
         state.beatsUnlocked[track.id] = true;
         unlockedNow = track.id;
-        playBeatSupernova(track.label);
         break;
       }
+      // Every streak of 10: the burst with "Good job!" only (the beat still unlocks quietly).
+      playBeatSupernova();
       if (!unlockedNow) return "";
       state.beatJustUnlocked = unlockedNow;
       // Make the newly unlocked beat the active choice immediately. setPlayMusicId
@@ -12655,7 +12656,6 @@
       hud.appendChild(score);
       app.appendChild(hud);
       app.appendChild(withBuddy(streakBanner()));
-      if (state.beatJustUnlocked) app.appendChild(el("p", { class: "fact", text: "Beat " + beatLabel(state.beatJustUnlocked) + " unlocked" }));
       const eq = el("div", { class: "card eq" });
       if (isMultiples()) {
         eq.appendChild(el("p", { class: "label", text: "Multiples" }));
