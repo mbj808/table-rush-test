@@ -3511,7 +3511,7 @@
     @media (prefers-reduced-motion: reduce) { .av-big.bounce .av { animation: none; } }
     /* ===== TEST SITE: design-review fixes ===== */
     body.theme-tg .wave-bg { background: linear-gradient(180deg, var(--tg-a, #e98a3c) 0%, var(--tg-b, #c45a26) 50%, #8a3a18 100%); }
-    .tg-big { position: absolute; right: 3%; top: 1%; width: min(30vw, 230px); height: min(30vw, 230px); padding: 3%; box-sizing: border-box; border-radius: 50%; background: radial-gradient(circle, rgba(255,246,214,.75) 0%, rgba(255,230,170,.35) 55%, rgba(255,230,170,0) 72%); }
+    .tg-big { position: absolute; right: 2%; top: 1%; width: min(46vw, 340px); height: min(46vw, 340px); padding: 3%; box-sizing: border-box; border-radius: 50%; background: radial-gradient(circle, rgba(255,246,214,.75) 0%, rgba(255,230,170,.35) 55%, rgba(255,230,170,0) 72%); }
     .tg-scene .tg-stars { display: none; }
     .tg-scene.tg-night .tg-stars { display: inline; }
     body.theme-tg .wave-bg > :not(.tg-scene), body.theme-tg .belfry-moon, body.theme-tg .belfry-scene { display: none !important; }
@@ -10414,25 +10414,25 @@
       let stars = "";
       for (let k = 0; k < 18; k++) stars += '<circle cx="' + (80 + (k * 197) % 1300) + '" cy="' + (40 + (k * 83) % 300) + '" r="' + (k % 3 ? 2 : 3) + '" fill="#fff6d8"/>';
       let fence = "";
-      for (let k = 0; k < 13; k++) fence += '<rect x="' + (300 + k * 70) + '" y="676" width="12" height="54" rx="3" fill="#8a5a2e"/>';
+      for (let k = 0; k < 11; k++) fence += '<rect x="' + (260 + k * 100) + '" y="630" width="20" height="100" rx="5" fill="#8a5a2e"/>';
       const d = document.createElement("div");
       d.className = "tg-scene";
       d.innerHTML = '<svg class="night-art" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMax slice" aria-hidden="true">'
         + '<defs><radialGradient id="tg-glow"><stop offset="0" stop-color="#fff3c4" stop-opacity=".95"/><stop offset=".35" style="stop-color:var(--tg-sun)" stop-opacity=".55"/><stop offset="1" style="stop-color:var(--tg-sun)" stop-opacity="0"/></radialGradient></defs>'
         + '<g class="tg-stars">' + stars + '</g>'
-        + '<g class="tg-sun"><circle cx="0" cy="0" r="230" fill="url(#tg-glow)"/><circle cx="0" cy="0" r="78" style="fill:var(--tg-sun)"/></g>'
+        + '<g class="tg-sun"><circle cx="0" cy="0" r="300" fill="url(#tg-glow)"/><circle cx="0" cy="0" r="110" style="fill:var(--tg-sun)"/></g>'
         + '<g fill="#fff8ec" opacity=".75"><ellipse cx="300" cy="170" rx="110" ry="30"/><ellipse cx="360" cy="150" rx="70" ry="34"/><ellipse cx="1050" cy="120" rx="120" ry="28"/><ellipse cx="1000" cy="104" rx="64" ry="30"/></g>'
         + '<path d="M0 560 Q240 470 520 540 T1000 520 T1440 500 V900 H0Z" style="fill:var(--tg-h1)"/>'
-        + tgTree(130, 560, 1, "--tg-t1") + tgTree(250, 548, .8, "--tg-t2") + tgTree(560, 548, .9, "--tg-t3") + tgTree(660, 556, .7, "--tg-t1") + tgTree(900, 540, 1, "--tg-t2") + tgTree(1010, 552, .75, "--tg-t3") + tgTree(1320, 520, 1.1, "--tg-t1")
+        + tgTree(140, 560, 1.9, "--tg-t1") + tgTree(330, 548, 1.6, "--tg-t2") + tgTree(520, 552, 1.7, "--tg-t3") + tgTree(650, 540, 1.4, "--tg-t1") + tgTree(900, 545, 1.9, "--tg-t2") + tgTree(1080, 552, 1.5, "--tg-t3") + tgTree(1300, 525, 2, "--tg-t1")
         + '<path d="M0 640 Q360 570 720 630 T1440 600 V900 H0Z" style="fill:var(--tg-h2)"/>'
         + '<g opacity=".25" stroke="#3a1e0c" stroke-width="5" fill="none"><path d="M0 680 Q720 610 1440 660"/><path d="M0 710 Q720 650 1440 690"/></g>'
-        + fence + '<path d="M300 690 H1210 M300 712 H1210" stroke="#8a5a2e" stroke-width="8"/>'
-        + tgCorn(150, 760, 1.2) + tgCorn(240, 770, 1) + tgCorn(1290, 760, 1.15) + tgCorn(1370, 770, .95)
+        + fence + '<path d="M250 660 H1290 M250 700 H1290" stroke="#8a5a2e" stroke-width="14"/>'
+        + tgCorn(150, 780, 2.2) + tgCorn(545, 770, 2) + tgCorn(960, 775, 2.1) + tgCorn(1330, 780, 2.2)
         + '<path d="M0 740 Q400 690 820 735 T1440 715 V900 H0Z" style="fill:var(--tg-h3)"/>'
-        + tgScarecrow(810, 610, .85) + tgHay(400, 790, 1.1) + tgHay(1120, 780, 1)
-        + tgSunflower(500, 690, .9) + tgSunflower(560, 710, .75) + tgSunflower(1000, 690, .85)
+        + tgHay(330, 800, 2) + tgHay(1150, 790, 1.9) + tgScarecrow(800, 500, 1.7)
+        + tgSunflower(610, 600, 1.7) + tgSunflower(680, 650, 1.3) + tgSunflower(985, 620, 1.6)
         + '<path d="M0 815 Q480 775 960 815 T1440 805 V900 H0Z" style="fill:var(--tg-h4)"/>'
-        + tgPumpkin(620, 840, 1.15) + tgPumpkin(745, 860, .8) + tgBasket(840, 860, 1) + tgPumpkin(1060, 845, 1.1) + tgPumpkin(300, 850, .9)
+        + tgPumpkin(300, 845, 2) + tgPumpkin(625, 840, 2.2) + tgBasket(800, 860, 1.8) + tgPumpkin(930, 860, 1.5) + tgPumpkin(1150, 845, 2)
         + '<g fill="#e8a02f"><path d="M700 880 l14 -10 4 14z"/><path d="M960 875 l12 -12 6 14z" fill="#d9542b"/><path d="M520 885 l14 -8 2 14z" fill="#c8452a"/></g>'
         + '</svg>' + leaves;
       bg.appendChild(d);
