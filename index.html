@@ -3388,6 +3388,15 @@
     .h2h-full { position: fixed; inset: 0; z-index: 9000; max-width: none; margin: 0; padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom); gap: 0; background: #140f28; display: flex; flex-direction: column; }
     #my-pts { position: fixed; top: calc(env(safe-area-inset-top, 0px) + 8px); left: 50%; transform: translateX(-50%); z-index: 50; pointer-events: none; padding: .3rem .85rem; border-radius: 999px; background: #ffe58a; color: #3a2400; font: 800 1.05rem/1.2 var(--ui-font); box-shadow: 0 2px 0 rgba(0,0,0,.3); white-space: nowrap; }
     #my-pts[hidden] { display: none; }
+    .np-ranges { display: grid; grid-template-columns: repeat(3, 1fr); gap: .5rem; margin: .2rem 0 .7rem; }
+    .np-range, .np-num { font: 800 1.35rem/1 var(--ui-font); color: #fff; background: rgba(255,255,255,.12); border: 2px solid rgba(255,255,255,.35); cursor: pointer; transition: background-color .15s, transform .1s, border-color .15s; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+    .np-range { min-height: 54px; border-radius: 16px; }
+    .np-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: .55rem; }
+    .np-num { aspect-ratio: 1; min-height: 56px; border-radius: 50%; font-size: 1.55rem; }
+    .np-range.on, .np-num.on { background: #ffd23f; border-color: #fff3b0; color: #3a2400; box-shadow: 0 3px 0 #b8860b; }
+    .np-range:active, .np-num:active { transform: scale(.93); }
+    .np-tip { margin: .6rem 0 0; text-align: center; font-weight: 700; font-size: 1rem; color: #fff6dc; }
+    @media (prefers-reduced-motion: reduce) { .np-range, .np-num { transition: none; } .np-range:active, .np-num:active { transform: none; } }
     .plus1 { position: fixed; left: 0; top: 0; z-index: 9999; pointer-events: none; font: 900 3.8rem/1 var(--ui-font); color: #2fd15a; text-shadow: 0 3px 0 #0b4a1c, 0 0 3px #0b4a1c; opacity: 0; will-change: transform, opacity; }
     .plus1.go { animation: plus1Up 0.9s ease-out forwards; }
     .plus1.flip.go { animation-name: plus1Down; }
@@ -4114,7 +4123,7 @@
     const BEAT_IDS = PLAY_TRACKS.map(function (track) { return track.id; });
     const QUICK = [
       ["2–5", [2, 3, 4, 5]],
-      ["6–9", [6, 7, 8, 9]],
+      ["6–10", [6, 7, 8, 9, 10]],
       ["2–12", [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]]
     ];
     // No 0 or 1 anywhere in math: they make trivial questions (kids picked them to rush).
@@ -8924,25 +8933,39 @@
         const tableLabel = isMultiples() ? "Bases" : isAdd() ? "+ Addends" : isSubtract() ? "− Numbers" : isDivide() ? "÷ Tables" : "× Tables";
         head.appendChild(el("p", { class: "label", text: tableLabel }));
           tables.appendChild(head);
-        const quick = el("div", { class: "row" });
+        // Number picker: big range buttons on top, then 2-12 as big round buttons.
+        // With a range on, tapping a number picks just that number; after that, taps add or remove.
+        // Taps update the buttons in place (no full redraw), so it feels instant.
         const quickSets = (isAdd() || isSubtract()) ? QUICK_ADD : QUICK;
+        const sameSet = function (a, b) { return a.length === b.length && a.every(function (x) { return b.indexOf(x) >= 0; }); };
+        const quick = el("div", { class: "np-ranges", role: "group", "aria-label": "Number ranges" });
+        const grid = el("div", { class: "np-grid", role: "group", "aria-label": "Single numbers" });
+        const tip = el("p", { class: "np-tip" });
+        const paint = function () {
+          const preset = quickSets.some(function (set) { return sameSet(state.tables, set[1]); });
+          quick.querySelectorAll(".np-range").forEach(function (b, k) { const on = sameSet(state.tables, quickSets[k][1]); b.classList.toggle("on", on); b.setAttribute("aria-pressed", String(on)); });
+          grid.querySelectorAll(".np-num").forEach(function (b) { const on = state.tables.indexOf(Number(b.dataset.n)) >= 0; b.classList.toggle("on", on); b.setAttribute("aria-pressed", String(on)); });
+          tip.textContent = preset ? "Or tap one number to practice just that one." : state.tables.length === 1 ? "Just " + state.tables[0] + "s. Tap more numbers to add them." : "Practicing " + state.tables.join(", ") + ".";
+          try { writeSave(); } catch (e) {}
+        };
         quickSets.forEach(function (set) {
-          quick.appendChild(button(set[0], "chip", false, function () { state.tables = set[1].slice(); render(); }));
+          quick.appendChild(el("button", { type: "button", class: "np-range", text: set[0], onClick: function () { state.tables = set[1].slice(); paint(); } }));
         });
         tables.appendChild(quick);
-        const grid = el("div", { class: "grid6" });
-        const startN = MIN_OPERAND;
-        for (let n = startN; n <= 12; n++) {
+        for (let n = MIN_OPERAND; n <= 12; n++) {
           const value = n;
-          grid.appendChild(button(String(value), "num", state.tables.indexOf(value) >= 0, function () {
+          grid.appendChild(el("button", { type: "button", class: "np-num", "data-n": String(value), text: String(value), "aria-label": "Number " + value, onClick: function () {
+            const preset = quickSets.some(function (set) { return sameSet(state.tables, set[1]); });
             const i = state.tables.indexOf(value);
-            if (i >= 0) state.tables.splice(i, 1);
-            else state.tables.push(value);
-            state.tables.sort(function (a, b) { return a - b; });
-            render();
-          }));
+            if (preset) state.tables = [value];
+            else if (i >= 0) { if (state.tables.length > 1) state.tables.splice(i, 1); }
+            else { state.tables.push(value); state.tables.sort(function (a, b) { return a - b; }); }
+            paint();
+          } }));
         }
         tables.appendChild(grid);
+        tables.appendChild(tip);
+        paint();
         if (!state.tables.length) tables.appendChild(el("p", { class: "warn", text: "Pick at least one number." }));
         if (isMultiples()) tables.appendChild(el("p", { class: "hint", text: "Bases 2–12, in order: 2× through 12×, then the next base." }));
         stack.appendChild(tables);
