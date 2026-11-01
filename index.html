@@ -831,7 +831,13 @@
     html.scenes-paused .wave-bg,
     html.scenes-paused .wave-bg *,
     html.scenes-paused .wave-bg *::before,
-    html.scenes-paused .wave-bg *::after { animation-play-state: paused !important; }
+    html.scenes-paused .wave-bg *::after,
+    html.scenes-still .wave-bg,
+    html.scenes-still .wave-bg *,
+    html.scenes-still .wave-bg *::before,
+    html.scenes-still .wave-bg *::after { animation-play-state: paused !important; }
+    /* Slim backgrounds: no layer promotion; scenes move a few seconds, then hold still. */
+    .wave-bg *, .wave-bg *::before, .wave-bg *::after { will-change: auto !important; }
     .wave-bg .gy-fog,
     .wave-bg .gy-tree { will-change: transform; }
     @keyframes ghost-walk-x {
@@ -8365,6 +8371,7 @@
       bg.classList.toggle("scene-graveyard", level === 14);
       bg.classList.toggle("scene-meglo", level === 15);
       if (siteTheme === "thanksgiving") tgSetBeat(level);
+      sceneWake(siteTheme + level);
     }
     function render() {
       cleanMathTables();
@@ -8537,6 +8544,15 @@
       } else {
         render();
       }
+    }
+    // Slim mode for old computers: a scene plays for a few seconds after it changes, then freezes in place.
+    var sceneStillTimer = 0, sceneKey = "";
+    function sceneWake(key) {
+      if (key === sceneKey) return;
+      sceneKey = key;
+      document.documentElement.classList.remove("scenes-still");
+      clearTimeout(sceneStillTimer);
+      sceneStillTimer = setTimeout(function () { document.documentElement.classList.add("scenes-still"); }, 5000);
     }
     function syncScenePause() {
       document.documentElement.classList.toggle("scenes-paused", document.visibilityState === "hidden");
@@ -10332,7 +10348,7 @@
       if (!bg || bg.querySelector(".tg-scene")) return;
       const leafCols = ["#d9542b", "#e8a02f", "#b8452a", "#f0c24a"];
       let leaves = "";
-      for (let i = 0; i < 8; i++) leaves += '<i class="tg-leaf" style="left:' + (6 + i * 12) + '%;--d:' + (9 + (i % 4) * 2) + 's;--w:-' + (i * 1.7).toFixed(1) + 's;background:' + leafCols[i % 4] + '"></i>';
+      for (let i = 0; i < 4; i++) leaves += '<i class="tg-leaf" style="left:' + (10 + i * 24) + '%;--d:' + (9 + (i % 4) * 2) + 's;--w:-' + (i * 1.7).toFixed(1) + 's;background:' + leafCols[i % 4] + '"></i>';
       const d = document.createElement("div");
       d.className = "tg-scene";
       d.innerHTML = '<svg class="night-art" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMax slice" aria-hidden="true">'
