@@ -3386,6 +3386,8 @@
     /* Head to Head */
     body.h2h-on header, body.h2h-on .page-head, body.h2h-on footer, body.h2h-on .boombox, body.h2h-on .test-banner { display: none !important; }
     .h2h-full { position: fixed; inset: 0; z-index: 9000; max-width: none; margin: 0; padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom); gap: 0; background: #140f28; display: flex; flex-direction: column; }
+    #my-pts { position: fixed; top: calc(env(safe-area-inset-top, 0px) + 8px); left: 50%; transform: translateX(-50%); z-index: 50; pointer-events: none; padding: .3rem .85rem; border-radius: 999px; background: #ffe58a; color: #3a2400; font: 800 1.05rem/1.2 var(--ui-font); box-shadow: 0 2px 0 rgba(0,0,0,.3); white-space: nowrap; }
+    #my-pts[hidden] { display: none; }
     .plus1 { position: fixed; left: 0; top: 0; z-index: 9999; pointer-events: none; font: 900 3.8rem/1 var(--ui-font); color: #2fd15a; text-shadow: 0 3px 0 #0b4a1c, 0 0 3px #0b4a1c; opacity: 0; will-change: transform, opacity; }
     .plus1.go { animation: plus1Up 0.9s ease-out forwards; }
     .plus1.flip.go { animation-name: plus1Down; }
@@ -8402,6 +8404,7 @@
       syncPlayMusic();
       syncWooferPulse();
       syncBoombox();
+      myPtsSync();
       if (state.phase === "setup") sizeChallengeHero();
       if (rowScroll.length) app.querySelectorAll(".closet-opts, .pz-grid").forEach(function (r, i) { if (rowScroll[i]) r.scrollLeft = rowScroll[i]; });
     }
@@ -9102,6 +9105,31 @@
         if (lb.mode === "points") lbFlush(); else { try { localStorage.removeItem(LB_PTS_KEY); } catch (e) {} }
       }).catch(function () { lb.capsAsked = false; });
     }
+    // ---- My points pill: only the signed-in kid's own Today points, shown while they play. ----
+    // Today on the board + points sent since that board loaded + points still waiting to send.
+    function myPtsValue() {
+      const me = lbMe();
+      if (!me) return null;
+      let base = 0;
+      const t = lb.board && lb.board.points && lb.board.points.today;
+      if (t && t.overall) t.overall.forEach(function (r) { if (r.name && r.name.toLowerCase() === me.name.toLowerCase()) base = Number(r.points) || 0; });
+      const v = lbPtsRead();
+      let pend = 0;
+      Object.keys(v.games || {}).forEach(function (g) { pend += (v.games[g].r || 0) - (v.games[g].w || 0); });
+      return Math.max(0, base + (lb.sentDelta || 0) + pend);
+    }
+    function myPtsSync() {
+      let pill = document.getElementById("my-pts");
+      const pg = document.body.dataset.page;
+      const show = !!(LEADERBOARD_URL && lbMe() && (pg === "play" || pg === "bricks" || pg === "h2h"));
+      if (!show) { if (pill) pill.hidden = true; return; }
+      if (!lb.board && !lb.loading && !lb.failed && !lb.ptsAsked) { lb.ptsAsked = true; lbRefresh(); }
+      if (!pill) { pill = document.createElement("div"); pill.id = "my-pts"; pill.setAttribute("role", "status"); document.body.appendChild(pill); }
+      const n = myPtsValue();
+      const txt = !lb.board && (lb.loading || !lb.ptsAsked) ? "\u2B50 \u2026 pts today" : "\u2B50 " + n + " pts today";
+      if (pill.textContent !== txt) { pill.textContent = txt; pill.setAttribute("aria-label", "Your points today: " + n); }
+      pill.hidden = false;
+    }
     function lbPoint(right, op) {
       if (!LEADERBOARD_URL || !lbMe() || lb.mode === "streak") return;
       const v = lbPtsRead(), g = lbGameLabel(op) || "Other";
@@ -9111,6 +9139,7 @@
       lbPtsWrite(v);
       if (!lb.mode) lbCaps();
       if (v.n >= LB_BATCH) lbFlush();
+      myPtsSync();
     }
     function lbFlush(leaving) {
       if (!LEADERBOARD_URL || lb.mode !== "points") return;
@@ -9123,8 +9152,10 @@
       lbPtsWrite({ games: {}, n: 0 });
       games.forEach(function (g) {
         const t = v.games[g];
+        lb.sentDelta = (lb.sentDelta || 0) + Math.min(t.r, 200) - Math.min(t.w, 200);
         const giveBack = function () {
           if (leaving) return;
+          lb.sentDelta = (lb.sentDelta || 0) - Math.min(t.r, 200) + Math.min(t.w, 200);
           const cur = lbPtsRead(), c = cur.games[g] || (cur.games[g] = { r: 0, w: 0 });
           c.r += t.r; c.w += t.w; lbPtsWrite(cur);
         };
@@ -9166,6 +9197,8 @@
       const v = lbSessRead();
       v.push({ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 7), name: kid.name, code: kid.code, game: game, pts: Math.min(200, Math.floor(pts)) });
       lbSessWrite(v); lbSessFlush();
+      const me = lbMe();
+      if (me && me.name.toLowerCase() === String(kid.name).toLowerCase()) { lb.sentDelta = (lb.sentDelta || 0) + Math.min(200, Math.floor(pts)); myPtsSync(); }
       return true;
     }
     function lbSessFlush() {
@@ -9214,7 +9247,7 @@
       const me = lbMe();
       avPull();
       Promise.all([me ? Promise.resolve(lb.names) : lbGet("action=roster").then(function (d) { return (d && d.names) || []; }), lbGet("action=board")])
-        .then(function (res) { lb.names = res[0]; lb.board = res[1] && res[1].ok ? res[1] : null; lb.sig = lbSig(lb.board); if (lb.board) lb.updated = Date.now(); if (me && lb.board && lb.board.classOf) { const c = lbClassOf(me.name); if (me.cls !== c) { me.cls = c; try { localStorage.setItem(LB_KEY, JSON.stringify(me)); } catch (e) {} if (!lb.clsTouched) lb.cls = c; } } lb.failed = false; if (lb.board && lb.board.timed && !lb.timedOk) { lb.timedOk = true; lbTimedFlush(); } if (lb.board && lb.board.points && lb.mode !== "points") { lb.mode = "points"; lbFlush(); } })
+        .then(function (res) { lb.names = res[0]; lb.board = res[1] && res[1].ok ? res[1] : null; lb.sig = lbSig(lb.board); if (lb.board) lb.sentDelta = 0; setTimeout(myPtsSync, 0); if (lb.board) lb.updated = Date.now(); if (me && lb.board && lb.board.classOf) { const c = lbClassOf(me.name); if (me.cls !== c) { me.cls = c; try { localStorage.setItem(LB_KEY, JSON.stringify(me)); } catch (e) {} if (!lb.clsTouched) lb.cls = c; } } lb.failed = false; if (lb.board && lb.board.timed && !lb.timedOk) { lb.timedOk = true; lbTimedFlush(); } if (lb.board && lb.board.points && lb.mode !== "points") { lb.mode = "points"; lbFlush(); } })
         .catch(function () { lb.failed = true; })
         .then(function () { lb.loading = false; if (state.phase === "setup" && currentPage() === "leaders") render(); });
     }
@@ -9243,7 +9276,7 @@
         lb.failed = false; lb.updated = Date.now();
         const sig = lbSig(d);
         if (sig === lb.sig && lb.board) { lbStampUpdated(); lb.polls = (lb.polls || 0) + 1; return; }
-        lb.board = d; lb.sig = sig; lb.redraws = (lb.redraws || 0) + 1;
+        lb.board = d; lb.sig = sig; lb.redraws = (lb.redraws || 0) + 1; lb.sentDelta = 0;
         const a = document.activeElement;
         if (a && a.tagName === "SELECT") return;
         const before = {};
