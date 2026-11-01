@@ -1918,6 +1918,7 @@
     body.play-screen[data-play-page="beats"] .brand-meta { margin-top: 0.1rem; }
     body.play-screen .eq .prompt.quiz-prompt,
     body.play-screen .eq .prompt.multiples-prompt { font-size: 1.25rem; line-height: 1.25; }
+    body.play-screen .eq .prompt.quiz-prompt.sci-prompt { font-size: clamp(1.85rem, 7.5vw, 2.5rem); line-height: 1.2; }
     .flag-svg, .piano-svg {
       display: block; width: 100%; height: auto; margin: 0.1rem auto 0.2rem;
     }
@@ -12696,7 +12697,7 @@
           });
           eq.appendChild(img);
         }
-        if (problem.ask && !problem.pictureOnly) eq.appendChild(el("p", { class: "prompt quiz-prompt", text: problem.ask }));
+        if (problem.ask && !problem.pictureOnly) eq.appendChild(el("p", { class: "prompt quiz-prompt" + (String(state.operation).indexOf("sci-") === 0 ? " sci-prompt" : ""), text: problem.ask }));
       } else {
         let askLabel = "What is the product?";
         if (isDivide()) askLabel = state.mode === "quotient" ? "What is the quotient?" : "What number is missing?";
