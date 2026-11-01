@@ -3510,6 +3510,9 @@
     @keyframes tgFall { from { transform: translate(0, 0) rotate(0); } to { transform: translate(60px, 105vh) rotate(540deg); } }
     @media (prefers-reduced-motion: reduce) { .tg-leaf { animation: none; display: none; } }
     .theme-pick { margin-bottom: .4rem; }
+    .tg-art { display: block; width: 100%; height: 100%; }
+    .tg-tile-art { position: absolute; inset: 0; background: linear-gradient(180deg, #ffe2b0, #f2a65a); padding: 8% 22% 26%; box-sizing: border-box; }
+    .beat-pill .pill-icon.tg-icon { background: #fff1dc; padding: 2px; box-sizing: border-box; }
     body.theme-tg .bgs-card .hint, body.theme-tg .av-tip, body.theme-tg .lb-updated { color: #4a2410; text-shadow: none; }
     .si-head2 { min-height: 0; }
     .si-who { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; margin: 0 auto; }
@@ -10345,6 +10348,33 @@
       if (tg) tgBuild();
     }
     applyTheme();
+    // Thanksgiving art for each beat (names stay the same). Tiny inline SVG, built only in the Thanksgiving theme.
+    const TG_BEAT_ART = {
+      replay: ["Pumpkin", '<ellipse cx="22" cy="38" rx="14" ry="16" fill="#e8741f"/><ellipse cx="42" cy="38" rx="14" ry="16" fill="#e8741f"/><ellipse cx="32" cy="38" rx="13" ry="17" fill="#f28a2e"/><path d="M32 22q2-8 8-10" stroke="#5a7a2a" stroke-width="4" fill="none" stroke-linecap="round"/>'],
+      rise: ["Sunrise", '<circle cx="32" cy="40" r="14" fill="#ffc94a"/><path d="M0 44q16-8 32-2t32-4V64H0z" fill="#b8652a"/><path d="M32 14v8M14 24l5 5M50 24l-5 5" stroke="#ffc94a" stroke-width="4" stroke-linecap="round"/>'],
+      spark: ["Maple leaf", '<path d="M32 6l5 12 9-4-3 11 11 2-10 8 4 8-12-3-2 13h-4l-2-13-12 3 4-8-10-8 11-2-3-11 9 4z" fill="#d9542b"/><path d="M32 30v28" stroke="#7a3f1c" stroke-width="3"/>'],
+      square: ["Pie", '<ellipse cx="32" cy="40" rx="24" ry="12" fill="#d08a3a"/><ellipse cx="32" cy="36" rx="24" ry="12" fill="#f0b45a"/><ellipse cx="32" cy="36" rx="18" ry="8" fill="#c8662a"/>'],
+      bitwave: ["Corn", '<ellipse cx="32" cy="28" rx="10" ry="20" fill="#f2c443"/><path d="M26 18h12M24 26h16M24 34h16M26 42h12" stroke="#d9a02a" stroke-width="2"/><path d="M32 58q-16-6-18-24 10 6 18 20 8-14 18-20-2 18-18 24z" fill="#6f9a35"/>'],
+      cry: ["Turkey", '<g fill="#d9542b"><ellipse cx="18" cy="26" rx="7" ry="16" transform="rotate(-30 18 26)"/><ellipse cx="46" cy="26" rx="7" ry="16" transform="rotate(30 46 26)"/></g><ellipse cx="32" cy="20" rx="7" ry="16" fill="#f0b45a"/><circle cx="32" cy="40" r="14" fill="#8a4a22"/><circle cx="32" cy="27" r="7" fill="#a85a26"/><circle cx="30" cy="25" r="1.6" fill="#222"/><path d="M33 28l5 2-5 2z" fill="#f2c443"/><path d="M31 30q-1 5 2 6" stroke="#d9302b" stroke-width="2.5" fill="none"/>'],
+      thunder: ["Apple", '<path d="M32 20c-8-6-22-2-20 14 2 16 12 24 20 20 8 4 18-4 20-20 2-16-12-20-20-14z" fill="#c8312a"/><path d="M32 20q0-8 4-12" stroke="#5a3a1a" stroke-width="3" fill="none"/><ellipse cx="40" cy="12" rx="6" ry="3" fill="#6f9a35" transform="rotate(-20 40 12)"/>'],
+      howl: ["Fox", '<path d="M12 14l10 14h20l10-14-4 26-16 14-16-14z" fill="#e8741f"/><path d="M22 40l10 14 10-14-10 4z" fill="#fff4e6"/><circle cx="25" cy="34" r="2" fill="#222"/><circle cx="39" cy="34" r="2" fill="#222"/><circle cx="32" cy="50" r="2.5" fill="#222"/>'],
+      cauldron: ["Soup pot", '<path d="M10 30h44l-4 22H14z" fill="#7a4a2a"/><rect x="8" y="26" width="48" height="6" rx="3" fill="#a85a26"/><path d="M24 22q-4-6 0-12M32 22q-4-6 0-12M40 22q-4-6 0-12" stroke="#f6e0c0" stroke-width="2.5" fill="none" stroke-linecap="round"/>'],
+      bat: ["Acorn", '<path d="M18 30h28c0 16-6 26-14 28-8-2-14-12-14-28z" fill="#b8742a"/><path d="M14 30q18-18 36 0z" fill="#6a3d1a"/><path d="M32 14v-6" stroke="#6a3d1a" stroke-width="4" stroke-linecap="round"/>'],
+      bats: ["Geese", '<g stroke="#3a2a1a" stroke-width="3.5" fill="none" stroke-linecap="round"><path d="M8 24l6 4 6-4"/><path d="M20 34l6 4 6-4"/><path d="M32 44l6 4 6-4"/><path d="M34 18l6 4 6-4"/></g><circle cx="50" cy="14" r="6" fill="#ffd77a"/>'],
+      spooked: ["Mushroom", '<path d="M10 34q22-30 44 0z" fill="#c8312a"/><circle cx="24" cy="26" r="3" fill="#fff4e6"/><circle cx="38" cy="22" r="3" fill="#fff4e6"/><rect x="26" y="34" width="12" height="20" rx="5" fill="#f6e0c0"/>'],
+      belfry: ["Barn", '<path d="M10 28L32 10l22 18v28H10z" fill="#b8352a"/><rect x="24" y="38" width="16" height="18" fill="#7a2a20"/><path d="M24 38l16 18M40 38L24 56" stroke="#f6e0c0" stroke-width="2"/><rect x="28" y="22" width="8" height="8" fill="#f6e0c0"/>'],
+      moonwalk: ["Harvest moon", '<circle cx="32" cy="28" r="18" fill="#f2a83a"/><circle cx="26" cy="24" r="3" fill="#e08a2a"/><circle cx="38" cy="32" r="2.5" fill="#e08a2a"/><path d="M0 52q32-10 64 0V64H0z" fill="#5a3418"/>'],
+      graveyard: ["Wheat", '<g stroke="#c89a3a" stroke-width="3" stroke-linecap="round"><path d="M22 58V20M32 58V14M42 58V20"/></g><g fill="#e8b84a"><ellipse cx="22" cy="20" rx="4" ry="8"/><ellipse cx="32" cy="14" rx="4" ry="8"/><ellipse cx="42" cy="20" rx="4" ry="8"/></g><rect x="18" y="40" width="28" height="5" rx="2" fill="#b8652a"/>'],
+      meglo: ["Cranberries", '<g fill="#b8203a"><circle cx="22" cy="40" r="8"/><circle cx="38" cy="42" r="8"/><circle cx="30" cy="28" r="8"/><circle cx="44" cy="28" r="6"/></g><circle cx="27" cy="25" r="2" fill="#f6c0c8"/><path d="M14 18q10-8 20 2" stroke="#6f9a35" stroke-width="3" fill="none"/>']
+    };
+    function tgBeatArt(id, cls) {
+      const a = TG_BEAT_ART[id] || TG_BEAT_ART.replay;
+      const sp = document.createElement("span");
+      sp.className = "tg-art " + (cls || "");
+      sp.setAttribute("aria-hidden", "true");
+      sp.innerHTML = '<svg viewBox="0 0 64 64" width="100%" height="100%">' + a[1] + '</svg>';
+      return sp;
+    }
     function backgroundsCard() {
       const card = el("div", { class: "card bgs-card" });
       card.appendChild(el("p", { class: "label", text: "Theme" }));
@@ -10355,15 +10385,15 @@
         } }));
       });
       card.appendChild(themes);
-      if (siteTheme === "thanksgiving") { card.appendChild(el("p", { class: "hint", text: "Pick Halloween to use the night backgrounds below." })); }
+
       card.appendChild(el("p", { class: "label", text: "Backgrounds" }));
       const grid = el("div", { class: "bg-tiles" });
       const current = chosenBackgroundLevel();
       PLAY_TRACKS.forEach(function (track, i) {
         const open = backgroundUnlocked(i);
         const tile = el("button", { type: "button", class: "bg-tile" + (open ? "" : " locked") + (open && current === i ? " on" : ""), "data-bg": String(i) });
-        const img = el("img", { src: "assets/backgrounds/" + track.id + ".jpg", alt: "", loading: "lazy", decoding: "async", width: "160", height: "107" });
-        tile.appendChild(img);
+        if (siteTheme === "thanksgiving") tile.appendChild(tgBeatArt(track.id, "tg-tile-art"));
+        else tile.appendChild(el("img", { src: "assets/backgrounds/" + track.id + ".jpg", alt: "", loading: "lazy", decoding: "async", width: "160", height: "107" }));
         const cap = el("span", { class: "bg-cap" });
         if (!open) cap.appendChild(lockIcon());
         cap.appendChild(document.createTextNode(open ? track.label : String(i * BEAT_UNLOCK_STEP)));
@@ -10406,6 +10436,7 @@
           const pill = el("button", { type: "button", class: "beat-pill" + (locked ? " locked" : "") + (selected ? " on" : ""), "data-beat-id": track.id });
           const icon = el("span", { class: "pill-icon", "aria-hidden": "true" });
           if (locked) icon.appendChild(lockIcon());
+          else if (siteTheme === "thanksgiving") { icon.classList.add("tg-icon"); icon.appendChild(tgBeatArt(track.id)); }
           pill.appendChild(icon);
           pill.appendChild(el("span", { class: "pill-name", text: track.label }));
           if (locked) {
