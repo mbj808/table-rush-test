@@ -7992,7 +7992,7 @@
     function hintPill() {
       return el("span", { class: "scroll-hint-pill" }, [
         el("span", { class: "scroll-hint-acc hint-note", "aria-hidden": "true", text: "\u266A" }),
-        el("span", { class: "scroll-hint-text", text: "Unlock beats and backgrounds" }),
+        el("span", { class: "scroll-hint-text", text: "Unlock beats and change backgrounds" }),
         el("span", { class: "scroll-hint-acc hint-spark", "aria-hidden": "true", text: "\u2726" })
       ]);
     }
@@ -8265,12 +8265,19 @@
     // A background picked on the home screen (if still unlocked), else the newest unlocked scene.
     function backgroundUnlocked(i) {
       const track = PLAY_TRACKS[i];
-      return !!track && (trackIsFree(track) || !!state.beatsUnlocked[track.id]);
+      return !!track; // Every background is open now; beats no longer unlock them.
     }
     function chosenBackgroundLevel() {
       const c = state.bgChoice;
       if (Number.isInteger(c) && c >= 0 && backgroundUnlocked(c)) return c;
-      return unlockedBackgroundLevel();
+      return 0;
+    }
+    // Every streak of BG_ROTATE_STEP in a row moves to the next background (wraps after the last one).
+    const BG_ROTATE_STEP = 10;
+    function rotateBackground() {
+      state.bgChoice = (chosenBackgroundLevel() + 1) % PLAY_TRACKS.length;
+      writeSave();
+      applyUnlockedBackground();
     }
     function unlockedBackgroundLevel() {
       let level = 0;
@@ -10470,7 +10477,7 @@
           tile.setAttribute("aria-label", track.label + " background" + (current === i ? ", showing" : ""));
           tile.setAttribute("aria-pressed", String(current === i));
           tile.addEventListener("click", function () {
-            state.bgChoice = state.bgChoice === i ? -1 : i;
+            state.bgChoice = i;
             writeSave();
             render();
           });
@@ -10481,7 +10488,7 @@
         grid.appendChild(tile);
       });
       card.appendChild(grid);
-      card.appendChild(el("p", { class: "hint", text: "Each background unlocks with its beat. Tap one to use it; tap it again to go back to the newest." }));
+      card.appendChild(el("p", { class: "hint", text: "Tap a background to use it. Every streak of 10 moves to the next one." }));
       return card;
     }
     function musicCard(includeReset, noPlayer) {
@@ -12825,6 +12832,7 @@
         const kqNoPrize = isKq(problem.operation);
         if (!kqNoPrize && state.streak % AV_PRIZE_EVERY === 0) { const prizeAt = state.streak; setTimeout(function () { avPrizeWhenClear(prizeAt, 0); }, 650); }
         state.bestStreak = Math.max(state.bestStreak, state.streak);
+        if (state.streak % BG_ROTATE_STEP === 0) rotateBackground();
         state.gain = 10 + Math.min(state.streak, 8) * 2;
         state.score += state.gain;
         state.correct += 1;
