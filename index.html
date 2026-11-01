@@ -3502,7 +3502,8 @@
     @media (max-height: 700px) and (max-width: 759px) { .av-big .av svg { width: 130px; height: 130px; } }
     @media (prefers-reduced-motion: reduce) { .av-big.bounce .av { animation: none; } }
     /* ===== TEST SITE: design-review fixes ===== */
-    body.theme-tg .wave-bg { background: linear-gradient(180deg, #e98a3c 0%, #c45a26 50%, #8a3a18 100%); }
+    body.theme-tg .wave-bg { background: linear-gradient(180deg, var(--tg-a, #e98a3c) 0%, var(--tg-b, #c45a26) 50%, #8a3a18 100%); }
+    .tg-big { position: absolute; right: 4%; top: 2%; width: min(34vw, 260px); height: min(34vw, 260px); opacity: .9; }
     body.theme-tg .wave-bg > :not(.tg-scene), body.theme-tg .belfry-moon, body.theme-tg .belfry-scene { display: none !important; }
     .tg-scene { position: absolute; inset: 0; }
     .wave-bg .tg-scene svg { position: absolute; left: 0; right: auto; top: 0; bottom: 0; width: 100%; height: 100%; transform: none; animation: none; opacity: 1; filter: none; display: block !important; }
@@ -8362,6 +8363,7 @@
       bg.classList.toggle("scene-moonwalk", level === 13);
       bg.classList.toggle("scene-graveyard", level === 14);
       bg.classList.toggle("scene-meglo", level === 15);
+      if (siteTheme === "thanksgiving") tgSetBeat(level);
     }
     function render() {
       cleanMathTables();
@@ -10333,7 +10335,6 @@
       const d = document.createElement("div");
       d.className = "tg-scene";
       d.innerHTML = '<svg class="night-art" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMax slice" aria-hidden="true">'
-        + '<circle cx="900" cy="250" r="80" fill="#ffd77a" opacity=".9"/>'
         + '<path d="M0 640 Q360 540 720 620 T1440 590 V900 H0Z" fill="#c9782f"/>'
         + '<path d="M0 720 Q400 640 820 710 T1440 690 V900 H0Z" fill="#a85a26"/>'
         + '<path d="M0 800 Q480 750 960 800 T1440 790 V900 H0Z" fill="#7a3f1c"/>'
@@ -10342,12 +10343,28 @@
         + '</svg>' + leaves;
       bg.appendChild(d);
     }
+    // Each Thanksgiving background: its own sky colors plus a big copy of the beat's art.
+    const TG_SKIES = [["#e98a3c","#c45a26"],["#f6b26b","#d9762f"],["#e0703a","#a83f22"],["#d98a4a","#9a4a26"],["#e8b04a","#b8702a"],["#c8643a","#8a3420"],["#9fb8c8","#c87a3a"],["#d9763a","#7a3a1c"],["#b86a3a","#6a3418"],["#e8a05a","#b05a2a"],["#f0c07a","#c8783a"],["#c87a4a","#7a3a20"],["#8ab0d0","#d08a4a"],["#4a3a6a","#c0602a"],["#f0c45a","#c88a2a"],["#c84a4a","#7a2a24"]];
+    function tgSetBeat(level) {
+      tgBuild();
+      const bg = document.querySelector(".wave-bg");
+      const scene = bg && bg.querySelector(".tg-scene");
+      if (!scene || scene.dataset.beat === String(level)) return;
+      scene.dataset.beat = String(level);
+      const sky = TG_SKIES[level] || TG_SKIES[0];
+      bg.style.setProperty("--tg-a", sky[0]);
+      bg.style.setProperty("--tg-b", sky[1]);
+      const track = PLAY_TRACKS[level] || PLAY_TRACKS[0];
+      let big = scene.querySelector(".tg-big");
+      if (!big) { big = document.createElement("div"); big.className = "tg-big"; scene.insertBefore(big, scene.firstChild); }
+      const art = tgBeatArt(track.id); art.querySelector("svg").setAttribute("class", "night-art"); big.replaceChildren(art);
+    }
     function applyTheme() {
       const tg = siteTheme === "thanksgiving";
       document.body.classList.toggle("theme-tg", tg);
-      if (tg) tgBuild();
+      if (tg) tgSetBeat(chosenBackgroundLevel());
+      else { const bg = document.querySelector(".wave-bg"); if (bg) { bg.style.removeProperty("--tg-a"); bg.style.removeProperty("--tg-b"); } }
     }
-    applyTheme();
     // Thanksgiving art for each beat (names stay the same). Tiny inline SVG, built only in the Thanksgiving theme.
     const TG_BEAT_ART = {
       replay: ["Pumpkin", '<ellipse cx="22" cy="38" rx="14" ry="16" fill="#e8741f"/><ellipse cx="42" cy="38" rx="14" ry="16" fill="#e8741f"/><ellipse cx="32" cy="38" rx="13" ry="17" fill="#f28a2e"/><path d="M32 22q2-8 8-10" stroke="#5a7a2a" stroke-width="4" fill="none" stroke-linecap="round"/>'],
@@ -10367,6 +10384,7 @@
       graveyard: ["Wheat", '<g stroke="#c89a3a" stroke-width="3" stroke-linecap="round"><path d="M22 58V20M32 58V14M42 58V20"/></g><g fill="#e8b84a"><ellipse cx="22" cy="20" rx="4" ry="8"/><ellipse cx="32" cy="14" rx="4" ry="8"/><ellipse cx="42" cy="20" rx="4" ry="8"/></g><rect x="18" y="40" width="28" height="5" rx="2" fill="#b8652a"/>'],
       meglo: ["Cranberries", '<g fill="#b8203a"><circle cx="22" cy="40" r="8"/><circle cx="38" cy="42" r="8"/><circle cx="30" cy="28" r="8"/><circle cx="44" cy="28" r="6"/></g><circle cx="27" cy="25" r="2" fill="#f6c0c8"/><path d="M14 18q10-8 20 2" stroke="#6f9a35" stroke-width="3" fill="none"/>']
     };
+    applyTheme();
     function tgBeatArt(id, cls) {
       const a = TG_BEAT_ART[id] || TG_BEAT_ART.replay;
       const sp = document.createElement("span");
