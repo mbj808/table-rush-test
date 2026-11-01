@@ -10554,10 +10554,10 @@
         else tile.appendChild(el("img", { src: "assets/backgrounds/" + track.id + ".jpg", alt: "", loading: "lazy", decoding: "async", width: "160", height: "107" }));
         const cap = el("span", { class: "bg-cap" });
         if (!open) cap.appendChild(lockIcon());
-        cap.appendChild(document.createTextNode(open ? track.label : String(i * BEAT_UNLOCK_STEP)));
+        cap.appendChild(document.createTextNode(open ? String(i + 1) : String(i * BEAT_UNLOCK_STEP)));
         tile.appendChild(cap);
         if (open) {
-          tile.setAttribute("aria-label", track.label + " background" + (current === i ? ", showing" : ""));
+          tile.setAttribute("aria-label", "Background " + (i + 1) + (current === i ? ", showing" : ""));
           tile.setAttribute("aria-pressed", String(current === i));
           tile.addEventListener("click", function () {
             state.bgChoice = i;
@@ -10565,7 +10565,7 @@
             render();
           });
         } else {
-          tile.setAttribute("aria-label", track.label + " background, locked until a streak of " + i * BEAT_UNLOCK_STEP + ". Tap to enter a teacher code");
+          tile.setAttribute("aria-label", "Background " + (i + 1) + ", locked until a streak of " + i * BEAT_UNLOCK_STEP + ". Tap to enter a teacher code");
           tile.addEventListener("click", function (event) { openCodeBox({ kind: "beats", opener: event.currentTarget }); });
         }
         grid.appendChild(tile);
