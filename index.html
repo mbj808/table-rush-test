@@ -9121,7 +9121,7 @@
     function myPtsSync() {
       let pill = document.getElementById("my-pts");
       const pg = document.body.dataset.page;
-      const show = !!(LEADERBOARD_URL && lbMe() && (pg === "play" || pg === "bricks" || pg === "h2h"));
+      const show = !!(LEADERBOARD_URL && lbMe() && (pg === "play" || pg === "bricks" || pg === "h2h" || pg === "grammar"));
       if (!show) { if (pill) pill.hidden = true; return; }
       if (!lb.board && !lb.loading && !lb.failed && !lb.ptsAsked) { lb.ptsAsked = true; lbRefresh(); }
       if (!pill) { pill = document.createElement("div"); pill.id = "my-pts"; pill.setAttribute("role", "status"); document.body.appendChild(pill); }
@@ -11122,6 +11122,8 @@
       const m = gr.mode, q = GR_BANK[m][gr.cur[m]];
       gr.picked = c;
       if (c === q[2]) { gr.streak[m] = (gr.streak[m] || 0) + 1; if (gr.streak[m] > (gr.best[m] || 0)) gr.best[m] = gr.streak[m]; } else gr.streak[m] = 0;
+      // Grammar counts like every Fact Challenge topic: +1 right, -1 wrong, batched with the rest.
+      lbPoint(c === q[2], "Grammar");
       render();
       gr.timer = setTimeout(function () { if (location.hash !== "#grammar" || gr.mode !== m) return; grNext(); render(); }, c === q[2] ? 900 : 2400);
     }
@@ -11146,7 +11148,7 @@
         el("p", { class: "gr-ask", text: mode.ask }),
         el("div", { class: "pos-streak" }, [el("span", { class: "pos-streak-n", text: String(st) }), el("span", { class: "pos-streak-l", text: "in a row" + (best ? " \u00B7 best " + best : "") })])
       ]));
-      card.appendChild(el("p", { class: "gr-practice", text: "Practice game \u00B7 no beats here" }));
+      card.appendChild(el("p", { class: "gr-practice", text: "No beats here \u00B7 points still count" }));
       if (q[0] !== null) {
         const sent = el("p", { class: "pos-sent", "data-i": String(gr.cur[m]), "data-mode": m });
         const ws = q[0].split(" ");
