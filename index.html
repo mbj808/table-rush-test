@@ -3393,6 +3393,14 @@
       font: 900 1.25rem/1 var(--ui-font); box-shadow: 0 4px 0 rgba(0,0,0,.35), 0 0 14px rgba(255,210,63,.55); opacity: 1; }
     body.play-screen #back::before { content: "\2039\00a0"; font-size: 1.5rem; }
     body.play-screen #back:active { transform: translateY(2px); box-shadow: 0 2px 0 rgba(0,0,0,.35); }
+    .coin-bank { display: inline-flex; align-items: center; gap: .45rem; margin: .3rem auto .5rem; padding: .35rem 1rem .35rem .4rem; border-radius: 999px; background: #fff4c2; color: #4a3000; font: 900 1.25rem/1 var(--ui-font); border: 3px solid #e0a91f; box-shadow: 0 3px 0 rgba(0,0,0,.3); align-self: center; }
+    .beats-card .coin-bank { display: flex; width: max-content; }
+    .coin-ico { display: inline-grid; place-items: center; width: 1.9rem; height: 1.9rem; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #fff6b0, #ffd23f 45%, #d99a10); color: #7a4a00; font: 900 1.2rem/1 var(--ui-font); box-shadow: inset 0 -3px 0 rgba(0,0,0,.18), 0 0 0 2px #b8800a; }
+    .coin-ico.big { width: 5.5rem; height: 5.5rem; font-size: 3.4rem; box-shadow: inset 0 -6px 0 rgba(0,0,0,.18), 0 0 0 4px #b8800a, 0 0 30px rgba(255,210,63,.9); }
+    .coin-drop { position: fixed; left: 50%; top: 18%; z-index: 90; pointer-events: none; display: flex; flex-direction: column; align-items: center; gap: .3rem; animation: coinDrop 1.5s ease-out forwards; }
+    .coin-plus { font: 900 2rem/1 var(--ui-font); color: #fff; text-shadow: 0 2px 0 #7a4a00, 0 0 10px #ffb703; }
+    @keyframes coinDrop { 0% { opacity: 0; transform: translate(-50%, -120px) rotateY(0); } 25% { opacity: 1; transform: translate(-50%, 0) rotateY(360deg); } 40% { transform: translate(-50%, -14px) rotateY(540deg); } 55% { transform: translate(-50%, 0) rotateY(720deg); } 80% { opacity: 1; } 100% { opacity: 0; transform: translate(-50%, 0) scale(.85); } }
+    .pill-cost, .av-cost { background: #ffd23f !important; color: #4a3000 !important; border-radius: 999px; padding: .1rem .45rem; font-weight: 900; }
     #my-pts { position: fixed; top: calc(env(safe-area-inset-top, 0px) + 8px); left: 50%; transform: translateX(-50%); z-index: 50; pointer-events: none; padding: .3rem .85rem; border-radius: 999px; background: #ffe58a; color: #3a2400; font: 800 1.05rem/1.2 var(--ui-font); box-shadow: 0 2px 0 rgba(0,0,0,.3); white-space: nowrap; }
     #my-pts[hidden] { display: none; }
     .game-start.gs-top { margin: 0 0 .3rem; }
@@ -5957,6 +5965,9 @@
       if (state.phase !== "play") return "";
       // Unlock the next locked beat each time the natural streak hits a multiple of BEAT_UNLOCK_STEP.
       if (state.streak < BEAT_UNLOCK_STEP || state.streak % BEAT_UNLOCK_STEP !== 0) return "";
+      // Coin prototype: beats are bought with coins on the Beats page now; the streak just celebrates.
+      playBeatSupernova();
+      return "";
       let unlockedNow = "";
       for (let i = 0; i < PLAY_TRACKS.length; i++) {
         const track = PLAY_TRACKS[i];
@@ -10056,6 +10067,21 @@
       if (first) first.focus({ preventScroll: true });
     }
     function avPrizeOpen() { return !!document.querySelector(".prize-ov"); }
+    // ---- Coins (prototype): 1 coin every streak of 10; spend 1 coin on a beat or an avatar piece. Saved on this device. ----
+    const COIN_KEY = "mf-coins";
+    function coinGet() { try { return Math.max(0, parseInt(localStorage.getItem(COIN_KEY) || "0", 10) || 0); } catch (e) { return 0; } }
+    function coinSet(n) { try { localStorage.setItem(COIN_KEY, String(Math.max(0, n))); } catch (e) {} }
+    function coinSpend() { const c = coinGet(); if (c < 1) { say("You need a coin. Get 10 in a row to earn one!"); return false; } coinSet(c - 1); return true; }
+    function coinPill() { const c = coinGet(); return el("p", { class: "coin-bank", role: "status", "aria-label": c + (c === 1 ? " coin" : " coins") }, [el("span", { class: "coin-ico", "aria-hidden": "true", text: "\u00A2" }), el("span", { text: c + (c === 1 ? " coin" : " coins") })]); }
+    function coinDrop() {
+      coinSet(coinGet() + 1);
+      say("You got a coin!");
+      if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      const old = document.getElementById("coin-drop"); if (old) old.remove();
+      const d = el("div", { id: "coin-drop", class: "coin-drop", "aria-hidden": "true" }, [el("span", { class: "coin-ico big", text: "\u00A2" }), el("span", { class: "coin-plus", text: "+1" })]);
+      document.body.appendChild(d);
+      setTimeout(function () { d.remove(); }, 1500);
+    }
     // ---- Game buddy: the kid's avatar next to the streak, gently animated. Nothing shows until an avatar is made. ----
     let buddy = { mood: "", at: 0 };
     function buddyMood(m) { buddy = { mood: m, at: performance.now() }; }
@@ -10106,9 +10132,10 @@
       if (LEADERBOARD_URL && !me) top.appendChild(el("button", { type: "button", class: "si-in av-signnote-btn", text: "\uD83D\uDC64 Sign in to save", onClick: siOpen }));
       const status = el("p", { class: "av-status " + avStatus, id: "av-status", role: "status" });
       top.appendChild(status);
+      top.appendChild(coinPill());
       if (avatar.pz > 0 && avAnyToWin()) top.appendChild(el("button", { type: "button", class: "pz-claim", text: "\uD83C\uDF81 Pick your prize!", onClick: function () { avPrizeShow(""); } }));
       const tabs = el("div", { class: "lb-tabs av-tabs", role: "tablist" });
-      [["mine", "My Stuff"], ["win", "Win More"]].forEach(function (t) {
+      [["mine", "My Stuff"], ["win", "Buy More"]].forEach(function (t) {
         tabs.appendChild(el("button", { type: "button", role: "tab", class: "lb-tab" + (closetTab === t[0] ? " on" : ""), "aria-selected": String(closetTab === t[0]), text: t[1], onClick: function () { closetTab = t[0]; render(); window.scrollTo(0, 0); } }));
       });
       top.appendChild(tabs);
@@ -10159,7 +10186,7 @@
           })));
         });
       } else {
-        items.appendChild(el("p", { class: "av-tip", text: "Get 10 in a row in Fact Challenge to win a prize. Gold ones need 50 in a row." }));
+        items.appendChild(el("p", { class: "av-tip", text: "Each piece costs 1 coin. Tap one to buy it. Get 10 in a row to earn a coin." }));
         let any = false;
         AV_CATS.forEach(function (c) {
           const list = avAll(c[0]).filter(function (it) { return !avOwns(it.id); });
@@ -10167,8 +10194,12 @@
           any = true;
           items.appendChild(sec(c[1], list.map(function (it) {
             const pic = it.swatch ? el("span", { class: "av-tile-swatch", style: "background:" + it.swatch }) : avNode(avPreview(it), 72);
-            const btn = el("button", { type: "button", class: "av-tile locked" + (it.gold ? " gold" : ""), "aria-label": it.name + ", locked", onClick: function () { say(it.gold ? "Gold needs 50 in a row." : "Win it with 10 in a row!"); } },
-              [pic, el("span", { class: "av-tile-name", text: it.swatch ? "Color" : it.name }), el("span", { class: "av-tile-lock", "aria-hidden": "true", text: it.gold ? "\u2B50" : "\uD83D\uDD12" })]);
+            const btn = el("button", { type: "button", class: "av-tile locked" + (it.gold ? " gold" : ""), "aria-label": it.name + ", tap to buy for 1 coin", onClick: function () {
+              if (!coinSpend()) return;
+              if (avatar.owned.indexOf(it.id) < 0) avatar.owned.push(it.id);
+              avApply(it); avBounce = true; say("You got " + it.name + "!"); refresh();
+            } },
+              [pic, el("span", { class: "av-tile-name", text: it.swatch ? "Color" : it.name }), el("span", { class: "av-tile-lock av-cost", "aria-hidden": "true", text: "\u00A2 1" })]);
             return btn;
           })));
         });
@@ -10602,7 +10633,8 @@
         setTimeout(function () { if (box.isConnected) fillBoombox(box); }, 0);
       }
       card.appendChild(beatsTitle());
-      card.appendChild(el("p", { class: "beat-unlock-note", text: "A new beat unlocks every streak of " + BEAT_UNLOCK_STEP + "." }));
+      card.appendChild(coinPill());
+      card.appendChild(el("p", { class: "beat-unlock-note", text: "Each beat costs 1 coin. Get " + BEAT_UNLOCK_STEP + " in a row to earn a coin." }));
       if (includeReset) {
         const list = el("div", { class: "beat-pills" });
         PLAY_TRACKS.forEach(function (track, i) {
@@ -10615,9 +10647,12 @@
           pill.appendChild(icon);
           pill.appendChild(el("span", { class: "pill-name", text: track.label }));
           if (locked) {
-            pill.appendChild(el("span", { class: "pill-streak", text: String(i * BEAT_UNLOCK_STEP) }));
-            pill.setAttribute("aria-label", track.label + ", locked until a streak of " + i * BEAT_UNLOCK_STEP + ". Tap to enter a teacher code");
-            pill.addEventListener("click", function (event) { openCodeBox({ kind: "beats", opener: event.currentTarget }); });
+            pill.appendChild(el("span", { class: "pill-streak pill-cost", text: "\u00A2 1" }));
+            pill.setAttribute("aria-label", track.label + ", locked. Tap to buy for 1 coin");
+            pill.addEventListener("click", function () {
+              if (!coinSpend()) return;
+              state.beatsUnlocked[track.id] = true; writeSave(); say(track.label + " is yours!"); render(); setTimeout(function () { tapHomeBeat(track.id); }, 0);
+            });
           } else {
             pill.setAttribute("aria-label", "Play " + track.label);
             pill.setAttribute("aria-pressed", String(selected));
@@ -11884,7 +11919,7 @@
       if (isKq()) {
         banner.appendChild(el("p", { class: "streak-next soft", text: "Practice game \u00B7 no beats here" }));
       } else if (moreUnlocks) {
-        const next = remain === 1 ? "1 more for the next beat" : remain + " more for the next beat";
+        const next = remain === 1 ? "1 more for a coin" : remain + " more for a coin";
         banner.appendChild(el("p", { class: "streak-next", text: next }));
         const meter = el("div", { class: "streak-meter" });
         meter.setAttribute("role", "progressbar");
@@ -12929,7 +12964,7 @@
         state.lbOp = problem.operation || state.operation;
         lbPoint(true, problem.operation || state.operation);
         const kqNoPrize = isKq(problem.operation);
-        if (!kqNoPrize && state.streak % AV_PRIZE_EVERY === 0) { const prizeAt = state.streak; setTimeout(function () { avPrizeWhenClear(prizeAt, 0); }, 650); }
+        if (!kqNoPrize && state.streak % AV_PRIZE_EVERY === 0) setTimeout(coinDrop, 350);
         state.bestStreak = Math.max(state.bestStreak, state.streak);
         if (state.streak % BG_ROTATE_STEP === 0) rotateBackground();
         state.gain = 10 + Math.min(state.streak, 8) * 2;
