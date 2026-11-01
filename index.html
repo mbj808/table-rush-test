@@ -3388,6 +3388,8 @@
     .h2h-full { position: fixed; inset: 0; z-index: 9000; max-width: none; margin: 0; padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom); gap: 0; background: #140f28; display: flex; flex-direction: column; }
     #my-pts { position: fixed; top: calc(env(safe-area-inset-top, 0px) + 8px); left: 50%; transform: translateX(-50%); z-index: 50; pointer-events: none; padding: .3rem .85rem; border-radius: 999px; background: #ffe58a; color: #3a2400; font: 800 1.05rem/1.2 var(--ui-font); box-shadow: 0 2px 0 rgba(0,0,0,.3); white-space: nowrap; }
     #my-pts[hidden] { display: none; }
+    .game-start.gs-top { margin: 0 0 .3rem; }
+    .gs-or { margin: .2rem 0 .6rem; text-align: center; font-weight: 700; font-size: .95rem; color: #fff6dc; }
     .np-ranges { display: grid; grid-template-columns: repeat(3, 1fr); gap: .5rem; margin: .2rem 0 .7rem; }
     .np-range, .np-num { font: 800 1.35rem/1 var(--ui-font); color: #fff; background: rgba(255,255,255,.12); border: 2px solid rgba(255,255,255,.35); cursor: pointer; transition: background-color .15s, transform .1s, border-color .15s; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
     .np-range { min-height: 54px; border-radius: 16px; }
@@ -8999,7 +9001,9 @@
           if (hint) hint.remove();
           panel.classList.add("start-only");
         }
-        panel.appendChild(startBtn);
+        // Start goes first so kids can play right away with the default picks; settings sit below.
+        panel.insertBefore(startBtn, panel.firstChild);
+        if (panel.children.length > 1) { startBtn.classList.add("gs-top"); startBtn.after(el("p", { class: "gs-or", text: "Or change your picks below:" })); }
         const ops = opsCard.querySelector(".ops");
         const openBtn = ops.querySelector(".choice.op-" + state.operation);
         const buttons = Array.prototype.filter.call(ops.querySelectorAll(".choice"), function (b) { return b.className.indexOf("gcat-" + gameCategory(state.operation)) >= 0; });
