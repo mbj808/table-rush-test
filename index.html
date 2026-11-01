@@ -8998,7 +8998,8 @@
       if (state.gameOpen) {
         const panel = el("div", { class: "game-panel", id: "game-panel", role: "region", "aria-label": opLabel(state.operation) + " options" });
         const hint = opsCard.querySelector(".hint");
-        if (isMathGame(state.operation) || isKq()) {
+        // Science topics: just the name and Start (no number or level picker).
+        if ((isMathGame(state.operation) || isKq()) && state.operation.indexOf("sci-") !== 0) {
           if (hint) panel.appendChild(hint);
           optionNodes.forEach(function (node) { node.classList.add("in-panel"); panel.appendChild(node); });
         } else {
