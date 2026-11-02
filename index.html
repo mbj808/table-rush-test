@@ -3524,6 +3524,7 @@
     .av-status.saved { color: #8ff0a4; }
     .av-status.offline { color: #ffd34e; }
     .av-print { display: flex; align-items: center; justify-content: center; min-height: 48px; padding: 0 1rem; border-radius: 999px; background: #fff7ea; color: #24306e; font: 800 1.05rem/1 var(--ui-font); text-decoration: none; box-shadow: 0 3px 0 rgba(0,0,0,.25); }
+    .av-hw { margin-top: 0.5rem; }
     .av-print:active { transform: translateY(2px); box-shadow: 0 1px 0 rgba(0,0,0,.25); }
     .av-print:focus-visible { outline: 3px solid #ffd84d; outline-offset: 2px; }
     .av-loading, .av-tip { margin: 0; text-align: center; font: 700 1.05rem/1.35 var(--ui-font); color: #fff; }
@@ -8210,6 +8211,7 @@
         }
       }
       state.phase = "results";
+      sessEnd(); sessQueue(q.mode === "all" ? "All Facts" : "60 Seconds", Date.now() - Math.round(q.elapsedMs || 60000), Date.now(), q.correct + q.mistakes, q.correct);
       lbTimed(q.mode === "all" ? "all" : "sixty", q.mode === "all" ? Math.round(q.elapsedMs) : Math.max(0, q.correct - q.mistakes));
       lbFlush();
       render();
@@ -8332,6 +8334,7 @@
         writeSave();
       }
       state.drill = null;
+      sessEnd();
       lbFlush();
       state.phase = "setup";
       state.problem = null;
@@ -9227,6 +9230,8 @@
       lbGet("action=version").then(function (d) {
         lb.mode = d && d.version >= 2 ? "points" : "streak";
         lb.timedOk = !!(d && d.version >= 3 && d.timed);
+        lb.sessOk = !!(d && d.version >= 9 && d.sessions);
+        if (lb.sessOk) sessSend();
         if (lb.timedOk) lbTimedFlush();
         if (lb.mode === "points") lbFlush(); else { try { localStorage.removeItem(LB_PTS_KEY); } catch (e) {} }
       }).catch(function () { lb.capsAsked = false; });
@@ -9257,6 +9262,7 @@
       pill.hidden = false;
     }
     function lbPoint(right, op) {
+      if (LEADERBOARD_URL && lbMe()) sessTick(lbGameLabel(op) || "Other", right);
       if (!LEADERBOARD_URL || !lbMe() || lb.mode === "streak") return;
       const v = lbPtsRead(), g = lbGameLabel(op) || "Other";
       const t = v.games[g] || (v.games[g] = { r: 0, w: 0 });
@@ -9267,6 +9273,50 @@
       if (v.n >= LB_BATCH) lbFlush();
       myPtsSync();
     }
+    // ---- Session log (sheet script v9): one record per game played, for the teacher Homework Report. ----
+    // Answers are grouped into a session per game; a new game, 5 idle minutes, leaving the game or hiding the page ends it.
+    const LB_LOG_KEY = "mad-facts-log";
+    let sessCur = null;
+    function sessLogRead() { try { const v = JSON.parse(localStorage.getItem(LB_LOG_KEY) || "[]"); return Array.isArray(v) ? v : []; } catch (e) { return []; } }
+    function sessLogWrite(v) { try { localStorage.setItem(LB_LOG_KEY, JSON.stringify(v.slice(-200))); } catch (e) {} }
+    function sessQueue(game, start, end, q, right) {
+      const me = LEADERBOARD_URL ? lbMe() : null;
+      if (!me || !(q > 0)) return;
+      const v = sessLogRead();
+      v.push({ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), name: me.name, code: me.code, game: game, start: start, end: Math.max(end, start), q: q, right: right });
+      sessLogWrite(v);
+      sessSend();
+    }
+    function sessEnd() { const c = sessCur; sessCur = null; if (c) sessQueue(c.game, c.start, c.last, c.q, c.r); }
+    function sessTick(game, right) {
+      const now = Date.now();
+      if (sessCur && (sessCur.game !== game || now - sessCur.last > 300000)) sessEnd();
+      if (!sessCur) sessCur = { game: game, start: now, last: now, q: 0, r: 0 };
+      sessCur.q++; if (right) sessCur.r++; sessCur.last = now;
+    }
+    const sessBusy = {};
+    function sessSend() {
+      if (!LEADERBOARD_URL) return;
+      if (!lb.sessOk) { if (!lb.mode) lbCaps(); return; }
+      sessLogRead().forEach(function (s) {
+        if (sessBusy[s.id]) return;
+        sessBusy[s.id] = 1;
+        const done = function () { sessLogWrite(sessLogRead().filter(function (x) { return x.id !== s.id; })); };
+        try {
+          fetch(LEADERBOARD_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, keepalive: true,
+            body: JSON.stringify({ type: "session", name: s.name, code: s.code, game: s.game, start: s.start, end: s.end, q: s.q, right: s.right }) })
+            .then(function (r) { return r.json(); })
+            .then(function (d) { if (d && (d.ok || /^(code|name|time|points|game)$/.test(d.error))) done(); })
+            .catch(function () {})
+            .then(function () { delete sessBusy[s.id]; });
+        } catch (e) { delete sessBusy[s.id]; }
+      });
+    }
+    window.addEventListener("hashchange", function () { lb.pageT0 = Date.now(); });
+    lb.pageT0 = Date.now();
+    window.addEventListener("online", sessSend);
+    window.addEventListener("pagehide", sessEnd);
+    document.addEventListener("visibilitychange", function () { if (document.visibilityState === "hidden") sessEnd(); });
     function lbFlush(leaving) {
       if (!LEADERBOARD_URL || lb.mode !== "points") return;
       const me = lbMe();
@@ -9322,6 +9372,7 @@
       if (!LEADERBOARD_URL || !kid || !kid.name || !kid.code || !(pts > 0)) return false;
       const v = lbSessRead();
       v.push({ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 7), name: kid.name, code: kid.code, game: game, pts: Math.min(200, Math.floor(pts)) });
+      if (lbMe() && lbMe().name.toLowerCase() === String(kid.name).toLowerCase()) { sessEnd(); const t0 = Math.max(lb.pageT0 || 0, Date.now() - 3600000); sessQueue(game, t0, Date.now(), Math.floor(pts), Math.floor(pts)); }
       lbSessWrite(v); lbSessFlush();
       const me = lbMe();
       if (me && me.name.toLowerCase() === String(kid.name).toLowerCase()) { lb.sentDelta = (lb.sentDelta || 0) + Math.min(200, Math.floor(pts)); myPtsSync(); }
@@ -10284,6 +10335,7 @@
       });
       top.appendChild(tabs);
       top.appendChild(el("a", { class: "av-print", href: "./print.html", target: "_blank", rel: "noopener", text: "\uD83D\uDDA8\uFE0F Print avatars" }));
+      top.appendChild(el("a", { class: "av-print av-hw", href: "./homework.html", target: "_blank", rel: "noopener", text: "\uD83D\uDCCB Homework report" }));
       card.appendChild(top);
       setTimeout(function () { avShowStatus(avStatus); }, 0);
       const items = el("div", { class: "av-items" });

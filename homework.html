@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:,">
+<title>Mad Facts Challenge · Homework Report</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: "Trebuchet MS", Arial, sans-serif; background: #f4f1fb; color: #241a3a; font-size: 16px; }
+  .bar { padding: 0.8rem 1rem; background: #2a1d4a; color: #fff; }
+  .bar h1 { margin: 0 0 0.5rem; font-size: 1.25rem; }
+  .ctl { display: flex; flex-wrap: wrap; gap: 0.5rem 0.8rem; align-items: flex-end; }
+  .ctl label { display: flex; flex-direction: column; font-size: 0.8rem; gap: 0.2rem; }
+  .ctl input, .ctl select, .ctl button { font: inherit; font-size: 1rem; padding: 0.4rem 0.5rem; border-radius: 0.5rem; border: 1px solid #8a7bb5; min-height: 40px; }
+  .ctl button { border: 0; background: #4d3a80; color: #fff; font-weight: 700; padding: 0.4rem 0.9rem; cursor: pointer; }
+  .ctl .print { background: #2fa35a; }
+  .ctl .chk { flex-direction: row; align-items: center; font-size: 0.9rem; }
+  .ctl .chk input { min-height: 0; }
+  .sum { padding: 0.6rem 1rem; margin: 0; font-size: 0.95rem; }
+  .msg { text-align: center; padding: 2rem 1rem; font-size: 1.1rem; }
+  .wrap { padding: 0 0.5rem 1.5rem; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  table { width: 100%; border-collapse: collapse; background: #fff; font-size: 0.95rem; }
+  th, td { padding: 0.45rem 0.5rem; border-bottom: 1px solid #e3dcf2; text-align: right; vertical-align: top; }
+  th:first-child, td:first-child, th.g, td.g { text-align: left; }
+  th { background: #ece6f8; position: sticky; top: 0; cursor: pointer; user-select: none; -webkit-user-select: none; white-space: nowrap; }
+  th.on::after { content: " \25BC"; font-size: 0.7em; }
+  th.on.asc::after { content: " \25B2"; }
+  td.g { font-size: 0.85rem; color: #4a3d66; min-width: 9rem; }
+  tr.zero td { color: #9a90b0; }
+  .print-head { display: none; }
+  .gm { display: none; font-size: 0.78rem; color: #4a3d66; margin-top: 0.2rem; }
+  @media (max-width: 600px) { .ctl label { flex: 1 1 42%; } .ctl input, .ctl select { width: 100%; } table { font-size: 0.85rem; } th.g, td.g { display: none; } .gm { display: block; } th, td { padding: 0.4rem 0.3rem; } }
+  @page { margin: 0.5in; }
+  @media print {
+    body { background: #fff; font-size: 11pt; }
+    .bar, .msg { display: none !important; }
+    .print-head { display: block; margin: 0 0 0.1in; font-size: 14pt; font-weight: 700; }
+    .sum { padding: 0 0 0.1in; }
+    .wrap { padding: 0; overflow: visible; }
+    th { position: static; background: #eee; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    th.on::after { content: ""; }
+    th.g, td.g { display: table-cell !important; } .gm { display: none !important; }
+    tr { break-inside: avoid; page-break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<div class="bar">
+  <h1>📋 Homework Report</h1>
+  <div class="ctl">
+    <label>Class <select id="cls"></select></label>
+    <label>From <input type="date" id="from"></label>
+    <label>To <input type="date" id="to"></label>
+    <label>School starts <input type="time" id="s0" value="07:45"></label>
+    <label>School ends <input type="time" id="s1" value="14:05"></label>
+    <label class="chk"><input type="checkbox" id="all"> Show all plays (not just homework)</label>
+    <button type="button" id="go">Load</button>
+    <button type="button" class="print" id="print">🖨️ Print</button>
+  </div>
+</div>
+<p class="print-head" id="ph"></p>
+<p class="sum" id="sum"></p>
+<p class="msg" id="msg">Pick a class and tap Load.</p>
+<div class="wrap"><table id="tbl" hidden><thead><tr>
+  <th data-k="name">Student</th><th data-k="nights">Nights</th><th data-k="min">Minutes</th><th data-k="q">Questions</th><th data-k="pct">% correct</th><th data-k="games" class="g">Games played</th>
+</tr></thead><tbody id="body"></tbody></table></div>
+<script>
+(function () {
+  // TEST site: the TEST Apps Script (needs script v9 with the Sessions tab).
+  var URL_ = "https://script.google.com/macros/s/AKfycbz2XyYeAkx55bjxd7owyqvByPX4tNU91qA5FtRJz4HR5hS6JcbdLOOnn6B1CPFWsm0W/exec";
+  var KEY_STORE = "mad-facts-teacher-key";
+  var CLASSES = [["A", "Eagles"], ["B", "Hawks"], ["C", "Wolves"], ["D", "Bears"], ["E", "Foxes"], ["F", "Deer"], ["G", "Owls"], ["H", "Falcons"], ["I", "Turtles"], ["J", "Coyotes"]];
+  var HST = -10 * 3600000; // Hawaii has no daylight saving
+  var MOCK = /[?&]mock=1/.test(location.search);
+  var $ = function (id) { return document.getElementById(id); };
+  var data = null, sortK = "min", sortAsc = false;
+
+  function pad(n) { return (n < 10 ? "0" : "") + n; }
+  function hDate(ms) { var d = new Date(ms + HST); return d.getUTCFullYear() + "-" + pad(d.getUTCMonth() + 1) + "-" + pad(d.getUTCDate()); }
+  function hInfo(ms) { var d = new Date(ms + HST); return { day: hDate(ms), dow: d.getUTCDay(), min: d.getUTCHours() * 60 + d.getUTCMinutes() }; }
+  function toMin(v) { var p = String(v || "").split(":"); return (+p[0] || 0) * 60 + (+p[1] || 0); }
+  function addDays(day, n) { var d = new Date(day + "T00:00:00Z"); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); }
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+
+  // Default: this week, Monday to Sunday, in Hawaii time.
+  var today = hDate(Date.now()), dow = new Date(today + "T00:00:00Z").getUTCDay();
+  $("from").value = addDays(today, -((dow + 6) % 7));
+  $("to").value = addDays($("from").value, 6);
+  CLASSES.forEach(function (c) { var o = document.createElement("option"); o.value = c[0]; o.textContent = c[1] + " (" + c[0] + ")"; $("cls").appendChild(o); });
+  try { var lastCls = localStorage.getItem("mad-facts-hw-cls"); if (lastCls) $("cls").value = lastCls; } catch (e) {}
+
+  function teacherKey(ask) {
+    var k = "";
+    try { k = localStorage.getItem(KEY_STORE) || ""; } catch (e) {}
+    if (!k || ask) { k = window.prompt("Teacher key (from the Settings tab, cell B14):", "") || ""; try { localStorage.setItem(KEY_STORE, k); } catch (e) {} }
+    return k;
+  }
+
+  function mockData(cls) {
+    var names = ["Rising Star", "Red Hawk", "Golden Blossom", "Tall Tree", "Thunder Shark", "Night Wolf", "Silent Fox", "Moon Flower", "Strong Bear", "Wind Dancer", "Kendama", "Bright Moon"];
+    var games = ["Multiplication", "Division", "Grammar", "Brick by Brick", "60 Seconds", "Vocab", "Rhyming"];
+    var rows = [], seed = cls.charCodeAt(0) * 97, start = Date.parse($("from").value + "T00:00:00Z") - HST;
+    function rnd() { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; }
+    names.forEach(function (n, i) {
+      var keen = i % 4 === 3 ? 0 : rnd();
+      for (var d = 0; d < 7; d++) {
+        var tries = Math.floor(keen * 3.2);
+        for (var t = 0; t < tries; t++) {
+          var hour = rnd() < 0.35 ? 9 + Math.floor(rnd() * 4) : 15 + Math.floor(rnd() * 6);
+          var q = 10 + Math.floor(rnd() * 50), mins = Math.round((2 + rnd() * 14) * 10) / 10;
+          rows.push([start + d * 864e5 + hour * 3600000 + Math.floor(rnd() * 3600000), n, games[Math.floor(rnd() * games.length)], q, Math.round(q * (0.55 + rnd() * 0.45)), mins]);
+        }
+      }
+    });
+    return { ok: true, names: names, rows: rows };
+  }
+
+  function load(askKey) {
+    var cls = $("cls").value;
+    try { localStorage.setItem("mad-facts-hw-cls", cls); } catch (e) {}
+    $("msg").hidden = false; $("msg").textContent = "Loading\u2026"; $("tbl").hidden = true;
+    if (MOCK) { data = mockData(cls); paint(); return; }
+    var key = teacherKey(askKey);
+    if (!key) { $("msg").textContent = "A teacher key is needed."; return; }
+    var q = "?action=sessions&cls=" + encodeURIComponent(cls) + "&from=" + $("from").value + "&to=" + $("to").value + "&key=" + encodeURIComponent(key);
+    fetch(URL_ + q, { cache: "no-store" }).then(function (r) { return r.json(); }).then(function (d) {
+      if (d && d.ok) { data = d; paint(); return; }
+      if (d && d.error === "key") { try { localStorage.removeItem(KEY_STORE); } catch (e) {} $("msg").textContent = "Wrong teacher key. Tap Load to try again."; return; }
+      $("msg").textContent = d && d.version ? "" : "The sheet script needs updating (v9) before this report works.";
+    }).catch(function () { $("msg").textContent = "Could not reach the sheet. Check the connection and tap Load."; });
+  }
+
+  function isHomework(ms, s0, s1) {
+    var h = hInfo(ms);
+    if (h.dow === 0 || h.dow === 6) return true;
+    return h.min < s0 || h.min >= s1;
+  }
+
+  function paint() {
+    if (!data) return;
+    var s0 = toMin($("s0").value), s1 = toMin($("s1").value), all = $("all").checked;
+    var from = $("from").value, to = $("to").value, kids = {};
+    (data.names || []).forEach(function (n) { kids[n.toLowerCase()] = { name: n, days: {}, min: 0, q: 0, r: 0, g: {} }; });
+    var plays = 0;
+    data.rows.forEach(function (r) {
+      var day = hDate(r[0]);
+      if (day < from || day > to) return;
+      if (!all && !isHomework(r[0], s0, s1)) return;
+      var k = kids[String(r[1]).toLowerCase()] || (kids[String(r[1]).toLowerCase()] = { name: r[1], days: {}, min: 0, q: 0, r: 0, g: {} });
+      k.days[day] = 1; k.min += r[5]; k.q += r[3]; k.r += r[4]; k.g[r[2]] = (k.g[r[2]] || 0) + 1; plays++;
+    });
+    var list = Object.keys(kids).map(function (id) {
+      var k = kids[id];
+      k.nights = Object.keys(k.days).length; k.pct = k.q ? Math.round(100 * k.r / k.q) : -1;
+      k.gl = Object.keys(k.g).sort(function (a, b) { return k.g[b] - k.g[a] || (a < b ? -1 : 1); });
+      k.games = k.gl.length; return k;
+    });
+    list.sort(function (a, b) {
+      var x = a[sortK], y = b[sortK], c = sortK === "name" ? (x.toLowerCase() < y.toLowerCase() ? -1 : x.toLowerCase() > y.toLowerCase() ? 1 : 0) : x - y;
+      if (!c) c = a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1;
+      return sortAsc ? c : -c;
+    });
+    var html = "";
+    list.forEach(function (k) {
+      var gtxt = k.gl.map(function (g) { return esc(g) + " \u00D7" + k.g[g]; }).join(", ");
+      html += "<tr" + (k.q ? "" : " class=\"zero\"") + "><td>" + esc(k.name) + (k.gl.length ? "<div class=\"gm\">" + gtxt + "</div>" : "") + "</td><td>" + k.nights + "</td><td>" + Math.round(k.min) + "</td><td>" + k.q + "</td><td>" + (k.pct < 0 ? "\u2013" : k.pct + "%") +
+        "</td><td class=\"g\">" + (gtxt || "\u2013") + "</td></tr>";
+    });
+    $("body").innerHTML = html;
+    var ths = document.querySelectorAll("th");
+    for (var i = 0; i < ths.length; i++) { var on = ths[i].getAttribute("data-k") === sortK; ths[i].className = (ths[i].className.indexOf("g") >= 0 ? "g " : "") + (on ? "on" + (sortAsc ? " asc" : "") : ""); }
+    var clsName = $("cls").options[$("cls").selectedIndex].textContent;
+    var win = all ? "all plays" : "homework = outside school hours " + $("s0").value + "\u2013" + $("s1").value + " on weekdays, all day on weekends (Hawaii time)";
+    $("ph").textContent = "Homework Report \u00B7 " + clsName + " \u00B7 " + from + " to " + to;
+    var did = list.filter(function (k) { return k.q > 0; }).length;
+    $("sum").textContent = did + " of " + list.length + " students played \u00B7 " + plays + " games \u00B7 " + win + (MOCK ? " \u00B7 SAMPLE DATA" : "");
+    $("msg").hidden = true; $("tbl").hidden = false;
+  }
+
+  document.querySelector("thead").onclick = function (e) {
+    var k = e.target && e.target.getAttribute && e.target.getAttribute("data-k");
+    if (!k) return;
+    if (k === sortK) sortAsc = !sortAsc; else { sortK = k; sortAsc = k === "name"; }
+    paint();
+  };
+  $("go").onclick = function () { load(false); };
+  $("cls").onchange = $("from").onchange = $("to").onchange = function () { if (data) load(false); };
+  $("s0").onchange = $("s1").onchange = $("all").onchange = paint;
+  $("print").onclick = function () { window.print(); };
+  if (MOCK) load(false);
+})();
+</script>
+</body>
+</html>
