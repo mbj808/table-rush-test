@@ -7565,6 +7565,30 @@
     // Broad first-gesture unlock: scroll/touch/wheel count, not only taps.
     const HOME_UNLOCK_EVENTS = ["pointerdown", "touchstart", "mousedown", "keydown", "click", "wheel"];
     var pageAway = false, pageAwayWasPlaying = false;
+    // Lazy music: no mp3 is fetched until the first real tap/key. The Audio element starts with no src and
+    // preload="none"; play() sets the src (inside the tap handler, so iOS still counts it as the gesture) and
+    // only the one track being played is downloaded. A play() before any tap rejects like an autoplay block.
+    var userGestured = false;
+    ["pointerdown", "touchstart", "touchend", "mousedown", "keydown", "click"].forEach(function (type) {
+      document.addEventListener(type, function (e) { if (e.isTrusted !== false) userGestured = true; }, true);
+    });
+    function lazyAudio(url) {
+      const a = new Audio();
+      a.preload = "none";
+      a.dataset.src = url;
+      a.play = function () {
+        if (!a.getAttribute("src")) {
+          if (!userGestured) {
+            const err = new Error("waiting for first tap"); err.name = "NotAllowedError";
+            return Promise.reject(err);
+          }
+          a.preload = "auto";
+          a.src = a.dataset.src;
+        }
+        return HTMLMediaElement.prototype.play.call(a);
+      };
+      return a;
+    }
     function homeMusicSrc() {
       try {
         return new URL("assets/audio/home.mp3", document.baseURI || window.location.href).href;
@@ -7574,9 +7598,8 @@
     }
     function ensureHomeMusic() {
       if (homeMusic) return homeMusic;
-      homeMusic = new Audio(homeMusicSrc());
+      homeMusic = lazyAudio(homeMusicSrc());
       homeMusic.loop = true;
-      homeMusic.preload = "auto";
       homeMusic.volume = HOME_MUSIC_VOLUME;
       homeMusic.muted = false;
       homeMusic.playsInline = true;
@@ -7845,9 +7868,8 @@
       if (playMusic && playMusicTrackId === state.playMusicId) return playMusic;
       disposePlayMusic();
       playMusicTrackId = state.playMusicId;
-      playMusic = new Audio(playMusicSrc());
+      playMusic = lazyAudio(playMusicSrc());
       playMusic.loop = true;
-      playMusic.preload = "auto";
       playMusic.volume = 0.55;
       playMusic.playsInline = true;
       playMusic.setAttribute("playsinline", "");
@@ -9118,6 +9140,23 @@
     const LEADERBOARD_URL = TEST_SCRIPT_URL;
     const LB_KEY = "mad-facts-lb";
     const lb = { names: null, board: null, view: "points", tab: "today", game: "__all", loading: false, failed: false, msg: "" };
+    // Saved board: the last good board is kept in localStorage so Leaders paints instantly (even on a fresh page load),
+    // then a fresh fetch replaces it. One board holds every class; it is saved under the signed-in kid's class key
+    // (mad-facts-lb-board-<cls>) and a shared fallback key, so a shared iPad switching kids still paints something.
+    const LB_BOARD_KEY = "mad-facts-lb-board";
+    function lbBoardKeys() { const me = lbMe(); return (me && me.cls ? [LB_BOARD_KEY + "-" + me.cls] : []).concat([LB_BOARD_KEY]); }
+    function lbBoardSave() {
+      if (!lb.board) return;
+      const v = JSON.stringify({ at: lb.updated || Date.now(), board: lb.board });
+      lbBoardKeys().forEach(function (k) { try { localStorage.setItem(k, v); } catch (e) {} });
+    }
+    function lbBoardLoad() {
+      if (lb.board) return;
+      const ks = lbBoardKeys();
+      for (let i = 0; i < ks.length; i++) {
+        try { const v = JSON.parse(localStorage.getItem(ks[i]) || "null"); if (v && v.board && v.board.ok) { lb.board = v.board; lb.sig = lbSig(v.board); lb.updated = v.at || 0; lb.cached = true; return; } } catch (e) {}
+      }
+    }
     function lbMe() {
       try { const v = JSON.parse(localStorage.getItem(LB_KEY) || "null"); return v && v.name && v.code && v.pw ? v : null; } catch (e) { return null; }
     }
@@ -9423,9 +9462,9 @@
       const me = lbMe();
       avPull();
       Promise.all([me ? Promise.resolve(lb.names) : lbGet("action=roster").then(function (d) { return (d && d.names) || []; }), lbGet("action=board")])
-        .then(function (res) { lb.names = res[0]; lb.board = res[1] && res[1].ok ? res[1] : null; lb.sig = lbSig(lb.board); if (lb.board) lb.sentDelta = 0; setTimeout(myPtsSync, 0); if (lb.board) lb.updated = Date.now(); if (me && lb.board && lb.board.classOf) { const c = lbClassOf(me.name); if (me.cls !== c) { me.cls = c; try { localStorage.setItem(LB_KEY, JSON.stringify(me)); } catch (e) {} if (!lb.clsTouched) lb.cls = c; } } lb.failed = false; if (lb.board && lb.board.timed && !lb.timedOk) { lb.timedOk = true; lbTimedFlush(); } if (lb.board && lb.board.points && lb.mode !== "points") { lb.mode = "points"; lbFlush(); } })
+        .then(function (res) { lb.names = res[0]; lb.fetched = true; if (res[1] && res[1].ok) lb.board = res[1]; else if (!lb.cached) lb.board = null; lb.sig = lbSig(lb.board); if (lb.board) lb.sentDelta = 0; setTimeout(myPtsSync, 0); if (lb.board) { lb.updated = Date.now(); lb.cached = false; lbBoardSave(); } if (me && lb.board && lb.board.classOf) { const c = lbClassOf(me.name); if (me.cls !== c) { me.cls = c; try { localStorage.setItem(LB_KEY, JSON.stringify(me)); } catch (e) {} if (!lb.clsTouched) lb.cls = c; } } lb.failed = false; if (lb.board && lb.board.timed && !lb.timedOk) { lb.timedOk = true; lbTimedFlush(); } if (lb.board && lb.board.points && lb.mode !== "points") { lb.mode = "points"; lbFlush(); } })
         .catch(function () { lb.failed = true; })
-        .then(function () { lb.loading = false; if (state.phase === "setup" && currentPage() === "leaders") render(); });
+        .then(function () { lb.loading = false; if (state.phase === "setup" && currentPage() === "leaders") lbRedraw(); });
     }
     // ---- Live board for a classroom TV: while Leaders is open and visible, fetch the board every 5 s (never two at once). ----
     // Rows whose score changed get a short green glow; rows that move slide to their new place. Tabs, class and scroll stay put.
@@ -9451,8 +9490,8 @@
         if (!d || !d.ok || currentPage() !== "leaders" || state.phase !== "setup") return;
         lb.failed = false; lb.updated = Date.now();
         const sig = lbSig(d);
-        if (sig === lb.sig && lb.board) { lbStampUpdated(); lb.polls = (lb.polls || 0) + 1; return; }
-        lb.board = d; lb.sig = sig; lb.redraws = (lb.redraws || 0) + 1; lb.sentDelta = 0;
+        if (sig === lb.sig && lb.board) { lbBoardSave(); lbStampUpdated(); lb.polls = (lb.polls || 0) + 1; return; }
+        lb.board = d; lb.sig = sig; lb.cached = false; lbBoardSave(); lb.redraws = (lb.redraws || 0) + 1; lb.sentDelta = 0;
         const a = document.activeElement;
         if (a && a.tagName === "SELECT") return;
         const before = {};
@@ -9474,7 +9513,28 @@
         });
       }).catch(function () {}).then(function () { lb.polling = false; });
     }
-    setInterval(lbPoll, 5000);
+    // The 5 s timer runs only while Leaders is open; it stops itself as soon as you leave.
+    let lbTimer = 0;
+    function lbTimerOn() { if (!lbTimer && LEADERBOARD_URL) { lbLastTick = Date.now(); lbTimer = setInterval(lbTick, 5000); } }
+    function lbTimerOff() { if (lbTimer) { clearInterval(lbTimer); lbTimer = 0; } }
+    function lbTick() { if (currentPage() !== "leaders" || state.phase !== "setup") { lbTimerOff(); return; } lbPoll(); }
+    window.addEventListener("hashchange", function () { if (currentPage() !== "leaders") lbTimerOff(); });
+    // Redraw after a fetch, keeping scroll put (same as a poll redraw).
+    function lbRedraw() { const y = window.scrollY; render(); if (Math.abs(window.scrollY - y) > 1) window.scrollTo(0, y); }
+    // Quiet prefetch: once per page load, a few seconds after home goes idle, fetch the board in the background
+    // so the first tap on Leaders already has fresh rows. Never repeats; skipped if Leaders already fetched.
+    let lbPrefetched = false;
+    function lbPrefetch() {
+      if (lbPrefetched || !LEADERBOARD_URL) return;
+      lbPrefetched = true;
+      setTimeout(function go() {
+        if (lb.fetched || lb.loading) return;
+        if (document.visibilityState !== "visible" || state.phase !== "setup") { lbPrefetched = false; return; }
+        const run = function () { if (!lb.fetched && !lb.loading) { lbBoardLoad(); lbRefresh(); } };
+        if (window.requestIdleCallback) requestIdleCallback(run, { timeout: 3000 }); else run();
+      }, 4000);
+    }
+    if (document.readyState === "complete") lbPrefetch(); else window.addEventListener("load", lbPrefetch);
     // Back on Leaders (or the screen wakes up): show the cached board now and fetch fresh right away.
     window.addEventListener("hashchange", function () { if (currentPage() === "leaders" && lb.board) lbKick(); });
     document.addEventListener("visibilitychange", function () { if (document.visibilityState === "visible" && state.phase === "setup" && currentPage() === "leaders" && lb.board) lbKick(); });
@@ -9496,6 +9556,27 @@
       lbFlush(true);
       if (state.phase === "play" && state.streak > 0) { const s = state.streak; state.streak = 0; lbStreakEnded(s, state.lbOp || state.operation); }
     });
+    // All rows of a list in one DOM write (one HTML string, one insertAdjacentHTML), with each avatar SVG built once and reused.
+    const lbAvCache = new Map();
+    function lbEsc(t) { return String(t == null ? "" : t).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+    function lbAvHTML(a) {
+      const k = JSON.stringify(a);
+      let h = lbAvCache.get(k);
+      if (h === undefined) { try { h = avatarSVG(a, { size: 30 }); } catch (e) { h = ""; } if (lbAvCache.size > 300) lbAvCache.clear(); lbAvCache.set(k, h); }
+      return h;
+    }
+    function lbRowsInto(list, items, me) {
+      const medals = ["\uD83E\uDD47", "\uD83E\uDD48", "\uD83E\uDD49"], avs = (lb.board && lb.board.avatars) || {}, my = me ? String(me.name).toLowerCase() : null;
+      let html = "";
+      items.forEach(function (it, i) {
+        const mine = my !== null && String(it.name).toLowerCase() === my;
+        const cls = "lb-row" + (mine ? " me" : "") + (i < 3 ? " top" + (i + 1) : "") + (lbChanged(it.key, it.val) ? " lb-bump" : "");
+        html += '<li class="' + cls + '" data-n="' + lbEsc(it.key) + '"><span class="lb-rank">' + (i < 3 ? medals[i] : String(i + 1)) +
+          '</span><span class="lb-name"><span class="av lb-av">' + lbAvHTML(mine ? avatar : avs[it.name] || { color: "#c9c9d6" }) +
+          '</span><span>' + lbEsc(it.name) + '</span></span><span class="lb-streak">' + lbEsc(it.val) + '</span></li>';
+      });
+      if (html) list.insertAdjacentHTML("beforeend", html);
+    }
     function lbTimedLists(me) {
       const wrap = el("div", { class: "lb-timed" });
       const t = lb.board && lb.board.timed;
@@ -9507,14 +9588,7 @@
         if (!lb.board) list.appendChild(el("li", { class: "lb-empty", text: lb.failed ? "Can\u2019t load the board right now." : "Loading\u2026" }));
         else if (!t) list.appendChild(el("li", { class: "lb-empty", text: "Coming soon!" }));
         else if (!rows.length) list.appendChild(el("li", { class: "lb-empty", text: "No scores yet. Be the first!" }));
-        rows.slice(0, 10).forEach(function (r, i) {
-          const mine = me && r.name.toLowerCase() === me.name.toLowerCase();
-          list.appendChild(el("li", { class: "lb-row" + (mine ? " me" : "") + (i < 3 ? " top" + (i + 1) : "") + (lbChanged(s[0] + ":" + r.name, s[2](r)) ? " lb-bump" : ""), "data-n": s[0] + ":" + r.name }, [
-            el("span", { class: "lb-rank", text: i < 3 ? ["\uD83E\uDD47", "\uD83E\uDD48", "\uD83E\uDD49"][i] : String(i + 1) }),
-            el("span", { class: "lb-name" }, [avNode(mine ? avatar : (lb.board.avatars && lb.board.avatars[r.name]) || { color: "#c9c9d6" }, 30, "lb-av"), el("span", { text: r.name })]),
-            el("span", { class: "lb-streak", text: s[2](r) })
-          ]));
-        });
+        lbRowsInto(list, rows.slice(0, 10).map(function (r) { return { key: s[0] + ":" + r.name, name: r.name, val: s[2](r) }; }), me);
         wrap.appendChild(list);
       });
       wrap.appendChild(el("p", { class: "lb-hint", text: "60 Seconds: right minus wrong. All Facts: time plus 5 seconds for each wrong one." }));
@@ -9672,7 +9746,9 @@
         el("h2", { class: "lb-title", text: "\uD83C\uDFC6 Leaderboard" })
       ]));
       if (!LEADERBOARD_URL) { card.appendChild(el("p", { class: "lb-big lb-offline", text: "Test site: offline" })); return card; }
-      if (!lb.board && !lb.loading && !lb.failed) lbRefresh();
+      lbBoardLoad();
+      if ((!lb.board || !lb.fetched) && !lb.loading && !lb.failed) lbRefresh();
+      lbTimerOn();
       const me = lbMe();
       if (!me) {
         card.appendChild(el("div", { class: "lb-join" }, [
@@ -9717,15 +9793,8 @@
       const list = el("ol", { class: "lb-list" });
       if (!lb.board) list.appendChild(el("li", { class: "lb-empty", text: lb.failed ? "Can\u2019t load the board right now." : "Loading\u2026" }));
       else if (!rows.length) list.appendChild(el("li", { class: "lb-empty", text: usePts ? "No points yet. Be the first!" : "No streaks yet. Be the first!" }));
-      rows.forEach(function (r, i) {
-        const mine = me && r.name.toLowerCase() === me.name.toLowerCase();
-        const val = usePts ? r.points + " pts" : String(r.streak) + " \uD83D\uDD25";
-        list.appendChild(el("li", { class: "lb-row" + (mine ? " me" : "") + (i < 3 ? " top" + (i + 1) : "") + (lbChanged(r.name, val) ? " lb-bump" : ""), "data-n": r.name }, [
-          el("span", { class: "lb-rank", text: i < 3 ? ["\uD83E\uDD47", "\uD83E\uDD48", "\uD83E\uDD49"][i] : String(i + 1) }),
-          el("span", { class: "lb-name" }, [avNode(mine ? avatar : (lb.board.avatars && lb.board.avatars[r.name]) || { color: "#c9c9d6" }, 30, "lb-av"), el("span", { text: r.name })]),
-          el("span", { class: "lb-streak", text: val })
-        ]));
-      });
+      // Guard: a row with no number shows "0 pts", never "undefined pts".
+      lbRowsInto(list, rows.map(function (r) { return { key: r.name, name: r.name, val: usePts ? (Number(r.points) || 0) + " pts" : (Number(r.streak) || 0) + " \uD83D\uDD25" }; }), me);
       card.appendChild(list);
       card.appendChild(el("p", { class: "lb-hint", text: usePts ? "1 point for each right answer, minus 1 for each wrong one." : "Your best streak goes up when it ends." }));
       return card;
