@@ -7550,6 +7550,7 @@
     const HOME_MUSIC_VOLUME = 0.55;
     // Broad first-gesture unlock: scroll/touch/wheel count, not only taps.
     const HOME_UNLOCK_EVENTS = ["pointerdown", "touchstart", "mousedown", "keydown", "click", "wheel"];
+    var pageAway = false, pageAwayWasPlaying = false;
     function homeMusicSrc() {
       try {
         return new URL("assets/audio/home.mp3", document.baseURI || window.location.href).href;
@@ -7637,7 +7638,7 @@
     }
     // Home BGM is always available on setup — never tied to the beat challenge lock.
     function homeMusicShouldPlay() {
-      return state.phase === "setup" && !state.muted && !musicPausedForGame && !state.homeBeat && !state.homeSilenced;
+      return !pageAway && state.phase === "setup" && !state.muted && !musicPausedForGame && !state.homeBeat && !state.homeSilenced;
     }
     // A beat picked on the home screen plays there (instead of the home music).
     function beatOnHome() { return state.phase === "setup" && !!state.homeBeat; }
@@ -7856,6 +7857,7 @@
       document.addEventListener("keydown", unlockPlayMusic, true);
     }
     function tryPlayPlayMusic() {
+      if (pageAway) return;
       const audio = ensurePlayMusic();
       if (!audio) return;
       const playAttempt = audio.play();
@@ -7880,7 +7882,7 @@
       }
       const audio = ensurePlayMusic();
       if (!audio) return;
-      const shouldPlay = beatMusicPhase() && !state.muted && !musicPausedForGame && !(state.beatStopped && state.phase !== "setup");
+      const shouldPlay = !pageAway && beatMusicPhase() && !state.muted && !musicPausedForGame && !(state.beatStopped && state.phase !== "setup");
       if (!shouldPlay) {
         unbindPlayMusicUnlock();
         if (!audio.paused) audio.pause();
@@ -8631,10 +8633,32 @@
       document.documentElement.classList.toggle("scenes-paused", document.visibilityState === "hidden");
     }
     syncScenePause();
+    // Leaving the page (tab hidden, navigating away, closing): stop all audio; resume on return
+    // only if something was playing and the current screen still wants it.
+    function stopAudioForPageAway() {
+      if (pageAway) return;
+      pageAway = true;
+      var was = false;
+      try { if (homeMusic && !homeMusic.paused) { was = true; homeMusic.pause(); } } catch (_) {}
+      try { if (playMusic && !playMusic.paused) { was = true; playMusic.pause(); } } catch (_) {}
+      pageAwayWasPlaying = pageAwayWasPlaying || was;
+      try { if (audioCtx && audioCtx.state === "running") audioCtx.suspend(); } catch (_) {}
+    }
+    function resumeAudioAfterPageAway() {
+      if (!pageAway || document.visibilityState === "hidden") return;
+      pageAway = false;
+      var was = pageAwayWasPlaying;
+      pageAwayWasPlaying = false;
+      if (!was || musicPausedForGame || state.muted) return;
+      try { syncHomeMusic(); syncPlayMusic(); updateMuteButton(); } catch (_) {}
+    }
+    window.addEventListener("pagehide", stopAudioForPageAway);
+    window.addEventListener("beforeunload", stopAudioForPageAway);
+    window.addEventListener("pageshow", function () { if (document.visibilityState !== "hidden") resumeAudioAfterPageAway(); });
     document.addEventListener("visibilitychange", function () {
       syncScenePause();
-      if (document.visibilityState === "hidden") noteLeftForGame();
-      else if (returnedFromGame()) resumeMusicAfterGame();
+      if (document.visibilityState === "hidden") { noteLeftForGame(); stopAudioForPageAway(); }
+      else { resumeAudioAfterPageAway(); if (returnedFromGame()) resumeMusicAfterGame(); }
     });
     window.addEventListener("blur", noteLeftForGame);
     window.addEventListener("focus", function () {
