@@ -14,9 +14,8 @@
  *
  * v9 (TEST): Sessions tab – one row per finished game (homework report).
  *   POST {type:'session', name, code, game, start, end, q, right}  (start/end = epoch ms from the device)
- *   Sessions – Logged (HST) | Start (HST) | Start ms | Class | Name | Game | Questions | Right | Minutes
- *   GET ?action=sessions&key=TEACHER_KEY&cls=A&from=YYYY-MM-DD&to=YYYY-MM-DD -> {ok, rows:[[startMs,name,game,q,right,minutes]]}
- *   Teacher key: Settings A14 'Teacher key', B14 = the key (set it once; blank = report closed).
+ *   Sessions – Start (HST) | Week of (Mon) | Date | Day | Class | Name | Game | Questions | Right | % correct | Minutes | Homework? | Start ms
+ *   Homework – formulas (made by setupSessions): per week + student, Homework?=Yes rows only.
  * GET  ?action=roster  -> {ok:true, names:[...]}
  * v7 classes:
  * GET  ?action=roster&code=X -> {ok:true, cls:'A', clsName:'Class A', names:[only that class]} | {ok:false, error:'class'}
@@ -189,7 +188,6 @@ function doGet(e) {
     if (action.indexOf('room') === 0) return json_(room_(action, e.parameter));
     if (action === 'check') return json_({ ok: String(e.parameter.code || '').trim().toUpperCase() === classCode_().toUpperCase() });
     if (action === 'board') return json_(board_());
-    if (action === 'sessions') return json_(sessionsRead_(e.parameter));
     return json_({ ok: false, error: 'unknown action' });
   } catch (err) {
     return json_({ ok: false, error: 'server' });
@@ -517,25 +515,46 @@ function pwSalt_() {
 }
 
 
-// ===== v9 (TEST): per-game session log for the teacher Homework Report. =====
+// ===== v9 (TEST): per-game session log. The teacher reads the Sessions and Homework tabs in the sheet. =====
 var TZ = 'Pacific/Honolulu';
-var SESS_HEAD = ['Logged (HST)', 'Start (HST)', 'Start ms', 'Class', 'Name', 'Game', 'Questions', 'Right', 'Minutes'];
+var SCHOOL_START = 7 * 60 + 45, SCHOOL_END = 14 * 60 + 5; // 7:45 AM - 2:05 PM Hawaii time, Mon-Fri
+var SESS_HEAD = ['Start (HST)', 'Week of (Mon)', 'Date', 'Day', 'Class', 'Name', 'Game', 'Questions', 'Right', '% correct', 'Minutes', 'Homework?', 'Start ms'];
 function sessSheet_() {
   var sh = ss_().getSheetByName('Sessions');
   if (!sh) {
     sh = ss_().insertSheet('Sessions');
     sh.getRange(1, 1, 1, SESS_HEAD.length).setValues([SESS_HEAD]).setFontWeight('bold');
     sh.setFrozenRows(1);
+    sh.getRange('A:D').setNumberFormat('@');
+    sh.getRange('J:J').setNumberFormat('0%');
   }
   return sh;
 }
-// Run once from the editor: makes the Sessions tab and the Teacher key row.
+// Run once from the editor: makes the Sessions tab and the Homework summary tab.
 function setupSessions() {
   sessSheet_();
-  var st = ss_().getSheetByName('Settings') || ss_().insertSheet('Settings');
-  if (!String(st.getRange('A14').getValue() || '').trim()) st.getRange('A14').setValue('Teacher key').setFontWeight('bold');
+  var ss = ss_(), hw = ss.getSheetByName('Homework') || ss.insertSheet('Homework');
+  hw.clear();
+  hw.getRange(1, 1, 1, 9).setValues([['Week of (Mon)', 'Class', 'Name', 'Nights played', 'Minutes', 'Questions', '% correct', 'Games', 'Games played']]).setFontWeight('bold');
+  hw.setFrozenRows(1);
+  var S = 'Sessions!', HW = S + 'L2:L,"Yes"';
+  var crit = function (w, n) { return S + 'B2:B,' + w + ',' + S + 'F2:F,' + n + ',' + HW; };
+  hw.getRange('A2').setFormula('=IFERROR(SORT(UNIQUE(FILTER({' + S + 'B2:B,' + S + 'E2:E,' + S + 'F2:F},' + S + 'L2:L="Yes")),1,FALSE,2,TRUE,3,TRUE),)');
+  hw.getRange('D2').setFormula('=MAP(A2:A,C2:C,LAMBDA(w,n,IF(n="","",COUNTUNIQUEIFS(' + S + 'C2:C,' + crit('w', 'n') + '))))');
+  hw.getRange('E2').setFormula('=MAP(A2:A,C2:C,LAMBDA(w,n,IF(n="","",ROUND(SUMIFS(' + S + 'K2:K,' + crit('w', 'n') + ')))))');
+  hw.getRange('F2').setFormula('=MAP(A2:A,C2:C,LAMBDA(w,n,IF(n="","",SUMIFS(' + S + 'H2:H,' + crit('w', 'n') + '))))');
+  hw.getRange('G2').setFormula('=MAP(A2:A,C2:C,F2:F,LAMBDA(w,n,q,IF(OR(n="",q=0),"",SUMIFS(' + S + 'I2:I,' + crit('w', 'n') + ')/q)))');
+  hw.getRange('H2').setFormula('=MAP(A2:A,C2:C,LAMBDA(w,n,IF(n="","",COUNTIFS(' + crit('w', 'n') + '))))');
+  hw.getRange('I2').setFormula('=MAP(A2:A,C2:C,LAMBDA(w,n,IF(n="","",LET(g,UNIQUE(FILTER(' + S + 'G2:G,' + S + 'B2:B=w,' + S + 'F2:F=n,' + S + 'L2:L="Yes")),' +
+    'TEXTJOIN(", ",TRUE,MAP(g,LAMBDA(x,x&" \u00D7"&COUNTIFS(' + S + 'G2:G,x,' + crit('w', 'n') + '))))))))');
+  hw.getRange('G:G').setNumberFormat('0%');
+  hw.setColumnWidth(9, 380);
 }
-function hst_(ms) { return Utilities.formatDate(new Date(ms), TZ, 'yyyy-MM-dd HH:mm:ss'); }
+function isHomework_(ms) {
+  var dow = Number(Utilities.formatDate(new Date(ms), TZ, 'u')); // 1 = Mon .. 7 = Sun
+  var hm = Utilities.formatDate(new Date(ms), TZ, 'HH:mm').split(':'), m = Number(hm[0]) * 60 + Number(hm[1]);
+  return dow >= 6 || m < SCHOOL_START || m >= SCHOOL_END;
+}
 function saveSession_(match, body) {
   var now = Date.now();
   var start = Math.floor(Number(body.start)), end = Math.floor(Number(body.end));
@@ -544,33 +563,17 @@ function saveSession_(match, body) {
   if (!game) return json_({ ok: false, error: 'game' });
   if (!(start > now - 14 * 864e5) || start > now + 600000 || !(end >= start) || end - start > 4 * 3600000) return json_({ ok: false, error: 'time' });
   if (!(q >= 0 && q <= 2000) || !(right >= 0 && right <= q)) return json_({ ok: false, error: 'points' });
+  var d = new Date(start), dow = Number(Utilities.formatDate(d, TZ, 'u'));
+  var monday = Utilities.formatDate(new Date(start - (dow - 1) * 864e5), TZ, 'yyyy-MM-dd') + ' wk'; // text, so sheet formulas never turn it into a date
   var mins = Math.round((end - start) / 6000) / 10;
+  var row = [Utilities.formatDate(d, TZ, 'yyyy-MM-dd HH:mm'), monday, Utilities.formatDate(d, TZ, 'yyyy-MM-dd'), Utilities.formatDate(d, TZ, 'EEE'),
+    classOf_()[match] || 'A', match, game, q, right, q ? right / q : '', mins, isHomework_(start) ? 'Yes' : 'No', start];
   var lock = LockService.getScriptLock();
   if (!lock.tryLock(8000)) return json_({ ok: false, error: 'busy' });
   try {
-    sessSheet_().appendRow([hst_(now), hst_(start), start, classOf_()[match] || 'A', match, game, q, right, mins]);
+    sessSheet_().appendRow(row);
   } finally {
     lock.releaseLock();
   }
   return json_({ ok: true });
-}
-function sessionsRead_(p) {
-  var st = ss_().getSheetByName('Settings');
-  var key = st ? String(st.getRange('B14').getValue() || '').trim() : '';
-  if (!key || String(p.key || '').trim() !== key) return { ok: false, error: 'key' };
-  var cls = String(p.cls || '').trim().toUpperCase();
-  var from = /^\d{4}-\d{2}-\d{2}$/.test(p.from || '') ? String(p.from) : '0000';
-  var to = /^\d{4}-\d{2}-\d{2}$/.test(p.to || '') ? String(p.to) : '9999';
-  var sh = ss_().getSheetByName('Sessions'), rows = [];
-  var of = classOf_();
-  if (sh && sh.getLastRow() > 1) {
-    sh.getRange(2, 1, sh.getLastRow() - 1, SESS_HEAD.length).getValues().forEach(function (r) {
-      var day = String(r[1] || '').slice(0, 10), name = String(r[4] || '');
-      if (day < from || day > to) return;
-      if (cls && (of[name] || r[3] || 'A') !== cls) return; // class from the Roster now, so moved kids follow
-      rows.push([Number(r[2]), name, String(r[5] || ''), Number(r[6]) || 0, Number(r[7]) || 0, Number(r[8]) || 0]);
-    });
-  }
-  var names = rosterNames_().filter(function (n) { return !cls || (of[n] || 'A') === cls; });
-  return { ok: true, tz: TZ, names: names, rows: rows };
 }
