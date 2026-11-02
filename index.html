@@ -3584,10 +3584,18 @@
     .tg-leaf { position: absolute; top: -40px; width: 22px; height: 14px; border-radius: 0 100% 0 100%; opacity: .85; animation: tgFall var(--d) linear var(--w) infinite; }
     @keyframes tgFall { from { transform: translate(0, 0) rotate(0); } to { transform: translate(60px, 105vh) rotate(540deg); } }
     @media (prefers-reduced-motion: reduce) { .tg-leaf { animation: none; display: none; } }
-    .theme-pick { margin-bottom: .4rem; }
+    .theme-pick { margin-bottom: .4rem; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    body .theme-pick .lb-tab { min-width: 0; padding-left: .3rem; padding-right: .3rem; font-size: .85rem; white-space: normal; line-height: 1.15; }
     .tg-art { display: block; width: 100%; height: 100%; }
     .tg-tile-art { position: absolute; inset: 0; background: linear-gradient(180deg, #ffe2b0, #f2a65a); padding: 8% 22% 26%; box-sizing: border-box; }
     .beat-pill .pill-icon.tg-icon { background: #fff1dc; padding: 2px; box-sizing: border-box; }
+    body.theme-hw2 .wave-bg { background: linear-gradient(180deg, #2a1650 0%, #4a2470 55%, #1a0e30 100%); }
+    .hw2-scene { position: absolute; inset: 0; }
+    .hw2-photo { position: absolute; inset: 0; background: #3a1e5a center 70% / cover no-repeat; }
+    .hw2-photo::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(20,8,36,.45) 0%, rgba(20,8,36,0) 28%); }
+    body.theme-hw2 .wave-bg > :not(.hw2-scene), body.theme-hw2 .belfry-moon, body.theme-hw2 .belfry-scene { display: none !important; }
+    body:not(.theme-hw2) .hw2-scene { display: none !important; }
+    body.theme-hw2 .bgs-card .hint, body.theme-hw2 .av-tip, body.theme-hw2 .lb-updated,
     body.theme-tg .bgs-card .hint, body.theme-tg .av-tip, body.theme-tg .lb-updated { color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,.9), 0 0 8px rgba(0,0,0,.6); }
     .si-head2 { min-height: 0; }
     .si-who { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; margin: 0 auto; }
@@ -8451,6 +8459,7 @@
       bg.classList.toggle("scene-graveyard", level === 14);
       bg.classList.toggle("scene-meglo", level === 15);
       if (siteTheme === "thanksgiving") tgSetBeat(level);
+      else if (siteTheme === "halloween2") hw2SetBeat(level);
       sceneWake(siteTheme + level);
     }
     function render() {
@@ -10584,7 +10593,7 @@
     // ---- Theme: Halloween (default) or Thanksgiving. Saved on this device. Thanksgiving art is built only when picked. ----
     const THEME_KEY = "mad-facts-theme";
     let siteTheme = "halloween";
-    try { if (localStorage.getItem(THEME_KEY) === "thanksgiving") siteTheme = "thanksgiving"; } catch (e) {}
+    try { const sv = localStorage.getItem(THEME_KEY); if (sv === "thanksgiving" || sv === "halloween2") siteTheme = sv; } catch (e) {}
     function tgPumpkin(x, y, s) {
       return '<g transform="translate(' + x + ' ' + y + ') scale(' + s + ')"><ellipse cx="-22" cy="0" rx="30" ry="34" fill="#e8741f"/><ellipse cx="22" cy="0" rx="30" ry="34" fill="#e8741f"/><ellipse cx="0" cy="0" rx="30" ry="36" fill="#f28a2e"/><path d="M0 -36 q4 -18 14 -22" stroke="#5a7a2a" stroke-width="7" fill="none" stroke-linecap="round"/></g>';
     }
@@ -10682,9 +10691,24 @@
       if (!photo) { photo = document.createElement("div"); photo.className = "tg-photo"; scene.insertBefore(photo, scene.firstChild); }
       photo.style.backgroundImage = "url(assets/tg/" + track.id + ".webp)";
     }
+    // Halloween 2: one painted cozy-spooky scene per background (~100 KB webp in assets/hw2/), loaded only when shown. Static, no motion.
+    function hw2SetBeat(level) {
+      const bg = document.querySelector(".wave-bg");
+      if (!bg) return;
+      let scene = bg.querySelector(".hw2-scene");
+      if (!scene) { scene = document.createElement("div"); scene.className = "hw2-scene"; scene.setAttribute("aria-hidden", "true"); scene.appendChild(document.createElement("div")).className = "hw2-photo"; bg.appendChild(scene); }
+      if (scene.dataset.beat === String(level)) return;
+      scene.dataset.beat = String(level);
+      const track = PLAY_TRACKS[level] || PLAY_TRACKS[0];
+      scene.firstChild.style.backgroundImage = "url(assets/hw2/" + track.id + ".webp)";
+    }
     function applyTheme() {
-      const tg = siteTheme === "thanksgiving";
+      const tg = siteTheme === "thanksgiving", hw2 = siteTheme === "halloween2";
       document.body.classList.toggle("theme-tg", tg);
+      document.body.classList.toggle("theme-hw2", hw2);
+      if (!hw2) { const s2 = document.querySelector(".wave-bg .hw2-scene"); if (s2) s2.remove(); }
+      if (!tg) { const s1 = document.querySelector(".wave-bg .tg-scene"); if (s1) s1.remove(); }
+      if (hw2) hw2SetBeat(chosenBackgroundLevel());
       if (tg) tgSetBeat(chosenBackgroundLevel());
       else { const bg = document.querySelector(".wave-bg"); if (bg) ["--tg-a", "--tg-b", "--tg-sun", "--tg-h1", "--tg-h2", "--tg-h3", "--tg-h4", "--tg-t1", "--tg-t2", "--tg-t3"].forEach(function (k) { bg.style.removeProperty(k); }); }
     }
@@ -10720,7 +10744,7 @@
       const card = el("div", { class: "card bgs-card" });
       card.appendChild(el("p", { class: "label", text: "Theme" }));
       const themes = el("div", { class: "lb-tabs theme-pick", role: "tablist", "aria-label": "Theme" });
-      [["halloween", "\uD83C\uDF83 Halloween"], ["thanksgiving", "\uD83C\uDF42 Thanksgiving"]].forEach(function (t) {
+      [["halloween", "\uD83C\uDF83 Halloween"], ["halloween2", "\uD83D\uDC7B Halloween 2"], ["thanksgiving", "\uD83C\uDF42 Thanksgiving"]].forEach(function (t) {
         themes.appendChild(el("button", { type: "button", role: "tab", class: "lb-tab" + (siteTheme === t[0] ? " on" : ""), "aria-selected": String(siteTheme === t[0]), text: t[1], onClick: function () {
           siteTheme = t[0]; try { localStorage.setItem(THEME_KEY, t[0]); } catch (e) {} applyTheme(); render();
         } }));
@@ -10734,6 +10758,7 @@
         const open = backgroundUnlocked(i);
         const tile = el("button", { type: "button", class: "bg-tile" + (open ? "" : " locked") + (open && current === i ? " on" : ""), "data-bg": String(i) });
         if (siteTheme === "thanksgiving") tile.appendChild(el("img", { src: "assets/tg/" + track.id + "-t.webp", alt: "", loading: "lazy", decoding: "async", width: "160", height: "107" }));
+        else if (siteTheme === "halloween2") tile.appendChild(el("img", { src: "assets/hw2/" + track.id + "-t.webp", alt: "", loading: "lazy", decoding: "async", width: "160", height: "107" }));
         else tile.appendChild(el("img", { src: "assets/backgrounds/" + track.id + ".jpg", alt: "", loading: "lazy", decoding: "async", width: "160", height: "107" }));
         const cap = el("span", { class: "bg-cap" });
         if (!open) cap.appendChild(lockIcon());
