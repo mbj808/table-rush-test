@@ -3632,6 +3632,8 @@
     .shp-sim[hidden] { display: none; }
     @media (prefers-reduced-motion: reduce) { .shp-hero.bounce .av, .shp-card:active { animation: none; transform: none; } }
     .hd-av { position: relative; display: inline-block; }
+    .hd-pic-box, .hd-pic-wait { display: inline-block; line-height: 0; } .hd-pic { display: block; object-fit: contain; }
+    .lb-av .hd-pic { height: 30px; width: auto; }
     .hd-av img, .hd-av .hd-shoe { position: absolute; left: 0; top: 0; width: 100%; height: 100%; pointer-events: none; user-select: none; }
     .hd-av .hd-shoe { background-size: 200% 100%; background-repeat: no-repeat; }
     .shp-hero .hd-av { display: block; }
@@ -8953,7 +8955,7 @@
       // First screen: only the title and Start Challenge. Everything else is below the fold.
       const hero = el("section", { class: "challenge-hero", "aria-label": "Timed challenge" });
       if (avHas() && !state.heroPick) {
-        hero.appendChild(el("button", { type: "button", class: "home-av", "aria-label": "My closet", onClick: function () { goPage("closet"); } }, [avNode(avatar, 64)]));
+        hero.appendChild(el("button", { type: "button", class: "home-av", "aria-label": "My closet", onClick: function () { goPage("closet"); } }, [hdOn() ? hdPicNode(avatar, 64, null, true) : avNode(avatar, 64)]));
       }
       if (!state.heroPick) {
         hero.appendChild(el("button", { class: "start start-challenge", type: "button", text: "Start Challenge", onClick: function () {
@@ -9681,6 +9683,7 @@
     const lbAvCache = new Map();
     function lbEsc(t) { return String(t == null ? "" : t).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
     function lbAvHTML(a) {
+      if (hdIsOn(a)) { let c = ""; try { c = avatarSVG(a, { size: 30 }); } catch (e) {} return hdPicOr(a, 30, c, a === avatar); }
       const k = JSON.stringify(a);
       let h = lbAvCache.get(k);
       if (h === undefined) { try { h = avatarSVG(a, { size: 30 }); } catch (e) { h = ""; } if (lbAvCache.size > 300) lbAvCache.clear(); lbAvCache.set(k, h); }
@@ -10074,16 +10077,61 @@
     // renders of this exact wizard, so they sit at fixed spots (L = left, top, width, height in %). Other characters: body only.
     // Images load only when this is called, and only for the selected character.
     const HD_LAYER_ORDER = ["shoes", "pet", "hat"];
-    function hdNode(h, size) {
+    function hdLayers(h) {
       const c = hdItem(h.b) || HD_ITEMS[0], wiz = c.ch === "wizard";
-      const box = el("span", { class: "hd-av", style: "width:" + Math.round(size * (wiz ? 0.639 : 0.683)) + "px;height:" + size + "px" });
-      const img = function (f, L) { box.appendChild(el("img", { src: HD_DIR + f + ".webp", alt: "", decoding: "async", draggable: "false",
-        style: L ? "left:" + L[0] + "%;top:" + L[1] + "%;width:" + L[2] + "%;height:" + L[3] + "%" : "" })); };
-      const it = function (k) { const i = h.w[k] ? hdItem(h.w[k]) : null; return i && i.ch === c.ch ? i : null; };
-      if (!wiz) { img(c.f); return box; }
-      const o = it("shirt");
-      img(o ? o.f : "w_base");
-      HD_LAYER_ORDER.forEach(function (k) { const i = it(k); if (i) img(i.f, i.L); });
+      const it = function (k) { const i = h.w && h.w[k] ? hdItem(h.w[k]) : null; return i && i.ch === c.ch ? i : null; };
+      if (!wiz) return { r: 0.683, l: [{ f: c.f }] };
+      const o = it("shirt"), l = [{ f: o ? o.f : "w_base" }];
+      HD_LAYER_ORDER.forEach(function (k) { const i = it(k); if (i) l.push({ f: i.f, L: i.L }); });
+      return { r: 0.639, l: l };
+    }
+    function hdNode(h, size) {
+      const g = hdLayers(h), box = el("span", { class: "hd-av", style: "width:" + Math.round(size * g.r) + "px;height:" + size + "px" });
+      g.l.forEach(function (x) { const L = x.L; box.appendChild(el("img", { src: HD_DIR + x.f + ".webp", alt: "", decoding: "async", draggable: "false",
+        style: L ? "left:" + L[0] + "%;top:" + L[1] + "%;width:" + L[2] + "%;height:" + L[3] + "%" : "" })); });
+      return box;
+    }
+    // Small flat HD picture for play screens and the leaderboard: the layers are drawn once onto a canvas at display size
+    // and kept as a data URL (memory, plus localStorage for the kid's own look), so gameplay shows one small image.
+    const hdPicMem = new Map(), hdPicWait = {};
+    const HD_PIC_KEY = "mf-hd-pic";
+    function hdIsOn(a) { return !!(a && Array.isArray(a.pk) && a.pk.indexOf("hd") >= 0 && a.hd && a.hd.on); }
+    function hdPicKey(h, px) { const g = hdLayers(h); return px + ":" + g.l.map(function (x) { return x.f; }).join(","); }
+    function hdPicGet(k) {
+      if (hdPicMem.has(k)) return hdPicMem.get(k);
+      try { const o = JSON.parse(localStorage.getItem(HD_PIC_KEY) || "null"); if (o && o.k === k) { hdPicMem.set(k, o.u); return o.u; } } catch (e) {}
+      return null;
+    }
+    function hdPicMake(h, px, keep) {
+      const k = hdPicKey(h, px);
+      if (hdPicGet(k) || hdPicWait[k]) return;
+      hdPicWait[k] = 1;
+      const g = hdLayers(h), dpr = Math.min(2, window.devicePixelRatio || 1), H = Math.round(px * dpr), W = Math.round(H * g.r);
+      Promise.all(g.l.map(function (x) { return new Promise(function (ok) { const im = new Image(); im.onload = function () { ok(im); }; im.onerror = function () { ok(null); }; im.src = HD_DIR + x.f + ".webp"; }); }))
+        .then(function (ims) {
+          const cv = document.createElement("canvas"); cv.width = W; cv.height = H;
+          const cx = cv.getContext("2d");
+          ims.forEach(function (im, i) { if (!im) return; const L = g.l[i].L; if (L) cx.drawImage(im, L[0] / 100 * W, L[1] / 100 * H, L[2] / 100 * W, L[3] / 100 * H); else cx.drawImage(im, 0, 0, W, H); });
+          let u = ""; try { u = cv.toDataURL("image/webp", 0.85); if (u.indexOf("image/webp") < 0) u = cv.toDataURL("image/png"); } catch (e) { u = ""; }
+          delete hdPicWait[k];
+          if (!u) return;
+          hdPicMem.set(k, u); if (hdPicMem.size > 80) hdPicMem.delete(hdPicMem.keys().next().value);
+          if (keep) { try { localStorage.setItem(HD_PIC_KEY, JSON.stringify({ k: k, u: u })); } catch (e) {} }
+          document.querySelectorAll('[data-hdk="' + k + '"]').forEach(function (n) { n.innerHTML = hdPicHTML(u, px, g.r); n.removeAttribute("data-hdk"); });
+        });
+    }
+    function hdPicHTML(u, px, r) { return '<img class="hd-pic" src="' + u + '" alt="" draggable="false" style="height:' + px + 'px;width:' + Math.round(px * r) + 'px">'; }
+    // Returns HTML: the cached HD picture, or the classic avatar until the picture is ready (then it swaps in place).
+    function hdPicOr(a, px, classic, keep) {
+      const h = hdClean(a.hd), k = hdPicKey(h, px), u = hdPicGet(k), r = hdLayers(h).r;
+      if (u) return hdPicHTML(u, px, r);
+      hdPicMake(h, px, keep);
+      return '<span class="hd-pic-wait" data-hdk="' + k + '">' + classic + "</span>";
+    }
+    function hdPicNode(a, px, fallback, keep) {
+      const box = el("span", { class: "hd-pic-box" });
+      box.innerHTML = hdPicOr(a, px, "", keep);
+      const w = box.querySelector(".hd-pic-wait"); if (w && fallback) w.appendChild(fallback);
       return box;
     }
     function avClean(a) {
@@ -10672,7 +10720,7 @@
       const bob = el("div", { class: "gb-bob" });
       // A right answer shows the big smile for a moment.
       const look = mood === "hop" || mood === "cheer" ? Object.assign({}, avatar, { face: "grin" }) : avatar;
-      bob.appendChild(avNode(look, 190));
+      bob.appendChild(hdOn() ? hdPicNode(avatar, 190, null, true) : avNode(look, 190));
       wrap.appendChild(bob);
       if (mood === "cheer") ["s1", "s2", "s3"].forEach(function (k) { wrap.appendChild(el("span", { class: "gb-spark " + k, text: "\u2728" })); });
       row.appendChild(wrap);
