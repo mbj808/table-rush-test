@@ -9455,6 +9455,7 @@
       lbGet("action=version").then(function (d) {
         lb.mode = d && d.version >= 2 ? "points" : "streak";
         lb.timedOk = !!(d && d.version >= 3 && d.timed);
+        lb.locksOk = !!(d && d.locks); if (lb.locksOk) tdFetch(true); else { try { localStorage.removeItem(TD_SRV_KEY); } catch (e) {} }
         lb.sessOk = !!(d && d.version >= 9 && d.sessions);
         if (lb.sessOk) sessSend();
         if (lb.timedOk) lbTimedFlush();
@@ -9797,6 +9798,7 @@
         goPage("h2h"); return;
       }
       try { localStorage.setItem(LB_KEY, JSON.stringify({ name: name, code: token, pw: 1, cls: cls || si.cls || "A" })); } catch (e) {}
+      setTimeout(function () { tdFetch(true); }, 0);
       lb.cls = cls || si.cls || "A";
       lb.msg = ""; si.step = "class"; si.msg = "";
       if (avOwner() && avOwner() !== name) avSwitchKid(name);
@@ -11595,38 +11597,93 @@
     const opsUnlocked = (function () { try { const v = JSON.parse(localStorage.getItem(OPS_KEY) || "null"); return v && typeof v === "object" ? v : {}; } catch (e) { return {}; } })();
     function opLocked(id) { return !!CODE_OPS[id] && !opsUnlocked[id]; }
 
-    // ---- Topic complete & lock (saved on this device). Teacher turns it on per game (OFF by default; Multiplication never locks).
-    // With a game ON, a kid who earns 4 streaks of 5 in it finishes it: gold Complete tile, locked, +15 coins once. Teacher unlocks.
-    const TD_KEY = "tr-topic-done", TD_RUNS = 4, TD_BONUS = 15;
+    // ---- Topic complete & lock. The class sheet controls it (Locks tab: ON/OFF per game; Completed tab: one row per kid who finished).
+    // Older sheet scripts without "locks": a teacher panel on this device controls it instead. Multiplication never locks.
+    // With a game ON, a kid who earns 4 streaks of 5 in it finishes it: gold Complete tile, locked, +15 coins (again after each unlock).
+    const TD_KEY = "tr-topic-done", TD_SRV_KEY = "tr-topic-srv", TD_RUNS = 4, TD_BONUS = 15;
     function tdRead() { try { const v = JSON.parse(localStorage.getItem(TD_KEY) || "null"); if (v && v.on && v.kids) return v; } catch (e) {} return { on: {}, kids: {} }; }
     function tdWrite(v) { try { localStorage.setItem(TD_KEY, JSON.stringify(v)); } catch (e) {} }
+    // Sheet cache: { on: {id:1}, kids: { name: { done: {id:1}, pend: {id:1} } } } (kept for offline).
+    function tdSrv() { try { const v = JSON.parse(localStorage.getItem(TD_SRV_KEY) || "null"); if (v && v.on && v.kids) return v; } catch (e) {} return null; }
+    function tdSrvWrite(v) { try { localStorage.setItem(TD_SRV_KEY, JSON.stringify(v)); } catch (e) {} }
+    function tdSheet() { return !!(LEADERBOARD_URL && (lb.locksOk || tdSrv())); }
     function tdKidId() { const me = lbMe(); return me ? String(me.name).trim().toLowerCase() : "_guest"; }
-    function tdKidOf(d, id) { const k = d.kids[id] || (d.kids[id] = { runs: {}, lock: {}, paid: {} }); k.runs = k.runs || {}; k.lock = k.lock || {}; k.paid = k.paid || {}; if (!k.name) k.name = id === "_guest" ? "Guest (not signed in)" : (lbMe() ? lbMe().name : id); return k; }
+    function tdKidOf(d, id) { const k = d.kids[id] || (d.kids[id] = { runs: {}, lock: {} }); k.runs = k.runs || {}; k.lock = k.lock || {}; if (!k.name) k.name = id === "_guest" ? "Guest (not signed in)" : (lbMe() ? lbMe().name : id); return k; }
+    function tdSrvKid(v, id) { const k = v.kids[id] || (v.kids[id] = { done: {}, pend: {} }); k.done = k.done || {}; k.pend = k.pend || {}; return k; }
     function tdCanLock(op) { return !!op && op !== "multiply"; }
-    function tdOn(op) { return tdCanLock(op) && !!tdRead().on[op]; }
-    function tdLocked(op) { if (!tdOn(op)) return false; const k = tdRead().kids[tdKidId()]; return !!(k && k.lock && k.lock[op]); }
+    function tdOn(op) {
+      if (!tdCanLock(op)) return false;
+      if (tdSheet()) { const v = tdSrv(); return !!(v && v.on[op]); }
+      return !!tdRead().on[op];
+    }
+    function tdLocked(op) {
+      if (!tdOn(op)) return false;
+      const id = tdKidId();
+      if (tdSheet() && id !== "_guest") { const v = tdSrv(), k = v && v.kids[id]; return !!(k && ((k.done && k.done[op]) || (k.pend && k.pend[op]))); }
+      const k = tdRead().kids[id]; return !!(k && k.lock && k.lock[op]);
+    }
     function tdRuns(op) { const k = tdRead().kids[tdKidId()]; return k && k.runs ? k.runs[op] || 0 : 0; }
     function tdToast(text, gold) {
       const old = document.getElementById("td-toast"); if (old) old.remove();
       const t = el("div", { id: "td-toast", class: "td-toast" + (gold ? " gold" : ""), role: "status", text: text });
       document.body.appendChild(t); setTimeout(function () { t.remove(); }, gold ? 4200 : 2400);
     }
+    function tdPost(me, op) {
+      try {
+        fetch(LEADERBOARD_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, keepalive: true,
+          body: JSON.stringify({ type: "complete", name: me.name, code: me.code, game: op }) })
+          .then(function (r) { return r.json(); })
+          .then(function (d) {
+            const v = tdSrv(); if (!v) return; const k = tdSrvKid(v, String(me.name).trim().toLowerCase());
+            if (d && d.ok) { delete k.pend[op]; k.done[op] = 1; }
+            else if (d && (d.error === "off" || d.error === "game")) { delete k.pend[op]; delete k.done[op]; }
+            else return;
+            tdSrvWrite(v);
+          }).catch(function () {});
+      } catch (e) {}
+    }
+    // Read the sheet: which games are ON and which this kid finished. A row deleted on the sheet unlocks the kid here too.
+    let tdAt = 0, tdFor = "";
+    function tdFetch(force) {
+      if (!LEADERBOARD_URL || !lb.locksOk) return;
+      const me = lbMe(), id = tdKidId();
+      if (!force && id === tdFor && Date.now() - tdAt < 20000) return;
+      tdAt = Date.now(); tdFor = id;
+      lbGet("action=locks" + (me ? "&name=" + encodeURIComponent(me.name) : "")).then(function (d) {
+        if (!d || !d.ok || !d.on) return;
+        const v = tdSrv() || { on: {}, kids: {} };
+        v.on = d.on;
+        if (me) {
+          const k = tdSrvKid(v, id), now = {};
+          (d.done || []).forEach(function (op) { now[op] = 1; delete k.pend[op]; });
+          const loc = tdRead(), lk = tdKidOf(loc, id);
+          Object.keys(k.done).forEach(function (op) { if (!now[op] && !k.pend[op]) { delete lk.runs[op]; } });
+          tdWrite(loc);
+          k.done = now;
+          Object.keys(k.pend).forEach(function (op) { tdPost(me, op); });
+        }
+        tdSrvWrite(v);
+        if (currentPage() === "games") render();
+      }).catch(function () { tdAt = 0; });
+    }
+    window.addEventListener("hashchange", function () { if (location.hash === "#games" || location.hash === "#menu") tdFetch(); });
     // Called on every 5-in-a-row in a Fact Challenge game.
     function tdStreak(op) {
-      if (!tdOn(op)) return;
-      const d = tdRead(), k = tdKidOf(d, tdKidId());
-      if (k.lock[op]) return;
+      if (!tdOn(op) || tdLocked(op)) return;
+      const d = tdRead(), id = tdKidId(), k = tdKidOf(d, id);
       k.runs[op] = (k.runs[op] || 0) + 1;
       if (k.runs[op] < TD_RUNS) { tdWrite(d); return; }
-      k.lock[op] = 1;
-      const pay = !k.paid[op]; if (pay) k.paid[op] = 1;
+      k.runs[op] = 0;
+      const me = lbMe();
+      if (tdSheet() && me) { const v = tdSrv() || { on: {}, kids: {} }; tdSrvKid(v, id).pend[op] = 1; tdSrvWrite(v); tdPost(me, op); }
+      else k.lock[op] = 1;
       tdWrite(d);
-      if (pay) coinSet(coinGet() + TD_BONUS);
+      coinSet(coinGet() + TD_BONUS);
       const name = opLabel(op) || "this game";
       setTimeout(function () {
         try { playCelebration(); } catch (e) {}
-        tdToast("\uD83C\uDF89 You finished " + name + "!" + (pay ? " +" + TD_BONUS + " bonus coins!" : ""), true);
-        say("Congratulations! You finished " + name + "." + (pay ? " You got " + TD_BONUS + " bonus coins." : ""));
+        tdToast("\uD83C\uDF89 You finished " + name + "! +" + TD_BONUS + " bonus coins!", true);
+        say("Congratulations! You finished " + name + ". You got " + TD_BONUS + " bonus coins.");
       }, 700);
       setTimeout(function () { if (state.phase === "play" && state.operation === op) { backToSetup(); render(); } }, 3200);
     }
@@ -11643,6 +11700,14 @@
         if (tdUi.err) card.appendChild(el("p", { class: "td-err", role: "alert", text: tdUi.err }));
         return card;
       }
+      if (tdSheet()) {
+        const v = tdSrv() || { on: {} }, on = OPS.filter(function (o) { return tdCanLock(o.id) && v.on[o.id]; });
+        card.appendChild(el("p", { class: "hint", text: "Controlled by the class Google Sheet. Locks tab: type ON next to a game to let it lock. Completed tab: one row per kid who finished; delete a row to unlock that kid on every device, or clear the tab to reset everyone." }));
+        card.appendChild(el("p", { class: "label td-h", text: "Games ON now (" + on.length + ")" }));
+        card.appendChild(el("p", { class: "hint", text: on.length ? on.map(function (o) { return o.label; }).join(", ") : "None. All games are playable." }));
+        card.appendChild(el("button", { type: "button", class: "td-btn small", text: "Refresh from sheet", onClick: function () { tdFetch(true); } }));
+        return card;
+      }
       const d = tdRead();
       card.appendChild(el("p", { class: "hint", text: "Turn a game ON and a kid who gets " + TD_RUNS + " streaks of 5 in it finishes it: the game locks for them with a Complete badge and +" + TD_BONUS + " coins (once). Saved on this device. Multiplication never locks." }));
       const list = el("div", { class: "td-list" });
@@ -11655,7 +11720,7 @@
         list.appendChild(row);
       });
       card.appendChild(list);
-      const kids = Object.keys(d.kids).filter(function (id) { const k = d.kids[id]; return Object.keys(k.lock || {}).length || Object.keys(k.paid || {}).length; });
+      const kids = Object.keys(d.kids).filter(function (id) { const k = d.kids[id]; return Object.keys(k.lock || {}).length; });
       card.appendChild(el("p", { class: "label td-h", text: "Kids on this device" }));
       if (!kids.length) card.appendChild(el("p", { class: "hint", text: "No one has finished a game yet." }));
       kids.forEach(function (id) {
@@ -11663,8 +11728,6 @@
         Object.keys(k.lock || {}).forEach(function (op) {
           box.appendChild(el("div", { class: "td-row" }, [el("span", { class: "td-name", text: "\u2705 " + (opLabel(op) || op) }), el("button", { type: "button", class: "td-btn small", text: "Unlock", onClick: function () { const v = tdRead(), kk = v.kids[id]; delete kk.lock[op]; delete kk.runs[op]; tdWrite(v); render(); } })]));
         });
-        const paid = Object.keys(k.paid || {});
-        if (paid.length) box.appendChild(el("button", { type: "button", class: "td-btn small ghost", text: "Reset bonus coins (" + paid.length + ")", onClick: function () { const v = tdRead(); v.kids[id].paid = {}; tdWrite(v); render(); } }));
         card.appendChild(box);
       });
       return card;
