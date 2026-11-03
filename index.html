@@ -10491,7 +10491,7 @@
       copy.wear[it.slot] = itemId;
       return copy;
     }
-    // ---- Prize: every AV_PRIZE_EVERY in a row, pick anything from the full list. Gold items too (no streak gate). ----
+    // ---- Streak coin: +1 coin every AV_PRIZE_EVERY in a row. The free prize pick is removed. ----
     const AV_PRIZE_EVERY = 5;
     // A beat unlock can land on the same streak: wait for its burst / congrats popup to finish, then show the prize.
     function avPrizeWhenClear(at, tries) {
@@ -10546,7 +10546,7 @@
         const can = win && !have && !goldLock;
         grid.appendChild(el("button", { type: "button", class: "pz-item" + (have ? " have" : "") + (locked ? " locked" : "") + (goldLock ? " goldlock" : "") + (it.gold ? " gold" : "") + (can ? " can" : ""),
           "aria-label": it.name + (have ? ", yours" : goldLock ? ", locked, needs 50 in a row" : locked ? ", locked" : ", locked, tap to unlock it"), "aria-disabled": String(!can),
-          onClick: function (ev) { if (can) onWin(it, ev.currentTarget); else if (goldLock) say("Gold needs 50 in a row."); else if (locked) say("Win it with " + AV_PRIZE_EVERY + " in a row!"); } }, kids));
+          onClick: function (ev) { if (can) onWin(it, ev.currentTarget); else if (goldLock) say("Buy it in the shop."); else if (locked) say("Buy it in the shop."); } }, kids));
       });
       wrap.appendChild(grid);
       return wrap;
@@ -10585,6 +10585,7 @@
       avPrizeShow(streak + " in a row!");
     }
     function avPrizeShow(title) {
+      return; // free prize pick removed
       if (avPrizeOpen() || !avatar.pz || !avAnyToWin()) return;
       const ov = el("div", { class: "prize-ov", role: "dialog", "aria-modal": "true", "aria-label": "Pick a prize" });
       const box = el("div", { class: "prize-box pz-box" });
@@ -10816,7 +10817,6 @@
         el("button", { type: "button", class: "shp-more", "aria-label": "More", text: "\u22EF", onClick: function () { if (menu.hasAttribute("hidden")) menu.removeAttribute("hidden"); else menu.setAttribute("hidden", ""); } }),
         coins, menu]));
       setTimeout(function () { avShowStatus(avStatus); }, 0);
-      if (avatar.pz > 0 && avAnyToWin()) card.appendChild(el("button", { type: "button", class: "pz-claim shp-prize", text: "\uD83C\uDF81 Pick your prize!", onClick: function () { avPrizeShow(""); } }));
       // Stage.
       const hero = el("div", { class: "shp-hero" });
       const tryTxt = el("b", { class: "shp-try-txt" });
