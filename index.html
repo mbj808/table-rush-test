@@ -3399,6 +3399,9 @@
     @keyframes sayDot { 50% { opacity: 0.4; } }
     .say-ops { display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; }
     .say-op { min-height: 2.8rem; padding: 0.4rem 1rem; border-radius: 999px; border: 2px solid rgba(255,255,255,0.45); background: rgba(10,14,40,0.75); color: #fff; font: 800 1.05rem/1.1 var(--ui-font); }
+    .say-q.say-q-long { font-size: clamp(2rem, 10vw, 3rem); white-space: nowrap; }
+    .say-lv { display: flex; flex-direction: column; align-items: center; min-width: 5.6rem; flex: 1 1 0; max-width: 8rem; }
+    .say-lv small { font-size: 0.72rem; font-weight: 700; opacity: 0.85; }
     .say-op.on { background: #ffd23f; border-color: #ffd23f; color: #241944; }
     .say-streak { font: 800 1.1rem/1 var(--ui-font); color: #9ff3ff; }
     .say-q { font: 900 clamp(2.6rem, 11vw, 4.5rem)/1.1 var(--ui-font); text-shadow: 0 0 18px rgba(95,242,255,0.6); }
@@ -11962,6 +11965,21 @@
     const sayG = { rec: null, on: false, want: false, denied: false, heard: "", status: "off", prob: null, streak: 0, right: 0, lock: 0, seen: 0, msg: "", msgKind: "", err: "", net: null, codeErr: "" };
     function sayOp() { try { return localStorage.getItem("tr-sayit-op") === "add" ? "add" : "multiply"; } catch (e) { return "multiply"; } }
     function saySetOp(op) { if (op === sayOp()) return; try { localStorage.setItem("tr-sayit-op", op); } catch (e) {} if (sayG.streak > 0) lbStreakEnded(sayG.streak, sayOp() === "add" ? "multiply" : "add"); sayG.streak = 0; sessEnd(); lbFlush(); sayG.prob = null; sayNext(); sayG.heard = ""; sayG.msg = ""; sayPaint(); }
+    // Addition level: easy (sums to 10), medium (sums to 20), hard (two-digit + two-digit).
+    const SAY_LV = [["easy", "Easy", "up to 10"], ["medium", "Medium", "up to 20"], ["hard", "Hard", "2-digit"]];
+    function sayLv() { try { const v = localStorage.getItem("tr-sayit-lv"); return v === "medium" || v === "hard" ? v : "easy"; } catch (e) { return "easy"; } }
+    function saySetLv(v) { if (v === sayLv()) return; try { localStorage.setItem("tr-sayit-lv", v); } catch (e) {} if (sayG.streak > 0) lbStreakEnded(sayG.streak, "add"); sayG.streak = 0; sayG.prob = null; sayG.msg = ""; sayG.heard = ""; sayNext(); render(); }
+    function sayAddProb(avoid) {
+      const lv = sayLv(), r = function (lo, hi) { return lo + Math.floor(Math.random() * (hi - lo + 1)); };
+      let a, b, key, tries = 0;
+      do {
+        if (lv === "hard") { a = r(10, 59); b = r(10, 39); }
+        else if (lv === "medium") { a = r(2, 12); b = r(Math.max(2, 11 - a), Math.min(12, 20 - a)); }
+        else { a = r(1, 8); b = r(1, 10 - a); }
+        key = a + "+" + b;
+      } while (key === avoid && ++tries < 20);
+      return { a: a, b: b, sum: a + b, answer: a + b, operation: "add", mode: "sum", key: key };
+    }
     function saySign() { return sayOp() === "add" ? "+" : "\u00D7"; }
     function sayWord() { return sayOp() === "add" ? "plus" : "times"; }
     function sayAns(p) { return sayOp() === "add" ? p.a + p.b : p.a * p.b; }
@@ -12002,6 +12020,8 @@
     function sayJudge(text, a, b, op) {
       const p = op === "add" ? a + b : a * b, n = sayNums(text);
       if (!n.length) return "again";
+      // Addition: just the answer counts too ("37" for 24 + 13).
+      if (op === "add" && n.length === 1 && n[0] === p) return "right";
       const digits = n.join(""), ab = "" + a + b, ba = "" + b + a;
       const has = function (arr, x, y) { const i = arr.indexOf(x); if (i < 0) return -1; const j = arr.indexOf(y, x === y ? i + 1 : 0); if (j < 0) return -1; return Math.max(i, j); };
       const at = Math.max(-1, has(n, a, b));
@@ -12015,6 +12035,8 @@
       // run-together like "78 54": starts with the two factors, then a different answer
       const d0 = digits.indexOf(ab) === 0 ? ab : digits.indexOf(ba) === 0 ? ba : "";
       if (d0 && digits.length > d0.length && n.length >= 2 && String(n[0]) === d0) return "wrong";
+      // Addition, just one number that isn't the answer (or an addend): wrong.
+      if (op === "add" && n.length === 1 && n[0] !== a && n[0] !== b && String(n[0]).length <= String(p).length && (n[0] >= 10 || p < 10)) return "wrong";
       return "again";
     }
     function sayJudgeAll(alts, a, b, op) {
@@ -12027,6 +12049,7 @@
       const keep = { operation: state.operation, mode: state.mode, drill: state.drill, tables: state.tables.slice() };
       try {
         const op = sayOp();
+        if (op === "add") { sayG.prob = sayAddProb(sayG.prob && sayG.prob.key); sayG.lock = 0; return; }
         if (state.operation !== op) state.tables = op === "add" ? defaultAddTables() : defaultMathTables();
         state.operation = op; state.mode = op === "add" ? "sum" : "product"; state.drill = null;
         sayG.prob = makeProblem(sayG.prob && sayG.prob.key);
@@ -12170,12 +12193,15 @@
       box.appendChild(el("div", { class: "say-ops", role: "group", "aria-label": "Pick facts" }, [["multiply", "\u2716\uFE0F Multiplication"], ["add", "\u2795 Addition"]].map(function (o) {
         return el("button", { type: "button", class: "say-op" + (cur === o[0] ? " on" : ""), "aria-pressed": String(cur === o[0]), text: o[1], onClick: function () { saySetOp(o[0]); } });
       })));
+      if (cur === "add") { const lv = sayLv(); box.appendChild(el("div", { class: "say-ops say-lvs", role: "group", "aria-label": "Pick a level" }, SAY_LV.map(function (o) {
+        return el("button", { type: "button", class: "say-op say-lv" + (lv === o[0] ? " on" : ""), "aria-pressed": String(lv === o[0]), onClick: function () { saySetLv(o[0]); } }, [el("span", { text: o[1] }), el("small", { text: o[2] })]);
+      }))); }
       const micTxt = sayG.status === "on" ? "Listening\u2026" : sayG.status === "denied" ? "Mic is blocked. Allow the microphone in your browser settings, then tap here." : "Mic is off. Tap to turn it on.";
       box.appendChild(el("button", { type: "button", class: "say-mic " + sayG.status, "aria-live": "polite", onClick: function () { sayG.denied = false; sayMicStart(); } }, [el("span", { class: "say-dot", "aria-hidden": "true" }), el("span", { text: "\uD83C\uDFA4 " + micTxt })]));
       box.appendChild(el("div", { class: "say-streak", text: sayG.streak + " in a row" }));
-      const q = el("div", { class: "say-q" + (sayG.msgKind === "wrong" ? " shake" : ""), text: p ? p.a + " " + saySign() + " " + p.b + " = ?" : "" });
+      const q = el("div", { class: "say-q" + (p && p.a + p.b >= 20 && sayOp() === "add" && (p.a >= 10 && p.b >= 10) ? " say-q-long" : "") + (sayG.msgKind === "wrong" ? " shake" : ""), text: p ? p.a + " " + saySign() + " " + p.b + " = ?" : "" });
       box.appendChild(withBuddy(q));
-      box.appendChild(el("p", { class: "say-tip", text: sayOp() === "add" ? "Say the whole fact, like \u201C7 plus 8 is 15\u201D." : "Say the whole fact, like \u201C7 times 8 is 56\u201D." }));
+      box.appendChild(el("p", { class: "say-tip", text: sayOp() === "add" ? (sayLv() === "hard" ? "Say \u201C24 plus 13 is 37\u201D, or just \u201C37\u201D." : "Say \u201C7 plus 8 is 15\u201D, or just \u201C15\u201D.") : "Say the whole fact, like \u201C7 times 8 is 56\u201D." }));
       box.appendChild(el("div", { class: "say-heard", "aria-live": "polite" }, [el("span", { class: "say-heard-l", text: "I heard: " }), el("b", { text: sayG.heard ? "\u201C" + sayG.heard + "\u201D" : "\u2026" })]));
       if (sayG.msg) box.appendChild(el("div", { class: "say-msg " + sayG.msgKind, role: "status", text: sayG.msg }));
       return box;
