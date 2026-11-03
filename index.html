@@ -9291,6 +9291,8 @@
       if (page === "minigames") stack.appendChild(minis);
 
       startBtn.disabled = state.tables.length === 0;
+      // A game that just got completed/locked can't stay open (its tile is now the gold Complete tile).
+      if (state.gameOpen && (tdLocked(state.operation) || opLocked(state.operation))) state.gameOpen = false;
       if (state.gameOpen) {
         const panel = el("div", { class: "game-panel", id: "game-panel", role: "region", "aria-label": opLabel(state.operation) + " options" });
         const hint = opsCard.querySelector(".hint");
@@ -9310,7 +9312,8 @@
         const buttons = Array.prototype.filter.call(ops.querySelectorAll(".choice"), function (b) { return b.className.indexOf("gcat-" + gameCategory(state.operation)) >= 0; });
         const idx = buttons.indexOf(openBtn);
         const rowEnd = Math.min(buttons.length - 1, idx % 2 === 0 ? idx + 1 : idx);
-        ops.insertBefore(panel, buttons[rowEnd].nextSibling);
+        if (idx >= 0 && buttons[rowEnd]) ops.insertBefore(panel, buttons[rowEnd].nextSibling);
+        else if (openBtn) openBtn.after(panel);
       } else {
         const hint = opsCard.querySelector(".hint");
         if (hint) hint.remove();
