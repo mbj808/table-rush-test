@@ -3870,6 +3870,25 @@
     .home-fc-row .menu-lb-ico { background: rgba(255,255,255,0.35); box-shadow: inset 0 1px 0 rgba(255,255,255,0.6); }
     .home-stack .menu-tile { box-shadow: 0 4px 0 rgba(0,0,0,0.4), 0 0 18px var(--tile-glow, rgba(95,242,255,0.55)); }
     @media (prefers-reduced-motion: reduce) { .home-stack .si-in::after { animation: none; display: none; } }
+    /* Topic complete & lock */
+    .game-name.game-done { background: linear-gradient(180deg, #ffe680, #f2b51d) !important; color: #3a2600 !important; border-color: #ffd23f !important; flex-wrap: wrap; }
+    .td-badge { display: inline-block; margin-left: .35rem; padding: .05rem .4rem; border-radius: 999px; background: #1f7a3a; color: #fff; font: 800 .72rem/1.4 var(--ui-font); }
+    .td-prog { margin-left: .35rem; padding: 0 .35rem; border-radius: 999px; background: rgba(0,0,0,.3); font: 800 .72rem/1.5 var(--ui-font); }
+    .td-toast { position: fixed; left: 50%; top: 22%; transform: translateX(-50%); z-index: 90; max-width: 90vw; padding: .8rem 1.1rem; border-radius: 1rem; background: #241944; color: #fff; border: 3px solid #ffd23f; font: 900 1.15rem/1.3 var(--ui-font); text-align: center; box-shadow: 0 8px 30px rgba(0,0,0,.5); pointer-events: none; }
+    .td-toast.gold { background: linear-gradient(180deg, #ffe680, #f2b51d); color: #3a2600; font-size: 1.35rem; }
+    .td-card { text-align: left; }
+    .td-open { width: 100%; min-height: 2.8rem; border-radius: .8rem; border: 2px solid rgba(255,255,255,.35); background: rgba(10,14,40,.6); color: #fff; font: 800 1rem/1.2 var(--ui-font); }
+    .td-gate { display: flex; gap: .5rem; margin-top: .6rem; } .td-gate input { flex: 1; min-width: 0; }
+    .td-err { color: #ff9a9a; font-weight: 800; }
+    .td-list { display: flex; flex-direction: column; gap: .35rem; margin-top: .4rem; }
+    .td-row { display: flex; align-items: center; gap: .4rem; padding: .3rem .2rem; border-bottom: 1px solid rgba(255,255,255,.12); }
+    .td-name { flex: 1; min-width: 0; font: 700 .95rem/1.25 var(--ui-font); overflow-wrap: anywhere; }
+    .td-sw { min-width: 4rem; min-height: 2.6rem; border-radius: 999px; border: 2px solid #fff; background: #555; color: #fff; font: 900 .95rem/1 var(--ui-font); }
+    .td-sw.on { background: #1f9d4a; }
+    .td-btn { min-height: 2.6rem; padding: 0 .9rem; border-radius: 999px; border: 2px solid #ffd23f; background: #ffd23f; color: #241944; font: 900 .9rem/1 var(--ui-font); }
+    .td-btn.small { min-height: 2.3rem; padding: 0 .7rem; font-size: .82rem; } .td-btn.ghost { background: transparent; color: #ffd23f; margin-top: .3rem; }
+    .td-kid { margin: .4rem 0; padding: .5rem; border-radius: .7rem; background: rgba(255,255,255,.06); }
+    .td-h { margin-top: .8rem; }
   </style>
 </head>
 <body>
@@ -9050,6 +9069,7 @@
       const opsCard = operationCard();
       if (page === "games" && learnList.length) stack.appendChild(learnCard());
       stack.appendChild(opsCard);
+      if (page === "games") stack.appendChild(tdCard());
       const optionsFrom = stack.children.length;
 
       if (isOceanMap()) {
@@ -11574,6 +11594,81 @@
     const OPS_KEY = "mad-facts-ops";
     const opsUnlocked = (function () { try { const v = JSON.parse(localStorage.getItem(OPS_KEY) || "null"); return v && typeof v === "object" ? v : {}; } catch (e) { return {}; } })();
     function opLocked(id) { return !!CODE_OPS[id] && !opsUnlocked[id]; }
+
+    // ---- Topic complete & lock (saved on this device). Teacher turns it on per game (OFF by default; Multiplication never locks).
+    // With a game ON, a kid who earns 4 streaks of 5 in it finishes it: gold Complete tile, locked, +15 coins once. Teacher unlocks.
+    const TD_KEY = "tr-topic-done", TD_RUNS = 4, TD_BONUS = 15;
+    function tdRead() { try { const v = JSON.parse(localStorage.getItem(TD_KEY) || "null"); if (v && v.on && v.kids) return v; } catch (e) {} return { on: {}, kids: {} }; }
+    function tdWrite(v) { try { localStorage.setItem(TD_KEY, JSON.stringify(v)); } catch (e) {} }
+    function tdKidId() { const me = lbMe(); return me ? String(me.name).trim().toLowerCase() : "_guest"; }
+    function tdKidOf(d, id) { const k = d.kids[id] || (d.kids[id] = { runs: {}, lock: {}, paid: {} }); k.runs = k.runs || {}; k.lock = k.lock || {}; k.paid = k.paid || {}; if (!k.name) k.name = id === "_guest" ? "Guest (not signed in)" : (lbMe() ? lbMe().name : id); return k; }
+    function tdCanLock(op) { return !!op && op !== "multiply"; }
+    function tdOn(op) { return tdCanLock(op) && !!tdRead().on[op]; }
+    function tdLocked(op) { if (!tdOn(op)) return false; const k = tdRead().kids[tdKidId()]; return !!(k && k.lock && k.lock[op]); }
+    function tdRuns(op) { const k = tdRead().kids[tdKidId()]; return k && k.runs ? k.runs[op] || 0 : 0; }
+    function tdToast(text, gold) {
+      const old = document.getElementById("td-toast"); if (old) old.remove();
+      const t = el("div", { id: "td-toast", class: "td-toast" + (gold ? " gold" : ""), role: "status", text: text });
+      document.body.appendChild(t); setTimeout(function () { t.remove(); }, gold ? 4200 : 2400);
+    }
+    // Called on every 5-in-a-row in a Fact Challenge game.
+    function tdStreak(op) {
+      if (!tdOn(op)) return;
+      const d = tdRead(), k = tdKidOf(d, tdKidId());
+      if (k.lock[op]) return;
+      k.runs[op] = (k.runs[op] || 0) + 1;
+      if (k.runs[op] < TD_RUNS) { tdWrite(d); return; }
+      k.lock[op] = 1;
+      const pay = !k.paid[op]; if (pay) k.paid[op] = 1;
+      tdWrite(d);
+      if (pay) coinSet(coinGet() + TD_BONUS);
+      const name = opLabel(op) || "this game";
+      setTimeout(function () {
+        try { playCelebration(); } catch (e) {}
+        tdToast("\uD83C\uDF89 You finished " + name + "!" + (pay ? " +" + TD_BONUS + " bonus coins!" : ""), true);
+        say("Congratulations! You finished " + name + "." + (pay ? " You got " + TD_BONUS + " bonus coins." : ""));
+      }, 700);
+      setTimeout(function () { if (state.phase === "play" && state.operation === op) { backToSetup(); render(); } }, 3200);
+    }
+    const tdUi = { open: false, ok: false, err: "" };
+    function tdCard() {
+      const card = el("div", { class: "card td-card" });
+      card.appendChild(el("button", { type: "button", class: "td-open", "aria-expanded": String(tdUi.open), text: "\uD83C\uDF4E Teacher: game complete & lock " + (tdUi.open ? "\u25B2" : "\u25BC"), onClick: function () { tdUi.open = !tdUi.open; render(); } }));
+      if (!tdUi.open) return card;
+      if (!tdUi.ok) {
+        const inp = el("input", { type: "text", class: "code-box-input", placeholder: "Teacher code", "aria-label": "Teacher code", autocomplete: "off", autocapitalize: "characters" });
+        const go = function () { if (codeHash(inp.value) === BEATS_CODE_HASH) { tdUi.ok = true; tdUi.err = ""; } else tdUi.err = "That's not the teacher code."; render(); };
+        inp.addEventListener("keydown", function (e) { if (e.key === "Enter") go(); });
+        card.appendChild(el("div", { class: "td-gate" }, [inp, el("button", { type: "button", class: "td-btn", text: "Open", onClick: go })]));
+        if (tdUi.err) card.appendChild(el("p", { class: "td-err", role: "alert", text: tdUi.err }));
+        return card;
+      }
+      const d = tdRead();
+      card.appendChild(el("p", { class: "hint", text: "Turn a game ON and a kid who gets " + TD_RUNS + " streaks of 5 in it finishes it: the game locks for them with a Complete badge and +" + TD_BONUS + " coins (once). Saved on this device. Multiplication never locks." }));
+      const list = el("div", { class: "td-list" });
+      OPS.filter(function (o) { return tdCanLock(o.id); }).forEach(function (o) {
+        const on = !!d.on[o.id];
+        const done = Object.keys(d.kids).filter(function (id) { return d.kids[id].lock && d.kids[id].lock[o.id]; });
+        const row = el("div", { class: "td-row" }, [el("span", { class: "td-name", text: (GAME_ICONS[o.id] || "\u2B50") + " " + o.label + (done.length ? " \u00B7 " + done.length + " done" : "") })]);
+        if (done.length) row.appendChild(el("button", { type: "button", class: "td-btn small", text: "Unlock all", onClick: function () { const v = tdRead(); Object.keys(v.kids).forEach(function (id) { const k = v.kids[id]; if (k.lock) delete k.lock[o.id]; if (k.runs) delete k.runs[o.id]; }); tdWrite(v); render(); } }));
+        row.appendChild(el("button", { type: "button", class: "td-sw" + (on ? " on" : ""), role: "switch", "aria-checked": String(on), "aria-label": o.label + " complete and lock", text: on ? "ON" : "OFF", onClick: function () { const v = tdRead(); if (v.on[o.id]) delete v.on[o.id]; else v.on[o.id] = 1; tdWrite(v); render(); } }));
+        list.appendChild(row);
+      });
+      card.appendChild(list);
+      const kids = Object.keys(d.kids).filter(function (id) { const k = d.kids[id]; return Object.keys(k.lock || {}).length || Object.keys(k.paid || {}).length; });
+      card.appendChild(el("p", { class: "label td-h", text: "Kids on this device" }));
+      if (!kids.length) card.appendChild(el("p", { class: "hint", text: "No one has finished a game yet." }));
+      kids.forEach(function (id) {
+        const k = d.kids[id], box = el("div", { class: "td-kid" }, [el("b", { text: k.name || id })]);
+        Object.keys(k.lock || {}).forEach(function (op) {
+          box.appendChild(el("div", { class: "td-row" }, [el("span", { class: "td-name", text: "\u2705 " + (opLabel(op) || op) }), el("button", { type: "button", class: "td-btn small", text: "Unlock", onClick: function () { const v = tdRead(), kk = v.kids[id]; delete kk.lock[op]; delete kk.runs[op]; tdWrite(v); render(); } })]));
+        });
+        const paid = Object.keys(k.paid || {});
+        if (paid.length) box.appendChild(el("button", { type: "button", class: "td-btn small ghost", text: "Reset bonus coins (" + paid.length + ")", onClick: function () { const v = tdRead(); v.kids[id].paid = {}; tdWrite(v); render(); } }));
+        card.appendChild(box);
+      });
+      return card;
+    }
     function applyTeacherCode(kind, beatId, text) {
       const hash = codeHash(text);
       if (kind === "beats") {
@@ -12892,6 +12987,14 @@
         const cat = gameCategory(op.id);
         if (cat !== lastCat) { lastCat = cat; row.appendChild(el("h3", { class: "ops-head ops-head-" + cat, text: CAT_NAME[cat] })); }
         const open = !!state.gameOpen && state.operation === op.id;
+        if (tdLocked(op.id)) {
+          const db = button(op.label, "choice game-name game-done op-" + op.id, false, function () { tdToast("You finished this one! \uD83C\uDF89"); say("You finished this one!"); });
+          db.setAttribute("aria-label", op.label + ", complete");
+          db.insertBefore(el("span", { class: "game-ico", "aria-hidden": "true", text: "\uD83D\uDD12" }), db.firstChild);
+          db.appendChild(el("span", { class: "td-badge", text: "\u2705 Complete" }));
+          row.appendChild(db);
+          return;
+        }
         if (opLocked(op.id)) {
           const lb = button(op.label, "choice game-name game-locked op-" + op.id, false, function (event) { openCodeBox({ kind: "op", beatId: op.id, opener: event && event.currentTarget }); });
           lb.setAttribute("aria-label", op.label + ", locked");
@@ -12912,6 +13015,7 @@
         });
         b.setAttribute("aria-expanded", String(open));
         b.classList.add("gcat-" + gameCategory(op.id));
+        if (tdOn(op.id)) b.appendChild(el("span", { class: "td-prog", text: tdRuns(op.id) + "/" + TD_RUNS }));
         b.insertBefore(el("span", { class: "game-ico", "aria-hidden": "true", text: GAME_ICONS[op.id] || "\u2B50" }), b.firstChild);
         row.appendChild(b);
         // Grammar is its own page with 6 tabs; its Fact Challenge entry sits right after Vocabulary.
@@ -14001,6 +14105,7 @@
       render();
     }
     function start(pairs) {
+      if (tdLocked(state.operation)) { tdToast("You finished this one! \uD83C\uDF89"); say("You finished this one!"); return; }
       clearTimeout(feedback);
       // A beat playing on the home screen carries on into the game.
       state.homeBeat = false;
@@ -14104,7 +14209,7 @@
         lbPoint(true, problem.operation || state.operation);
         const kqNoPrize = isKq(problem.operation);
         // Every game: +1 coin each '5 in a row' (quiz topics too).
-        if (state.streak % AV_PRIZE_EVERY === 0) setTimeout(coinDrop, 350);
+        if (state.streak % AV_PRIZE_EVERY === 0) { setTimeout(coinDrop, 350); tdStreak(problem.operation || state.operation); }
         state.bestStreak = Math.max(state.bestStreak, state.streak);
         if (state.streak % BG_ROTATE_STEP === 0) rotateBackground();
         state.gain = 10 + Math.min(state.streak, 8) * 2;
