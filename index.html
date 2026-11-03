@@ -3632,7 +3632,8 @@
     .shp-sim[hidden] { display: none; }
     @media (prefers-reduced-motion: reduce) { .shp-hero.bounce .av, .shp-card:active { animation: none; transform: none; } }
     .hd-av { position: relative; display: inline-block; }
-    .hd-av img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; pointer-events: none; user-select: none; }
+    .hd-av img, .hd-av .hd-shoe { position: absolute; left: 0; top: 0; width: 100%; height: 100%; pointer-events: none; user-select: none; }
+    .hd-av .hd-shoe { background-size: 200% 100%; background-repeat: no-repeat; }
     .shp-hero .hd-av { display: block; }
     .shp-stage.hd .shp-hero { bottom: calc(var(--pb) + 4px); }
     .shp-mode { position: absolute; top: 10px; right: 10px; z-index: 2; min-height: 44px; padding: 0 .9rem; border-radius: 999px; border: 3px solid #fff3a0; background: linear-gradient(#ff7ab8, #8a4dff); color: #fff; font: 900 .95rem/1 var(--ui-font); box-shadow: 0 3px 0 #4a2a9a; cursor: pointer; }
@@ -10026,17 +10027,46 @@
     function avHas() { return !!(avatar.made || avatar.owned.length); }
     function avOwns(id) { return !id || AV_FREE.indexOf(id) >= 0 || avatar.owned.indexOf(id) >= 0; }
     // ---- HD avatar (test site starter set). Saved as avatar.hd = { o: owned ids, w: {slot: id}, b: body id, on: 1 when shown }.
-    const HD_PACK_COST = 250, HD_PIECE_COST = 5, HD_DIR = "./assets/hd/";
+    const HD_PACK_COST = 250, HD_PIECE_COST = 5, HD_CHAR_COST = 100, HD_DIR = "./assets/hd/";
     const HD_ITEMS = [
-      { id: "xbA", slot: "look", name: "Sunny", f: "bodyA", free: 1 }, { id: "xbB", slot: "look", name: "Cocoa", f: "bodyB" },
-      { id: "xcap", slot: "hat", name: "Blue cap", f: "cap" }, { id: "xwiz", slot: "hat", name: "Star wizard hat", f: "wizhat" },
-      { id: "xhood", slot: "shirt", name: "Red hoodie", f: "hoodie" }, { id: "xstar", slot: "shirt", name: "Star tee", f: "star" },
-      { id: "xheart", slot: "glasses", name: "Heart shades", f: "heart" }, { id: "xround", slot: "glasses", name: "Gold specs", f: "round" },
-      { id: "xsneak", slot: "shoes", name: "Red sneakers", f: "sneak" }, { id: "xboot", slot: "shoes", name: "Rain boots", f: "boots" },
-      { id: "xpup", slot: "pet", name: "Puppy", f: "pup" }, { id: "xkit", slot: "pet", name: "Kitten", f: "kit" },
-      { id: "xice", slot: "hand", name: "Ice cream", f: "ice" }, { id: "xbal", slot: "hand", name: "Balloon", f: "bal" }
+      {"id":"xbA","slot":"look","name":"Wizard","f":"c_wizard","ch":"wizard","free":1},
+      {"id":"xbB","slot":"look","name":"Space explorer","f":"c_space","ch":"space"},
+      {"id":"xrob","slot":"look","name":"Robot","f":"c_robot","ch":"robot"},
+      {"id":"xpir","slot":"look","name":"Pirate","f":"c_pirate","ch":"pirate"},
+      {"id":"xfai","slot":"look","name":"Fairy","f":"c_fairy","ch":"fairy"},
+      {"id":"xkni","slot":"look","name":"Knight","f":"c_knight","ch":"knight"},
+      {"id":"xwiz","slot":"hat","name":"Star wizard hat","f":"wizhat2","a":0.881,"s":1.05,"k":0.08},
+      {"id":"xtri","slot":"hat","name":"Pirate hat","f":"tricorn","a":1.735,"s":1.15,"k":0.15},
+      {"id":"xcrown","slot":"hat","name":"Jewel crown","f":"crown","a":1.106,"s":0.8,"k":0.1},
+      {"id":"xcap","slot":"hat","name":"Propeller cap","f":"propel","a":0.879,"s":0.95,"k":0.15},
+      {"id":"xuni","slot":"hat","name":"Unicorn horn","f":"unihorn","a":0.938,"s":0.95,"k":0.25},
+      {"id":"xdrag","slot":"shirt","name":"Dragon vest","f":"dragvest","a":0.604},
+      {"id":"xhood","slot":"shirt","name":"Galaxy vest","f":"galaxy","a":0.616},
+      {"id":"xroyal","slot":"shirt","name":"Royal vest","f":"royal","a":0.605},
+      {"id":"xrain","slot":"shirt","name":"Rainbow knit","f":"rainbow","a":0.643},
+      {"id":"xstar","slot":"shirt","name":"Hero vest","f":"hero","a":0.605},
+      {"id":"xstarsh","slot":"glasses","name":"Star shades","f":"starsh","a":1.809,"s":1.1},
+      {"id":"xheart","slot":"glasses","name":"Heart shades","f":"heartsh","a":2.018,"s":1.05},
+      {"id":"xgog","slot":"glasses","name":"Steam goggles","f":"goggles","a":2.024,"s":1.15},
+      {"id":"xround","slot":"glasses","name":"Gold specs","f":"specs","a":2.06,"s":1.0},
+      {"id":"xvisor","slot":"glasses","name":"Rainbow visor","f":"visor","a":1.959,"s":1.1},
+      {"id":"xrock","slot":"shoes","name":"Rocket boots","f":"rocket","a":0.697,"s":1.05,"r":1.9,"k":0.22},
+      {"id":"xglass","slot":"shoes","name":"Crystal slippers","f":"glass","a":1.026,"s":0.95},
+      {"id":"xclaw","slot":"shoes","name":"Dragon slippers","f":"claw","a":1.258,"s":1.1},
+      {"id":"xsneak","slot":"shoes","name":"Rainbow sneakers","f":"rsneak","a":1.013,"s":1.05},
+      {"id":"xboot","slot":"shoes","name":"Gold boots","f":"goldboot","a":0.899,"s":1.05,"r":1.5},
+      {"id":"xdragon","slot":"pet","name":"Baby dragon","f":"dragon","a":0.862},
+      {"id":"xunip","slot":"pet","name":"Mini unicorn","f":"unicorn","a":0.613},
+      {"id":"xpup","slot":"pet","name":"Robo puppy","f":"robopup","a":0.536},
+      {"id":"xowl","slot":"pet","name":"Owl","f":"owl","a":0.782},
+      {"id":"xkit","slot":"pet","name":"Space kitten","f":"spacekit","a":0.722},
+      {"id":"xwand","slot":"hand","name":"Star wand","f":"wand","a":0.381,"gx":0.5,"gy":0.75},
+      {"id":"xsword","slot":"hand","name":"Foam sword","f":"sword","a":0.253,"gx":0.5,"gy":0.83},
+      {"id":"xice","slot":"hand","name":"Swirl lollipop","f":"lolly","a":0.455,"gx":0.5,"gy":0.78},
+      {"id":"xstaff","slot":"hand","name":"Crystal staff","f":"staff","a":0.22,"gx":0.5,"gy":0.72},
+      {"id":"xbal","slot":"hand","name":"Star flag","f":"flag","a":0.46,"gx":0.07,"gy":0.75}
     ];
-    const HD_ORDER = ["shoes", "shirt", "pet", "hand", "glasses", "hat"];
+    const HD_ANCH = {"wizard":{"h":[240,138,200],"g":[242,195,140],"t":[237,285,160,190],"f":[165,307,105],"k":[142,470]},"space":{"h":[253,138,205],"g":[257,195,145],"t":[258,318,150,170],"f":[186,313,112],"k":[156,492]},"robot":{"h":[256,178,230],"g":[254,245,180],"t":[254,357,150,125],"f":[183,318,120],"k":[138,530]},"pirate":{"h":[248,138,200],"g":[257,194,140],"t":[251,270,160,205],"f":[180,322,100],"k":[142,482]},"fairy":{"h":[245,150,180],"g":[240,215,130],"t":[245,317,120,118],"f":[201,306,72],"k":[126,486]},"knight":{"h":[228,138,200],"g":[226,192,140],"t":[230,280,165,190],"f":[153,295,105],"k":[123,474]}};
     function hdItem(id) { return HD_ITEMS.find(function (i) { return i.id === id; }) || null; }
     function hdClean(h) {
       h = h && typeof h === "object" ? h : {};
@@ -10048,12 +10078,32 @@
     }
     function hdHas(id) { const it = hdItem(id); return !!it && (it.free || avatar.hd.o.indexOf(id) >= 0); }
     function hdOn() { return avatar.pk.indexOf("hd") >= 0 && avatar.hd.on === 1; }
-    // Stacked transparent WebP layers on one fixed 512x750 template. Images load only when this is called.
+    // One body per character on a 512x750 frame; each item is placed from that character's anchors
+    // (h: hat [x, brim y, width], g: glasses [x, y, width], t: torso [x, top, w, h], f: feet [left x, right x, width], k: fist [x, y]).
+    // Images load only when this is called.
     function hdNode(h, size) {
-      const box = el("span", { class: "hd-av", style: "width:" + Math.round(size * 0.683) + "px;height:" + size + "px" });
-      const add = function (f) { box.appendChild(el("img", { src: HD_DIR + f + ".webp", alt: "", decoding: "async", draggable: "false" })); };
-      add((hdItem(h.b) || HD_ITEMS[0]).f);
-      HD_ORDER.forEach(function (k) { const it = h.w[k] && hdItem(h.w[k]); if (it) add(it.f); });
+      const W = 512, H = 750, box = el("span", { class: "hd-av", style: "width:" + Math.round(size * 0.683) + "px;height:" + size + "px" });
+      const c = hdItem(h.b) || HD_ITEMS[0], A = HD_ANCH[c.ch];
+      const pc = function (v, t) { return (v / t * 100).toFixed(2) + "%"; };
+      const pos = function (x, y, w, hh) { return "left:" + pc(x, W) + ";top:" + pc(y, H) + ";width:" + pc(w, W) + ";height:" + pc(hh, H); };
+      const img = function (f, x, y, w, hh, extra) { box.appendChild(el("img", { src: HD_DIR + f + ".webp", alt: "", decoding: "async", draggable: "false", style: pos(x, y, w, hh) + (extra || "") })); };
+      const it = function (k) { return h.w[k] ? hdItem(h.w[k]) : null; };
+      let i;
+      img(c.f, 0, 0, W, H);
+      if ((i = it("shirt"))) { const t = A.t; img(i.f, t[0] - t[2] / 2, t[1], t[2], t[3]); }
+      if ((i = it("shoes"))) {
+        const f = A.f, w = f[2] * 1.05 * (i.s || 1), hh = Math.min(w / (i.a / 2), w * (i.r || 1.35)), y = 742 - hh * (1 - (i.k || 0));
+        [[f[0], "0%"], [f[1], "100%"]].forEach(function (q) { box.appendChild(el("span", { class: "hd-shoe", style: pos(q[0] - w / 2, y, w, hh) + ";background-image:url(" + HD_DIR + i.f + ".webp);background-position:" + q[1] + " 0" })); });
+      }
+      if ((i = it("hand"))) {
+        // Item goes in under the fist, then a round cut of the body's own fist is laid back on top so the fingers wrap the handle.
+        const k = A.k, hh = 250, w = hh * i.a;
+        img(i.f, k[0] - w * i.gx, k[1] - hh * i.gy, w, hh);
+        img(c.f, 0, 0, W, H, ";clip-path:ellipse(" + pc(24, W) + " " + pc(24, H) + " at " + pc(k[0], W) + " " + pc(k[1], H) + ")");
+      }
+      if ((i = it("glasses"))) { const g = A.g, w = g[2] * (i.s || 1), hh = w / i.a; img(i.f, g[0] - w / 2, g[1] - hh / 2, w, hh); }
+      if ((i = it("hat"))) { const t = A.h, w = t[2] * (i.s || 1), hh = w / i.a; img(i.f, t[0] - w / 2, t[1] - hh * (1 - (i.k == null ? 0.2 : i.k)), w, hh); }
+      if ((i = it("pet"))) { const hh = 150, w = hh * i.a; img(i.f, 420 - w / 2, 745 - hh, w, hh); }
       return box;
     }
     function avClean(a) {
@@ -10700,7 +10750,7 @@
     const SHOP_PACK_BG = { hw: "#ff8a1f,#5b2a8a", bh: "#1fb5a8,#ff8a3d", sp: "#22308a,#6f8cff", sw: "#3550c8,#e8414f", tg: "#a0522d,#f2a65a",
       wz: "#5a1020,#c9a24a", bb: "#e8414f,#ffb703", ft: "#ff7ab8,#6f8cff", jg: "#2f7d3a,#9ccc3a" };
     function shopFind(id) { return avItem(id) || avLook(id); }
-    function shopCost(it) { return it.f ? HD_PIECE_COST : it.gold ? AV_GOLD_COST : AV_PIECE_COST; }
+    function shopCost(it) { return it.f ? (it.slot === "look" ? HD_CHAR_COST : HD_PIECE_COST) : it.gold ? AV_GOLD_COST : AV_PIECE_COST; }
     function shopHas(it) { return it.f ? hdHas(it.id) : avOwns(it.id); }
     function shopPackOpen(k) { return avatar.pk.indexOf(k) >= 0; }
     function shopPackName(k) { const x = AV_PACKS.find(function (q) { return q[0] === k; }); return x ? x[1] : ""; }
@@ -10771,9 +10821,10 @@
           shopPack = k; paintAll();
         });
       };
-      const buy = function (it, node) {
+      const buy = function (it, node, ok) {
         const cost = shopCost(it);
         if (coinGet() < cost) { shake(node); say("You need $" + cost + ". You have $" + coinGet() + "."); return; }
+        if (it.f && it.slot === "look" && !ok) { avConfirm("Get the " + it.name + " for $" + cost + "?", "HD characters cost $" + cost + ". You have $" + coinGet() + ".", function () { buy(it, node, true); }, "Yes, get it!"); return; }
         if (!coinSpend(cost)) return;
         if (it.f) { if (avatar.hd.o.indexOf(it.id) < 0) avatar.hd.o.push(it.id); if (it.slot === "look") avatar.hd.b = it.id; else avatar.hd.w[it.slot] = it.id; }
         else { if (avatar.owned.indexOf(it.id) < 0) avatar.owned.push(it.id); avApply(it); }
@@ -10852,14 +10903,14 @@
               if (hdOpen) { avatar.hd.on = 1; avSaveSoon(); shopTab = "hat"; shopMode = "shop"; paintAll(true); return; }
               const me2 = this;
               if (coinGet() < HD_PACK_COST) { shake(me2); say("You need $" + HD_PACK_COST + " to open the HD pack. You have $" + coinGet() + "."); return; }
-              avConfirm("Open the HD avatar pack for $" + HD_PACK_COST + "?", "Then each HD piece costs $" + HD_PIECE_COST + ".", function () {
+              avConfirm("Open the HD avatar pack for $" + HD_PACK_COST + "?", "You get the Wizard free. More characters are $" + HD_CHAR_COST + ", and each HD item is $" + HD_PIECE_COST + ".", function () {
                 if (!coinSpend(HD_PACK_COST)) return;
                 if (avatar.pk.indexOf("hd") < 0) avatar.pk.push("hd");
                 avatar.hd.on = 1; avatar.made = true; avSaveSoon(); say("HD avatar pack is open!");
                 shopTab = "hat"; shopMode = "shop"; paintAll(true);
               });
             } }, [el("span", { class: "shp-pack-art", text: "\u2728" }), el("span", { class: "shp-pack-txt" }, [el("b", { text: "HD Avatar \u00B7 NEW" }),
-              el("small", { text: "A movie-style 3D you! Hats, shirts, glasses, shoes, pets, looks and hand items. $" + HD_PIECE_COST + " each." }),
+              el("small", { text: "6 movie-style 3D characters to dress! Wizard free, others $" + HD_CHAR_COST + ". 30 items, $" + HD_PIECE_COST + " each." }),
               hdOpen ? el("span", { class: "shp-st own", text: "\u2713 Open \u00B7 Shop HD" }) : el("span", { class: "shp-buy" + (coinGet() < HD_PACK_COST ? " poor" : "") }, [el("span", { class: "coin-ico", "aria-hidden": "true", text: "$" }), el("span", { text: HD_PACK_COST + " Open" })])])]));
           AV_PACKS.forEach(function (pk) {
             const k = pk[0], open = shopPackOpen(k);
