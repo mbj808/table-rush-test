@@ -1988,12 +1988,12 @@
     .gx-bar i.on { background: #5ff2ff; }
     .gx-clock { width: min(15rem, 62vw); height: auto; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.45)); }
     .gx-coins { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; align-items: center; max-width: 20rem; }
-    .gx-coin { border-radius: 50%; display: grid; place-items: center; font-weight: 900; color: #1b1300; box-shadow: inset 0 -3px 0 rgba(0,0,0,0.25), inset 0 3px 0 rgba(255,255,255,0.45), 0 3px 6px rgba(0,0,0,0.45); text-align: center; line-height: 1.05; }
-    .gx-coin small { display: block; font-size: 0.55rem; font-weight: 800; letter-spacing: 0.02em; }
-    .gx-coin.c1 { width: 3.4rem; height: 3.4rem; background: radial-gradient(circle at 35% 30%, #f3b98a, #b8692e 70%); font-size: 1rem; }
-    .gx-coin.c5 { width: 3.9rem; height: 3.9rem; background: radial-gradient(circle at 35% 30%, #f4f4f4, #9a9fa6 70%); font-size: 1.05rem; }
-    .gx-coin.c10 { width: 3.2rem; height: 3.2rem; background: radial-gradient(circle at 35% 30%, #fbfbfb, #a9aeb5 70%); font-size: 0.95rem; }
-    .gx-coin.c25 { width: 4.4rem; height: 4.4rem; background: radial-gradient(circle at 35% 30%, #ffffff, #8f949b 70%); font-size: 1.15rem; }
+    .gx-coin { border-radius: 50%; display: grid; place-items: center; font-weight: 900; color: #1b1300; border: 3px solid rgba(0,0,0,.55); box-shadow: inset 0 0 0 3px rgba(255,255,255,.35), inset 0 -4px 0 rgba(0,0,0,0.25), 0 4px 0 rgba(0,0,0,.45); text-align: center; line-height: 1.05; text-shadow: 0 1px 0 rgba(255,255,255,.6); }
+    .gx-coin small { display: block; font-size: 0.62rem; font-weight: 900; letter-spacing: 0.02em; }
+    .gx-coin.c1 { width: 4.2rem; height: 4.2rem; background: radial-gradient(circle at 35% 30%, #f3b98a, #b8692e 70%); font-size: 1rem; }
+    .gx-coin.c5 { width: 4.6rem; height: 4.6rem; background: radial-gradient(circle at 35% 30%, #f4f4f4, #9a9fa6 70%); font-size: 1.05rem; }
+    .gx-coin.c10 { width: 4rem; height: 4rem; background: radial-gradient(circle at 35% 30%, #fbfbfb, #a9aeb5 70%); font-size: 0.95rem; }
+    .gx-coin.c25 { width: 5rem; height: 5rem; background: radial-gradient(circle at 35% 30%, #ffffff, #8f949b 70%); font-size: 1.15rem; }
     .gx-state { width: min(15rem, 66vw); height: 11rem; object-fit: contain; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5)); }
     .gx-emoji { font-size: clamp(4.5rem, 20vw, 6rem); line-height: 1; }
     .gx-name { margin: 0; font-size: 1.8rem; font-weight: 900; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
@@ -3393,10 +3393,10 @@
       font: 900 1.25rem/1 var(--ui-font); box-shadow: 0 4px 0 rgba(0,0,0,.35), 0 0 14px rgba(255,210,63,.55); opacity: 1; }
     body.play-screen #back::before { content: "\2039\00a0"; font-size: 1.5rem; }
     body.play-screen #back:active { transform: translateY(2px); box-shadow: 0 2px 0 rgba(0,0,0,.35); }
-    .coin-bank { display: inline-flex; align-items: center; gap: .45rem; margin: .3rem auto .5rem; padding: .35rem 1rem .35rem .4rem; border-radius: 999px; background: #fff4c2; color: #4a3000; font: 900 1.25rem/1 var(--ui-font); border: 3px solid #e0a91f; box-shadow: 0 3px 0 rgba(0,0,0,.3); align-self: center; }
+    .coin-bank { display: inline-flex; align-items: center; gap: .55rem; margin: .4rem auto .6rem; padding: .4rem 1.2rem .4rem .4rem; border-radius: 999px; background: linear-gradient(#fff7cf, #ffe27a); color: #3a2400; font: 900 1.6rem/1 var(--ui-font); border: 4px solid #b8780a; box-shadow: 0 4px 0 #7a4a00, 0 6px 10px rgba(0,0,0,.3); align-self: center; }
     .beats-card .coin-bank { display: flex; width: max-content; }
-    .coin-ico { display: inline-grid; place-items: center; width: 1.9rem; height: 1.9rem; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #fff6b0, #ffd23f 45%, #d99a10); color: #7a4a00; font: 900 1.2rem/1 var(--ui-font); box-shadow: inset 0 -3px 0 rgba(0,0,0,.18), 0 0 0 2px #b8800a; }
-    .coin-ico.big { width: 3.4rem; height: 3.4rem; font-size: 2.1rem; box-shadow: inset 0 -6px 0 rgba(0,0,0,.18), 0 0 0 4px #b8800a, 0 0 30px rgba(255,210,63,.9); }
+    .coin-ico { display: inline-grid; place-items: center; width: 2.6rem; height: 2.6rem; border-radius: 50%; background: radial-gradient(circle at 32% 28%, #fffbe0 0 12%, #ffe066 30%, #ffc21a 60%, #c98a00); color: #6b3d00; font: 900 1.85rem/1 var(--ui-font); text-shadow: 0 2px 0 #fff3a0, 0 -1px 0 #8a5200; border: 3px solid #8a5200; box-shadow: inset 0 0 0 3px #ffd84d, inset 0 -4px 0 rgba(0,0,0,.2), 0 3px 0 #6b3d00; }
+    .coin-ico.big { width: 5rem; height: 5rem; font-size: 3.4rem; border-width: 5px; box-shadow: inset 0 0 0 5px #ffd84d, inset 0 -7px 0 rgba(0,0,0,.2), 0 5px 0 #6b3d00, 0 0 34px rgba(255,210,63,.95); }
     .celeb-scene { position: fixed; inset: 0; z-index: 85; pointer-events: none; overflow: hidden; }
     .cb-bit { position: absolute; width: 11px; height: 11px; border-radius: 50%; opacity: 0; animation: cbBit 1.1s ease-out forwards; }
     .cb-bit.sq { border-radius: 2px; width: 10px; height: 14px; }
@@ -3431,9 +3431,9 @@
     @keyframes cbStar { 0% { opacity: 0; transform: scale(.3); } 20% { opacity: 1; transform: scale(1.3) rotate(40deg); } 100% { opacity: 0; transform: scale(.6) translateY(30px) rotate(160deg); } }
     .celeb-test { position: fixed; right: 10px; bottom: calc(env(safe-area-inset-bottom, 0px) + 150px); z-index: 9500; min-height: 48px; padding: 0 1rem; border-radius: 999px; border: 2px solid #fff; background: #7c3aed; color: #fff; font: 800 1rem/1 var(--ui-font); box-shadow: 0 3px 0 rgba(0,0,0,.35); }
     .coin-drop { position: fixed; right: 14px; top: calc(env(safe-area-inset-top, 0px) + 96px); z-index: 90; pointer-events: none; display: flex; flex-direction: column; align-items: center; gap: .3rem; animation: coinDrop 1.5s ease-out forwards; }
-    .coin-plus { font: 900 1.3rem/1 var(--ui-font); color: #fff; text-shadow: 0 2px 0 #7a4a00, 0 0 10px #ffb703; }
+    .coin-plus { font: 900 2rem/1 var(--ui-font); color: #fff; -webkit-text-stroke: 1px #7a4a00; text-shadow: 0 3px 0 #7a4a00, 0 0 12px #ffb703; }
     @keyframes coinDrop { 0% { opacity: 0; transform: translateY(24px) scale(.4); } 25% { opacity: 1; transform: translateY(-8px) scale(1.1) rotateY(360deg); } 40% { transform: translateY(0) scale(1); } 85% { opacity: 1; } 100% { opacity: 0; transform: translateY(-10px); } }
-    .pill-cost, .av-cost { background: #ffd23f !important; color: #4a3000 !important; border-radius: 999px; padding: .1rem .45rem; font-weight: 900; }
+    .pill-cost, .av-cost { background: linear-gradient(#ffe66b, #ffc21a) !important; color: #3a2400 !important; border: 2px solid #8a5200; border-radius: 999px; padding: .12rem .55rem; font-weight: 900; font-size: 1.05em; box-shadow: 0 2px 0 #6b3d00; }
     #my-pts { position: fixed; top: calc(env(safe-area-inset-top, 0px) + 8px); left: 50%; transform: translateX(-50%); z-index: 50; pointer-events: none; padding: .3rem .85rem; border-radius: 999px; background: #ffe58a; color: #3a2400; font: 800 1.05rem/1.2 var(--ui-font); box-shadow: 0 2px 0 rgba(0,0,0,.3); white-space: nowrap; }
     #my-pts[hidden] { display: none; }
     .game-start.gs-top { margin: 0 0 .3rem; }
@@ -4899,46 +4899,46 @@
     const US_STATES_BY_ID = US_STATES.reduce(function (m, x) { m[x.id] = x; return m; }, {});
     // Counting Money: fixed pool, each item once per pass; two choices.
     const MONEY_COINS = [
-      {"id": "m0", "coins": [25, 5, 1], "answer": "31¢", "choices": ["31¢", "26¢"], "why": "25 + 5 + 1 = 31¢."},
-      {"id": "m1", "coins": [25, 25], "answer": "50¢", "choices": ["50¢", "49¢"], "why": "25 + 25 = 50¢."},
-      {"id": "m2", "coins": [25, 5, 5], "answer": "35¢", "choices": ["35¢", "45¢"], "why": "25 + 5 + 5 = 35¢."},
-      {"id": "m3", "coins": [25, 10, 5], "answer": "40¢", "choices": ["40¢", "50¢"], "why": "25 + 10 + 5 = 40¢."},
-      {"id": "m4", "coins": [25, 10, 10, 1, 1], "answer": "47¢", "choices": ["47¢", "42¢"], "why": "25 + 10 + 10 + 1 + 1 = 47¢."},
-      {"id": "m5", "coins": [25, 10, 10, 5], "answer": "50¢", "choices": ["50¢", "60¢"], "why": "25 + 10 + 10 + 5 = 50¢."},
-      {"id": "m6", "coins": [25, 1], "answer": "26¢", "choices": ["26¢", "27¢"], "why": "25 + 1 = 26¢."},
-      {"id": "m7", "coins": [25, 25, 25], "answer": "75¢", "choices": ["75¢", "74¢"], "why": "25 + 25 + 25 = 75¢."},
-      {"id": "m8", "coins": [25, 25, 10, 5, 5], "answer": "70¢", "choices": ["70¢", "80¢"], "why": "25 + 25 + 10 + 5 + 5 = 70¢."},
-      {"id": "m9", "coins": [10, 10, 5, 1], "answer": "26¢", "choices": ["26¢", "31¢"], "why": "10 + 10 + 5 + 1 = 26¢."},
-      {"id": "m10", "coins": [25, 25, 10], "answer": "60¢", "choices": ["60¢", "70¢"], "why": "25 + 25 + 10 = 60¢."},
-      {"id": "m11", "coins": [25, 5, 5, 1, 1], "answer": "37¢", "choices": ["37¢", "27¢"], "why": "25 + 5 + 5 + 1 + 1 = 37¢."},
-      {"id": "m12", "coins": [10, 10, 5], "answer": "25¢", "choices": ["25¢", "30¢"], "why": "10 + 10 + 5 = 25¢."},
-      {"id": "m13", "coins": [25, 25, 5], "answer": "55¢", "choices": ["55¢", "60¢"], "why": "25 + 25 + 5 = 55¢."},
-      {"id": "m14", "coins": [10, 5, 5, 5, 5], "answer": "30¢", "choices": ["30¢", "31¢"], "why": "10 + 5 + 5 + 5 + 5 = 30¢."},
-      {"id": "m15", "coins": [25, 10, 10, 5, 5], "answer": "55¢", "choices": ["55¢", "60¢"], "why": "25 + 10 + 10 + 5 + 5 = 55¢."},
-      {"id": "m16", "coins": [10, 5], "answer": "15¢", "choices": ["15¢", "25¢"], "why": "10 + 5 = 15¢."},
-      {"id": "m17", "coins": [5, 5, 1], "answer": "11¢", "choices": ["11¢", "12¢"], "why": "5 + 5 + 1 = 11¢."},
-      {"id": "m18", "coins": [25, 10, 10, 10], "answer": "55¢", "choices": ["55¢", "54¢"], "why": "25 + 10 + 10 + 10 = 55¢."},
-      {"id": "m19", "coins": [5, 1, 1], "answer": "7¢", "choices": ["7¢", "8¢"], "why": "5 + 1 + 1 = 7¢."},
-      {"id": "m20", "coins": [25, 10, 1, 1], "answer": "37¢", "choices": ["37¢", "38¢"], "why": "25 + 10 + 1 + 1 = 37¢."},
-      {"id": "m21", "coins": [25, 5, 5, 5], "answer": "40¢", "choices": ["40¢", "39¢"], "why": "25 + 5 + 5 + 5 = 40¢."},
-      {"id": "m22", "coins": [10, 10, 10], "answer": "30¢", "choices": ["30¢", "25¢"], "why": "10 + 10 + 10 = 30¢."},
-      {"id": "m23", "coins": [25, 25, 10, 1, 1], "answer": "62¢", "choices": ["62¢", "67¢"], "why": "25 + 25 + 10 + 1 + 1 = 62¢."},
-      {"id": "m24", "coins": [25, 10, 5, 1], "answer": "41¢", "choices": ["41¢", "42¢"], "why": "25 + 10 + 5 + 1 = 41¢."},
-      {"id": "m25", "coins": [25, 10, 5, 5, 1], "answer": "46¢", "choices": ["46¢", "45¢"], "why": "25 + 10 + 5 + 5 + 1 = 46¢."},
-      {"id": "m26", "coins": [25, 10, 10, 10, 10], "answer": "65¢", "choices": ["65¢", "66¢"], "why": "25 + 10 + 10 + 10 + 10 = 65¢."},
-      {"id": "m27", "coins": [1, 1, 1], "answer": "3¢", "choices": ["3¢", "13¢"], "why": "1 + 1 + 1 = 3¢."},
-      {"id": "m28", "coins": [25, 25, 10, 1], "answer": "61¢", "choices": ["61¢", "71¢"], "why": "25 + 25 + 10 + 1 = 61¢."},
-      {"id": "m29", "coins": [10, 1, 1, 1, 1], "answer": "14¢", "choices": ["14¢", "4¢"], "why": "10 + 1 + 1 + 1 + 1 = 14¢."},
-      {"id": "m30", "coins": [5, 5, 1, 1], "answer": "12¢", "choices": ["12¢", "22¢"], "why": "5 + 5 + 1 + 1 = 12¢."},
-      {"id": "m31", "coins": [25, 10], "answer": "35¢", "choices": ["35¢", "34¢"], "why": "25 + 10 = 35¢."},
-      {"id": "m32", "coins": [5, 5, 5], "answer": "15¢", "choices": ["15¢", "16¢"], "why": "5 + 5 + 5 = 15¢."},
-      {"id": "m33", "coins": [10, 5, 5], "answer": "20¢", "choices": ["20¢", "15¢"], "why": "10 + 5 + 5 = 20¢."},
-      {"id": "m34", "coins": [5, 5, 5, 1], "answer": "16¢", "choices": ["16¢", "21¢"], "why": "5 + 5 + 5 + 1 = 16¢."},
-      {"id": "m35", "coins": [25, 10, 5, 5, 5], "answer": "50¢", "choices": ["50¢", "55¢"], "why": "25 + 10 + 5 + 5 + 5 = 50¢."},
-      {"id": "m36", "coins": [25, 25, 10, 5], "answer": "65¢", "choices": ["65¢", "60¢"], "why": "25 + 25 + 10 + 5 = 65¢."},
-      {"id": "m37", "coins": [25, 5], "answer": "30¢", "choices": ["30¢", "29¢"], "why": "25 + 5 = 30¢."},
-      {"id": "m38", "coins": [25, 25, 5, 5, 5], "answer": "65¢", "choices": ["65¢", "66¢"], "why": "25 + 25 + 5 + 5 + 5 = 65¢."},
-      {"id": "m39", "coins": [25, 25, 25, 5, 1], "answer": "81¢", "choices": ["81¢", "82¢"], "why": "25 + 25 + 25 + 5 + 1 = 81¢."}
+      {"id": "m0", "coins": [25, 5, 1], "answer": "$0.31", "choices": ["$0.31", "$0.26"], "why": "25 + 5 + 1 = $0.31."},
+      {"id": "m1", "coins": [25, 25], "answer": "$0.50", "choices": ["$0.50", "$0.49"], "why": "25 + 25 = $0.50."},
+      {"id": "m2", "coins": [25, 5, 5], "answer": "$0.35", "choices": ["$0.35", "$0.45"], "why": "25 + 5 + 5 = $0.35."},
+      {"id": "m3", "coins": [25, 10, 5], "answer": "$0.40", "choices": ["$0.40", "$0.50"], "why": "25 + 10 + 5 = $0.40."},
+      {"id": "m4", "coins": [25, 10, 10, 1, 1], "answer": "$0.47", "choices": ["$0.47", "$0.42"], "why": "25 + 10 + 10 + 1 + 1 = $0.47."},
+      {"id": "m5", "coins": [25, 10, 10, 5], "answer": "$0.50", "choices": ["$0.50", "$0.60"], "why": "25 + 10 + 10 + 5 = $0.50."},
+      {"id": "m6", "coins": [25, 1], "answer": "$0.26", "choices": ["$0.26", "$0.27"], "why": "25 + 1 = $0.26."},
+      {"id": "m7", "coins": [25, 25, 25], "answer": "$0.75", "choices": ["$0.75", "$0.74"], "why": "25 + 25 + 25 = $0.75."},
+      {"id": "m8", "coins": [25, 25, 10, 5, 5], "answer": "$0.70", "choices": ["$0.70", "$0.80"], "why": "25 + 25 + 10 + 5 + 5 = $0.70."},
+      {"id": "m9", "coins": [10, 10, 5, 1], "answer": "$0.26", "choices": ["$0.26", "$0.31"], "why": "10 + 10 + 5 + 1 = $0.26."},
+      {"id": "m10", "coins": [25, 25, 10], "answer": "$0.60", "choices": ["$0.60", "$0.70"], "why": "25 + 25 + 10 = $0.60."},
+      {"id": "m11", "coins": [25, 5, 5, 1, 1], "answer": "$0.37", "choices": ["$0.37", "$0.27"], "why": "25 + 5 + 5 + 1 + 1 = $0.37."},
+      {"id": "m12", "coins": [10, 10, 5], "answer": "$0.25", "choices": ["$0.25", "$0.30"], "why": "10 + 10 + 5 = $0.25."},
+      {"id": "m13", "coins": [25, 25, 5], "answer": "$0.55", "choices": ["$0.55", "$0.60"], "why": "25 + 25 + 5 = $0.55."},
+      {"id": "m14", "coins": [10, 5, 5, 5, 5], "answer": "$0.30", "choices": ["$0.30", "$0.31"], "why": "10 + 5 + 5 + 5 + 5 = $0.30."},
+      {"id": "m15", "coins": [25, 10, 10, 5, 5], "answer": "$0.55", "choices": ["$0.55", "$0.60"], "why": "25 + 10 + 10 + 5 + 5 = $0.55."},
+      {"id": "m16", "coins": [10, 5], "answer": "$0.15", "choices": ["$0.15", "$0.25"], "why": "10 + 5 = $0.15."},
+      {"id": "m17", "coins": [5, 5, 1], "answer": "$0.11", "choices": ["$0.11", "$0.12"], "why": "5 + 5 + 1 = $0.11."},
+      {"id": "m18", "coins": [25, 10, 10, 10], "answer": "$0.55", "choices": ["$0.55", "$0.54"], "why": "25 + 10 + 10 + 10 = $0.55."},
+      {"id": "m19", "coins": [5, 1, 1], "answer": "$0.07", "choices": ["$0.07", "$0.08"], "why": "5 + 1 + 1 = $0.07."},
+      {"id": "m20", "coins": [25, 10, 1, 1], "answer": "$0.37", "choices": ["$0.37", "$0.38"], "why": "25 + 10 + 1 + 1 = $0.37."},
+      {"id": "m21", "coins": [25, 5, 5, 5], "answer": "$0.40", "choices": ["$0.40", "$0.39"], "why": "25 + 5 + 5 + 5 = $0.40."},
+      {"id": "m22", "coins": [10, 10, 10], "answer": "$0.30", "choices": ["$0.30", "$0.25"], "why": "10 + 10 + 10 = $0.30."},
+      {"id": "m23", "coins": [25, 25, 10, 1, 1], "answer": "$0.62", "choices": ["$0.62", "$0.67"], "why": "25 + 25 + 10 + 1 + 1 = $0.62."},
+      {"id": "m24", "coins": [25, 10, 5, 1], "answer": "$0.41", "choices": ["$0.41", "$0.42"], "why": "25 + 10 + 5 + 1 = $0.41."},
+      {"id": "m25", "coins": [25, 10, 5, 5, 1], "answer": "$0.46", "choices": ["$0.46", "$0.45"], "why": "25 + 10 + 5 + 5 + 1 = $0.46."},
+      {"id": "m26", "coins": [25, 10, 10, 10, 10], "answer": "$0.65", "choices": ["$0.65", "$0.66"], "why": "25 + 10 + 10 + 10 + 10 = $0.65."},
+      {"id": "m27", "coins": [1, 1, 1], "answer": "$0.03", "choices": ["$0.03", "$0.13"], "why": "1 + 1 + 1 = $0.03."},
+      {"id": "m28", "coins": [25, 25, 10, 1], "answer": "$0.61", "choices": ["$0.61", "$0.71"], "why": "25 + 25 + 10 + 1 = $0.61."},
+      {"id": "m29", "coins": [10, 1, 1, 1, 1], "answer": "$0.14", "choices": ["$0.14", "$0.04"], "why": "10 + 1 + 1 + 1 + 1 = $0.14."},
+      {"id": "m30", "coins": [5, 5, 1, 1], "answer": "$0.12", "choices": ["$0.12", "$0.22"], "why": "5 + 5 + 1 + 1 = $0.12."},
+      {"id": "m31", "coins": [25, 10], "answer": "$0.35", "choices": ["$0.35", "$0.34"], "why": "25 + 10 = $0.35."},
+      {"id": "m32", "coins": [5, 5, 5], "answer": "$0.15", "choices": ["$0.15", "$0.16"], "why": "5 + 5 + 5 = $0.15."},
+      {"id": "m33", "coins": [10, 5, 5], "answer": "$0.20", "choices": ["$0.20", "$0.15"], "why": "10 + 5 + 5 = $0.20."},
+      {"id": "m34", "coins": [5, 5, 5, 1], "answer": "$0.16", "choices": ["$0.16", "$0.21"], "why": "5 + 5 + 5 + 1 = $0.16."},
+      {"id": "m35", "coins": [25, 10, 5, 5, 5], "answer": "$0.50", "choices": ["$0.50", "$0.55"], "why": "25 + 10 + 5 + 5 + 5 = $0.50."},
+      {"id": "m36", "coins": [25, 25, 10, 5], "answer": "$0.65", "choices": ["$0.65", "$0.60"], "why": "25 + 25 + 10 + 5 = $0.65."},
+      {"id": "m37", "coins": [25, 5], "answer": "$0.30", "choices": ["$0.30", "$0.29"], "why": "25 + 5 = $0.30."},
+      {"id": "m38", "coins": [25, 25, 5, 5, 5], "answer": "$0.65", "choices": ["$0.65", "$0.66"], "why": "25 + 25 + 5 + 5 + 5 = $0.65."},
+      {"id": "m39", "coins": [25, 25, 25, 5, 1], "answer": "$0.81", "choices": ["$0.81", "$0.82"], "why": "25 + 25 + 25 + 5 + 1 = $0.81."}
     ];
     const MONEY_COINS_BY_ID = MONEY_COINS.reduce(function (m, x) { m[x.id] = x; return m; }, {});
     // Telling Time: fixed pool, each item once per pass; two choices.
@@ -10336,12 +10336,12 @@
     function coinGet() { try { return Math.max(0, parseInt(localStorage.getItem(COIN_KEY) || "0", 10) || 0); } catch (e) { return 0; } }
     function coinSet(n) { try { localStorage.setItem(COIN_KEY, String(Math.max(0, n))); } catch (e) {} }
     function coinSpend() { const c = coinGet(); if (c < 1) { say("You need a coin. Get 10 in a row to earn one!"); return false; } coinSet(c - 1); return true; }
-    function coinPill() { const c = coinGet(); return el("p", { class: "coin-bank", role: "status", "aria-label": c + (c === 1 ? " coin" : " coins") }, [el("span", { class: "coin-ico", "aria-hidden": "true", text: "\u00A2" }), el("span", { text: c + (c === 1 ? " coin" : " coins") })]); }
+    function coinPill() { const c = coinGet(); return el("p", { class: "coin-bank", role: "status", "aria-label": c + (c === 1 ? " coin" : " coins") }, [el("span", { class: "coin-ico", "aria-hidden": "true", text: "$" }), el("span", { text: c + (c === 1 ? " coin" : " coins") })]); }
     function coinDrop(preview) {
       if (!preview) { coinSet(coinGet() + 1); say("You got a coin!"); }
       if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
       const old = document.getElementById("coin-drop"); if (old) old.remove();
-      const d = el("div", { id: "coin-drop", class: "coin-drop", "aria-hidden": "true" }, [el("span", { class: "coin-ico big", text: "\u00A2" }), el("span", { class: "coin-plus", text: "+1" })]);
+      const d = el("div", { id: "coin-drop", class: "coin-drop", "aria-hidden": "true" }, [el("span", { class: "coin-ico big", text: "$" }), el("span", { class: "coin-plus", text: "+1" })]);
       document.body.appendChild(d);
       setTimeout(function () { d.remove(); }, 1500);
     }
@@ -10462,7 +10462,7 @@
               if (avatar.owned.indexOf(it.id) < 0) avatar.owned.push(it.id);
               avApply(it); avBounce = true; say("You got " + it.name + "!"); refresh();
             } },
-              [pic, el("span", { class: "av-tile-name", text: it.swatch ? "Color" : it.name }), el("span", { class: "av-tile-lock av-cost", "aria-hidden": "true", text: "\u00A2 1" })]);
+              [pic, el("span", { class: "av-tile-name", text: it.swatch ? "Color" : it.name }), el("span", { class: "av-tile-lock av-cost", "aria-hidden": "true", text: "$1" })]);
             return btn;
           })));
         });
@@ -10926,7 +10926,7 @@
           pill.appendChild(icon);
           pill.appendChild(el("span", { class: "pill-name", text: track.label }));
           if (locked) {
-            pill.appendChild(el("span", { class: "pill-streak pill-cost", text: "\u00A2 1" }));
+            pill.appendChild(el("span", { class: "pill-streak pill-cost", text: "$1" }));
             pill.setAttribute("aria-label", track.label + ", locked. Tap to buy for 1 coin");
             pill.addEventListener("click", function () {
               if (!coinSpend()) return;
@@ -12009,7 +12009,7 @@
       oceanmap: "\uD83D\uDDFA\uFE0F", ocean: "\uD83C\uDF0A", sport: "\u26BD", hawaii: "\uD83C\uDF3A", capital: "\uD83C\uDFDB\uFE0F", state: "\uD83D\uDCCD", element: "\u2697\uFE0F", flag: "\uD83C\uDFF3\uFE0F", flagtrivia: "\uD83D\uDEA9",
       rhyme: "\uD83C\uDFA4", synonym: "\uD83D\uDD04", piano: "\uD83C\uDFB9", instrument: "\uD83C\uDFB8", vehicle: "\uD83D\uDE97", vehicletrivia: "\uD83D\uDE80", wonder: "\uD83D\uDDFF", athlete: "\uD83C\uDFC6",
       nfl: "\uD83C\uDFC8", mlb: "\u26BE", bor: "\uD83D\uDCDC", nounverb: "\uD83C\uDFC3", punct: "\u2757", fragrun: "\u270F\uFE0F", propcom: "\uD83D\uDD24", concab: "\uD83D\uDCA1", cartoon: "\uD83D\uDC2D",
-      fraction: "\uD83C\uDF55", placevalue: "\uD83D\uDCAF", evenodd: "\u2696\uFE0F", prime: "\uD83D\uDD0D", clock: "\u23F0", money: "\uD83E\uDE99", usstate: "\uD83C\uDDFA\uD83C\uDDF8", habitat: "\uD83D\uDC33", measure: "\uD83D\uDCCF", vocabfill: "\uD83D\uDCD6", analogy: "\uD83D\uDD17" };
+      fraction: "\uD83C\uDF55", placevalue: "\uD83D\uDCAF", evenodd: "\u2696\uFE0F", prime: "\uD83D\uDD0D", clock: "\u23F0", money: "\uD83D\uDCB5", usstate: "\uD83C\uDDFA\uD83C\uDDF8", habitat: "\uD83D\uDC33", measure: "\uD83D\uDCCF", vocabfill: "\uD83D\uDCD6", analogy: "\uD83D\uDD17" };
     SCI_OPS.forEach(function (o) { GAME_ICONS[o.id] = SCI_ICONS[o.id.slice(4)] || "\uD83D\uDD2C"; });
     function gameCategory(id) {
       if (id.indexOf("sci-") === 0) return "science";
@@ -12096,7 +12096,7 @@
       if (isEvenodd()) hint = "See a number. Is it even or odd? Even numbers end in 0, 2, 4, 6, or 8.";
       if (isPrime()) hint = "Prime = only 1 and itself go into it. Composite = other numbers go into it too.";
       if (isClock()) hint = "Look at the clock. The short hand is the hour. The long red hand is the minutes.";
-      if (isMoney()) hint = "Add up the coins. Penny 1\u00a2, nickel 5\u00a2, dime 10\u00a2, quarter 25\u00a2.";
+      if (isMoney()) hint = "Add up the coins. Penny $0.01, nickel $0.05, dime $0.10, quarter $0.25.";
       if (isUsstate()) hint = "See a state shape. Which state is it?";
       if (isHabitat()) hint = "See an animal. Does it live on land or in the ocean?";
       if (isAthlete()) hint = "See a photo of a famous player and choose their name. Soccer, football, baseball, basketball and golf.";
@@ -12865,7 +12865,7 @@
       if (b) {
         const row = el("div", { class: "gx-coins" });
         const NAMES = { 1: "penny", 5: "nickel", 10: "dime", 25: "quarter" };
-        b.coins.forEach(function (c) { row.appendChild(el("span", { class: "gx-coin c" + c, "aria-label": NAMES[c] }, [document.createTextNode(c + "\u00a2"), el("small", { text: NAMES[c] })])); });
+        b.coins.forEach(function (c) { row.appendChild(el("span", { class: "gx-coin c" + c, "aria-label": NAMES[c] }, [document.createTextNode(c < 10 ? "$0.0" + c : "$0." + c), el("small", { text: NAMES[c] })])); });
         box.appendChild(row);
       }
       return box;
