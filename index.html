@@ -7832,7 +7832,7 @@
     }
     // Home BGM is always available on setup — never tied to the beat challenge lock.
     function homeMusicShouldPlay() {
-      return !pageAway && state.phase === "setup" && !state.muted && !musicPausedForGame && !state.homeBeat && !state.homeSilenced;
+      return !pageAway && !sayQuiet() && state.phase === "setup" && !state.muted && !musicPausedForGame && !state.homeBeat && !state.homeSilenced;
     }
     // A beat picked on the home screen plays there (instead of the home music).
     function beatOnHome() { return state.phase === "setup" && !!state.homeBeat; }
@@ -8016,6 +8016,12 @@
       writeSave();
       render();
     }
+    // Say It: no beats or home music at all (the mic needs quiet). Leaving Say It brings them back.
+    function sayQuiet() { return location.hash === "#sayit"; }
+    window.addEventListener("hashchange", function () {
+      if (sayQuiet()) { try { if (homeMusic && !homeMusic.paused) homeMusic.pause(); } catch (_) {} try { if (playMusic && !playMusic.paused) playMusic.pause(); } catch (_) {} }
+      else setTimeout(function () { try { syncHomeMusic(); syncPlayMusic(); updateMuteButton(); } catch (_) {} }, 0);
+    });
     function ensurePlayMusic() {
       const meta = playTrackMeta();
       if (!meta || !meta.file) {
@@ -8050,7 +8056,7 @@
       document.addEventListener("keydown", unlockPlayMusic, true);
     }
     function tryPlayPlayMusic() {
-      if (pageAway) return;
+      if (pageAway || sayQuiet()) return;
       const audio = ensurePlayMusic();
       if (!audio) return;
       const playAttempt = audio.play();
@@ -8075,7 +8081,7 @@
       }
       const audio = ensurePlayMusic();
       if (!audio) return;
-      const shouldPlay = !pageAway && beatMusicPhase() && !state.muted && !musicPausedForGame && !(state.beatStopped && state.phase !== "setup");
+      const shouldPlay = !pageAway && !sayQuiet() && beatMusicPhase() && !state.muted && !musicPausedForGame && !(state.beatStopped && state.phase !== "setup");
       if (!shouldPlay) {
         unbindPlayMusicUnlock();
         if (!audio.paused) audio.pause();
