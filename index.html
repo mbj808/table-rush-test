@@ -3384,6 +3384,37 @@
     .si-no { min-height: 3.6rem; border-radius: 0.9rem; border: 2px solid rgba(255,255,255,0.6); background: transparent; color: #fff; font: 800 1.3rem/1 var(--ui-font); cursor: pointer; }
     .si-ask { text-align: center; font-size: 1rem; opacity: 0.9; }
     .av-signnote { margin: 0.3rem 0 0; text-align: center; font: 700 1rem/1.2 var(--ui-font); color: #ffe39a; }
+    /* Say It (voice mode) */
+    .home-fc-row > .home-bb.home-say, .home-fc-row > .home-bb.home-say:hover { grid-column: 1 / -1; background: linear-gradient(135deg, #3b2a8a 0%, #1b6fd1 60%, #12c2c9 100%); color: #fff; box-shadow: 0 4px 0 #14245e, 0 0 16px rgba(80, 180, 255, 0.45); }
+    .home-fc-row > .home-say.say-off { opacity: 0.55; filter: grayscale(0.5); }
+    .say-menu-note { grid-column: 1 / -1; margin: 0; text-align: center; font: 700 0.95rem/1.2 var(--ui-font); color: #ffe39a; }
+    .say-card { position: relative; overflow: hidden; min-height: 70vh; padding: 1rem; background: #070a1c; border-radius: 1.2rem; }
+    .say-net { position: absolute; inset: 0; width: 100%; height: 100%; display: block; z-index: 0; pointer-events: none; }
+    .say-live { position: relative; z-index: 1; }
+    .say-in { display: flex; flex-direction: column; align-items: center; gap: 0.8rem; color: #fff; text-align: center; }
+    .say-mic { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; border-radius: 999px; border: 2px solid rgba(255,255,255,0.4); background: rgba(10,14,40,0.75); color: #fff; font: 700 1rem/1.2 var(--ui-font); }
+    .say-dot { width: 0.8rem; height: 0.8rem; border-radius: 50%; background: #888; flex: none; }
+    .say-mic.on .say-dot { background: #ff4d6d; box-shadow: 0 0 10px #ff4d6d; animation: sayDot 1.2s ease-in-out infinite; }
+    .say-mic.denied { border-color: #ffb36b; }
+    @keyframes sayDot { 50% { opacity: 0.4; } }
+    .say-streak { font: 800 1.1rem/1 var(--ui-font); color: #9ff3ff; }
+    .say-q { font: 900 clamp(2.6rem, 11vw, 4.5rem)/1.1 var(--ui-font); text-shadow: 0 0 18px rgba(95,242,255,0.6); }
+    .say-q.shake { animation: sayShake 0.45s ease-in-out; }
+    @keyframes sayShake { 20%, 60% { transform: translateX(-8px); } 40%, 80% { transform: translateX(8px); } }
+    .say-tip { margin: 0; font: 700 1rem/1.3 var(--ui-font); color: #d8e4ff; }
+    .say-heard { min-height: 2.6rem; padding: 0.5rem 1rem; border-radius: 0.8rem; background: rgba(10,14,40,0.7); font: 600 1.1rem/1.3 var(--ui-font); max-width: 100%; overflow-wrap: anywhere; }
+    .say-heard-l { opacity: 0.7; }
+    .say-msg { padding: 0.5rem 1rem; border-radius: 0.8rem; font: 800 1.15rem/1.3 var(--ui-font); }
+    .say-msg.right { background: rgba(47,191,106,0.85); }
+    .say-msg.wrong { background: rgba(224,69,58,0.85); }
+    .say-msg.again { background: rgba(255,179,107,0.9); color: #241944; }
+    .say-h { margin: 0.5rem 0; text-align: center; color: #fff; }
+    .say-note { text-align: center; color: #fff; font: 700 1.05rem/1.3 var(--ui-font); }
+    .say-gate { display: flex; gap: 0.5rem; justify-content: center; }
+    .say-code { font: 700 1.2rem/1 var(--ui-font); padding: 0.6rem 0.8rem; border-radius: 0.8rem; border: 2px solid #9ff3ff; width: 10rem; }
+    .say-go { font: 800 1.2rem/1 var(--ui-font); padding: 0.6rem 1.2rem; border-radius: 0.8rem; border: 0; background: #ffd23f; color: #241944; }
+    .say-err { text-align: center; color: #ffb36b; font-weight: 800; }
+    @media (prefers-reduced-motion: reduce) { .say-mic.on .say-dot, .say-q.shake { animation: none; } }
     /* Head to Head */
     body.h2h-on header, body.h2h-on .page-head, body.h2h-on footer, body.h2h-on .boombox, body.h2h-on .test-banner { display: none !important; }
     .h2h-full { position: fixed; inset: 0; z-index: 9000; max-width: none; margin: 0; padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom); gap: 0; background: #140f28; display: flex; flex-direction: column; }
@@ -9000,6 +9031,7 @@
       if (page === "closet") { stack.appendChild(closetCard()); app.appendChild(stack); return; }
       if (page === "bricks") { stack.appendChild(bricksCard()); app.appendChild(stack); return; }
       if (page === "h2h") { stack.appendChild(h2hCard()); app.appendChild(stack); return; }
+      if (page === "sayit") { stack.appendChild(sayCard()); app.appendChild(stack); return; }
       if (page === "grammar") { stack.appendChild(grCard()); app.appendChild(stack); return; }
       if (page === "signin") { stack.appendChild(siCard()); app.appendChild(stack); return; }
       if (page === "leaders") { stack.appendChild(leaderboardCard()); app.appendChild(stack); return; }
@@ -9413,7 +9445,7 @@
     function myPtsSync() {
       let pill = document.getElementById("my-pts");
       const pg = document.body.dataset.page;
-      const show = !!(LEADERBOARD_URL && lbMe() && (pg === "play" || pg === "bricks" || pg === "h2h" || pg === "grammar"));
+      const show = !!(LEADERBOARD_URL && lbMe() && (pg === "play" || pg === "bricks" || pg === "h2h" || pg === "sayit" || pg === "grammar"));
       if (!show) { if (pill) pill.hidden = true; return; }
       if (!lb.board && !lb.loading && !lb.failed && !lb.ptsAsked) { lb.ptsAsked = true; lbRefresh(); }
       if (!pill) { pill = document.createElement("div"); pill.id = "my-pts"; pill.setAttribute("role", "status"); document.body.appendChild(pill); }
@@ -10996,8 +11028,8 @@
       paintAll();
       return card;
     }
-    const PAGES = ["menu", "beats", "backgrounds", "games", "minigames", "leaders", "closet", "bricks", "h2h", "grammar", "signin"];
-    const PAGE_TITLES = { beats: "Beats", backgrounds: "Backgrounds", games: "Fact Challenge", minigames: "Mini Games", leaders: "Leaders", closet: "Avatar", bricks: "Brick by Brick", h2h: "Head to Head", grammar: "Grammar", signin: "Your class" };
+    const PAGES = ["menu", "beats", "backgrounds", "games", "minigames", "leaders", "closet", "bricks", "h2h", "sayit", "grammar", "signin"];
+    const PAGE_TITLES = { beats: "Beats", backgrounds: "Backgrounds", games: "Fact Challenge", minigames: "Mini Games", leaders: "Leaders", closet: "Avatar", bricks: "Brick by Brick", h2h: "Head to Head", sayit: "Say It", grammar: "Grammar", signin: "Your class" };
     let menuSmooth = false;
     function currentPage() {
       const h = (location.hash || "").replace(/^#/, "");
@@ -11096,6 +11128,13 @@
           el("span", { class: "hb-label", text: "Head to Head" }),
           el("span", { class: "hb-go", "aria-hidden": "true", text: "\u203A" })
         ]));
+        fcRow.appendChild(el("button", { type: "button", class: "menu-lb home-bb home-say" + (SAY_SR ? "" : " say-off"), "aria-label": SAY_SR ? "Say It" : "Say It, needs a browser that can listen",
+          onClick: function () { if (!SAY_SR) { say("Say It needs a browser that can listen, like Chrome or Safari."); const n = document.querySelector(".say-menu-note"); if (n) n.hidden = false; return; } goPage("sayit"); } }, [
+          el("span", { class: "menu-lb-ico", "aria-hidden": "true", text: "\uD83C\uDFA4" }),
+          el("span", { class: "hb-label", text: "Say It" }),
+          el("span", { class: "hb-go", "aria-hidden": "true", text: "\u203A" })
+        ]));
+        if (!SAY_SR) { const n = el("p", { class: "say-menu-note", text: "Say It needs a browser that can listen, like Chrome or Safari." }); n.hidden = true; fcRow.appendChild(n); }
       }
       sec.appendChild(fcRow);
       // 4. Beats, Backgrounds, Mini Games
@@ -11904,6 +11943,249 @@
         answers.appendChild(el("button", { type: "button", class: cls, onClick: function () { bbAnswer(c); } }, [el("span", { text: String(c) })]));
       });
       card.appendChild(answers);
+      return card;
+    }
+    // ===== Say It: voice mode for x facts. Kid says the whole fact and answer ("7 times 8 is 56"). Unlock code O'ahu, kept on this device. =====
+    const SAY_KEY = "tr-sayit-unlock";
+    const SAY_SR = window.SpeechRecognition || window.webkitSpeechRecognition || null;
+    const sayG = { rec: null, on: false, want: false, denied: false, heard: "", status: "off", prob: null, streak: 0, right: 0, lock: 0, seen: 0, msg: "", msgKind: "", err: "", net: null, codeErr: "" };
+    function sayUnlocked() { try { return localStorage.getItem(SAY_KEY) === "1"; } catch (e) { return false; } }
+    function sayCodeOk(v) { return String(v || "").toLowerCase().replace(/[\s'\u2018\u2019\u02BB\u02BC`\u00B4\-.]/g, "") === "oahu"; }
+    // ---- Spoken numbers -> list of numbers in order ----
+    const SAY_ONES = { zero: 0, oh: 0, one: 1, won: 1, two: 2, to: 2, too: 2, three: 3, four: 4, for: 4, five: 5, six: 6, seven: 7, eight: 8, ate: 8, nine: 9, ten: 10, eleven: 11, twelve: 12, thirteen: 13, fourteen: 14, fifteen: 15, sixteen: 16, seventeen: 17, eighteen: 18, nineteen: 19 };
+    const SAY_TENS = { twenty: 20, thirty: 30, forty: 40, fourty: 40, fifty: 50, sixty: 60, seventy: 70, eighty: 80, ninety: 90 };
+    function sayWordNum(w) {
+      if (SAY_ONES.hasOwnProperty(w)) return SAY_ONES[w];
+      if (SAY_TENS.hasOwnProperty(w)) return SAY_TENS[w];
+      // plurals like "eights", "sixes", "8s"
+      let m = /^(\d+)'?s$/.exec(w); if (m) return +m[1];
+      const base = w.replace(/'?e?s$/, "");
+      if (SAY_ONES.hasOwnProperty(base) && base.length > 2) return SAY_ONES[base];
+      if (SAY_ONES.hasOwnProperty(w.replace(/s$/, "")) && w.length > 3) return SAY_ONES[w.replace(/s$/, "")];
+      return null;
+    }
+    function sayNums(text) {
+      const t = String(text || "").toLowerCase().replace(/(\d),(\d{3})/g, "$1$2").replace(/[\u00D7*]/g, " x ").replace(/(\d)\s*x\s*(\d)/g, "$1 x $2").replace(/(\d)([a-z])/g, function (s, d, l) { return l === "s" ? s : d + " " + l; }).replace(/[-=?!.,:;]/g, " ");
+      const toks = t.split(/\s+/).filter(Boolean), out = [];
+      let cur = null, lastWasTen = false;
+      const flush = function () { if (cur != null) out.push(cur); cur = null; lastWasTen = false; };
+      toks.forEach(function (w) {
+        if (/^\d+$/.test(w)) { flush(); out.push(+w); return; }
+        if (w === "hundred" && cur != null) { cur *= 100; lastWasTen = false; return; }
+        if (w === "and" && cur != null && cur >= 100) return;
+        const v = sayWordNum(w);
+        if (v == null) { flush(); return; }
+        if (cur != null && cur >= 100 && cur % 100 === 0 && v < 100) { cur += v; lastWasTen = v >= 20 && v % 10 === 0; return; }
+        if (cur != null && lastWasTen && v < 10) { cur += v; lastWasTen = false; return; }
+        flush(); cur = v; lastWasTen = v >= 20;
+      });
+      flush();
+      return out;
+    }
+    // "right" | "wrong" | "again" for one transcript
+    function sayJudge(text, a, b) {
+      const p = a * b, n = sayNums(text);
+      if (!n.length) return "again";
+      const digits = n.join(""), ab = "" + a + b, ba = "" + b + a;
+      const has = function (arr, x, y) { const i = arr.indexOf(x); if (i < 0) return -1; const j = arr.indexOf(y, x === y ? i + 1 : 0); if (j < 0) return -1; return Math.max(i, j); };
+      const at = Math.max(-1, has(n, a, b));
+      if (at >= 0) {
+        const rest = n.slice(at + 1);
+        if (rest.indexOf(p) >= 0) return "right";
+        if (rest.length) return "wrong";
+        return "again";
+      }
+      if (digits.indexOf(ab + p) >= 0 || digits.indexOf(ba + p) >= 0) return "right";
+      // run-together like "78 54": starts with the two factors, then a different answer
+      const d0 = digits.indexOf(ab) === 0 ? ab : digits.indexOf(ba) === 0 ? ba : "";
+      if (d0 && digits.length > d0.length && n.length >= 2 && String(n[0]) === d0) return "wrong";
+      return "again";
+    }
+    function sayJudgeAll(alts, a, b) {
+      let best = "again";
+      for (let i = 0; i < alts.length; i++) { const r = sayJudge(alts[i], a, b); if (r === "right") return "right"; if (r === "wrong") best = "wrong"; }
+      return best;
+    }
+    // ---- Facts: same picker as normal multiplication mode ----
+    function sayNext() {
+      const keep = { operation: state.operation, mode: state.mode, drill: state.drill, tables: state.tables.slice() };
+      try {
+        if (state.operation !== "multiply") state.tables = defaultMathTables();
+        state.operation = "multiply"; state.mode = "product"; state.drill = null;
+        sayG.prob = makeProblem(sayG.prob && sayG.prob.key);
+      } catch (e) { const a = 2 + Math.floor(Math.random() * 11), b = 2 + Math.floor(Math.random() * 11); sayG.prob = { a: a, b: b, product: a * b, answer: a * b, operation: "multiply", mode: "product", key: a + "x" + b }; }
+      finally { state.operation = keep.operation; state.mode = keep.mode; state.drill = keep.drill; state.tables = keep.tables; }
+      sayG.lock = 0;
+    }
+    // ---- Mic ----
+    function sayMicStart() {
+      if (!SAY_SR || sayG.denied) return;
+      sayG.want = true;
+      if (sayG.on) return;
+      try {
+        const r = sayG.rec || (sayG.rec = new SAY_SR());
+        r.lang = "en-US"; r.continuous = true; r.interimResults = true; r.maxAlternatives = 5;
+        r.onstart = function () { sayG.on = true; sayG.status = "on"; sayG.seen = 0; sayPaint(); };
+        r.onresult = sayOnResult;
+        r.onerror = function (e) {
+          if (e && (e.error === "not-allowed" || e.error === "service-not-allowed")) { sayG.denied = true; sayG.want = false; sayG.status = "denied"; sayPaint(); }
+        };
+        r.onend = function () { sayG.on = false; sayG.status = sayG.denied ? "denied" : "off"; if (sayG.want && !sayG.denied && document.body.dataset.page === "sayit") setTimeout(sayMicStart, 250); sayPaint(); };
+        r.start();
+      } catch (e) { setTimeout(function () { if (sayG.want && !sayG.on) sayMicStart(); }, 600); }
+    }
+    function sayMicStop() { sayG.want = false; if (sayG.rec) try { sayG.rec.abort(); } catch (e) {} sayG.on = false; sayG.status = "off"; }
+    window.addEventListener("hashchange", function () { if (location.hash !== "#sayit") sayMicStop(); });
+    document.addEventListener("visibilitychange", function () { if (document.hidden) { if (sayG.want) { sayMicStop(); sayG.want = true; } } else if (sayG.want && document.body.dataset.page === "sayit") sayMicStart(); });
+    function sayOnResult(ev) {
+      const p = sayG.prob; if (!p) return;
+      for (let i = Math.max(ev.resultIndex || 0, sayG.seen); i < ev.results.length; i++) {
+        const res = ev.results[i], alts = [];
+        for (let k = 0; k < res.length; k++) if (res[k] && res[k].transcript) alts.push(res[k].transcript);
+        if (!alts.length) continue;
+        sayG.heard = alts[0].trim();
+        if (performance.now() < sayG.lock) { if (res.isFinal) sayG.seen = i + 1; continue; }
+        const v = sayJudgeAll(alts, p.a, p.b);
+        // Interim results count only when right (fast); wrong or unclear waits for the final words.
+        if (v === "right" || res.isFinal) { sayG.seen = i + 1; sayAnswer(v); if (v !== "again") return; }
+      }
+      sayPaint();
+    }
+    function sayAnswer(v) {
+      const p = sayG.prob;
+      if (v === "again") { sayG.msg = "Try again \u2014 say the whole fact, like \u201C" + p.a + " times " + p.b + " is \u2026\u201D"; sayG.msgKind = "again"; sayPaint(); return; }
+      const ok = v === "right";
+      try { learnMark(p, ok); } catch (e) {}
+      lbPoint(ok, "multiply");
+      if (ok) {
+        sayG.streak += 1; sayG.right += 1;
+        buddyMood(sayG.streak % AV_PRIZE_EVERY === 0 ? "cheer" : "hop");
+        if (sayG.streak % AV_PRIZE_EVERY === 0) setTimeout(coinDrop, 300);
+        sayG.msg = "\u2705 " + p.a + " \u00D7 " + p.b + " = " + p.product + "!"; sayG.msgKind = "right";
+        sayNetFire(true);
+        try { playTone(true); } catch (e) {}
+        sayG.lock = performance.now() + 900;
+        setTimeout(function () { sayNext(); sayG.heard = ""; sayG.msg = ""; sayPaint(); }, 700);
+      } else {
+        if (sayG.streak > 0) lbStreakEnded(sayG.streak, "multiply");
+        sayG.streak = 0;
+        buddyMood("shake");
+        sayG.msg = "Not quite. " + p.a + " \u00D7 " + p.b + " = " + p.product + ". Next one!"; sayG.msgKind = "wrong";
+        sayNetFire(false);
+        try { playTone(false); } catch (e) {}
+        sayG.lock = performance.now() + 2200;
+        setTimeout(function () { sayNext(); sayG.heard = ""; sayG.msg = ""; sayPaint(); }, 2000);
+      }
+      sayPaint();
+    }
+    // ---- Neural network background (one canvas kept across renders) ----
+    const SAY_CALM = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+    function sayNetInit() {
+      if (sayG.net) return sayG.net;
+      const cv = document.createElement("canvas"); cv.className = "say-net"; cv.setAttribute("aria-hidden", "true");
+      const N = { cv: cv, nodes: [], edges: [], sparks: [], flick: 0, raf: 0, last: 0 };
+      for (let i = 0; i < 16; i++) N.nodes.push({ x: 0.06 + Math.random() * 0.88, y: 0.06 + Math.random() * 0.88, r: 2 + Math.random() * 2.5, ph: Math.random() * 6.3 });
+      for (let i = 0; i < 6; i++) sayNetLink(N);
+      sayG.net = N; return N;
+    }
+    function sayNetLink(N) {
+      if (N.nodes.length < 60 && N.edges.length % 3 === 2) N.nodes.push({ x: 0.06 + Math.random() * 0.88, y: 0.06 + Math.random() * 0.88, r: 2 + Math.random() * 2.5, ph: Math.random() * 6.3, born: performance.now() });
+      const L = N.nodes.length;
+      for (let t = 0; t < 30; t++) {
+        const i = Math.floor(Math.random() * L), j = Math.floor(Math.random() * L);
+        if (i === j) continue;
+        const dx = N.nodes[i].x - N.nodes[j].x, dy = N.nodes[i].y - N.nodes[j].y;
+        if (dx * dx + dy * dy > 0.16) continue;
+        if (N.edges.some(function (e) { return (e.i === i && e.j === j) || (e.i === j && e.j === i); })) continue;
+        const e = { i: i, j: j, born: performance.now() }; N.edges.push(e); return e;
+      }
+      return null;
+    }
+    function sayNetFire(ok) {
+      const N = sayNetInit();
+      if (ok) {
+        const e = sayNetLink(N) || N.edges[Math.floor(Math.random() * N.edges.length)];
+        if (e) N.sparks.push({ e: e, t0: performance.now() });
+      } else N.flick = performance.now();
+      sayNetKick();
+    }
+    function sayNetKick() { const N = sayG.net; if (!N) return; if (SAY_CALM) { sayNetDraw(performance.now()); return; } if (!N.raf) N.raf = requestAnimationFrame(sayNetTick); }
+    function sayNetTick(now) {
+      const N = sayG.net; N.raf = 0;
+      if (!N.cv.isConnected || document.hidden) return;
+      if (now - N.last > 45) { N.last = now; sayNetDraw(now); }   // ~22 fps is plenty, light for old iPads
+      N.raf = requestAnimationFrame(sayNetTick);
+    }
+    function sayNetDraw(now) {
+      const N = sayG.net, cv = N.cv, dpr = Math.min(2, window.devicePixelRatio || 1);
+      const w = cv.clientWidth || 300, h = cv.clientHeight || 300;
+      if (cv.width !== Math.round(w * dpr) || cv.height !== Math.round(h * dpr)) { cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr); }
+      const c = cv.getContext("2d"); c.setTransform(dpr, 0, 0, dpr, 0, 0);
+      c.fillStyle = "#070a1c"; c.fillRect(0, 0, w, h);
+      const glow = Math.min(1, 0.3 + N.edges.length * 0.025), fl = now - N.flick < 600 ? 0.55 + 0.45 * Math.abs(Math.cos((now - N.flick) / 50)) : 1;
+      c.lineWidth = 1.4;
+      N.edges.forEach(function (e) {
+        const a = N.nodes[e.i], b = N.nodes[e.j], fresh = Math.max(0, 1 - (now - e.born) / 1500);
+        c.strokeStyle = "rgba(95,242,255," + ((0.12 + 0.35 * glow + 0.5 * fresh) * fl).toFixed(3) + ")";
+        c.beginPath(); c.moveTo(a.x * w, a.y * h); c.lineTo(b.x * w, b.y * h); c.stroke();
+      });
+      N.nodes.forEach(function (n) {
+        const pulse = SAY_CALM ? 0.8 : 0.65 + 0.35 * Math.sin(now / 900 + n.ph);
+        const al = (0.35 + 0.6 * glow) * pulse * fl;
+        c.fillStyle = "rgba(160,120,255," + (al * 0.25).toFixed(3) + ")"; c.beginPath(); c.arc(n.x * w, n.y * h, n.r * 3.2, 0, 6.283); c.fill();
+        c.fillStyle = "rgba(200,240,255," + al.toFixed(3) + ")"; c.beginPath(); c.arc(n.x * w, n.y * h, n.r, 0, 6.283); c.fill();
+      });
+      N.sparks = N.sparks.filter(function (s) {
+        const k = (now - s.t0) / 700; if (k > 1) return false;
+        const a = N.nodes[s.e.i], b = N.nodes[s.e.j], x = (a.x + (b.x - a.x) * k) * w, y = (a.y + (b.y - a.y) * k) * h;
+        c.fillStyle = "rgba(255,240,150,0.35)"; c.beginPath(); c.arc(x, y, 9, 0, 6.283); c.fill();
+        c.fillStyle = "#fff6c0"; c.beginPath(); c.arc(x, y, 3.5, 0, 6.283); c.fill();
+        return true;
+      });
+    }
+    // ---- UI ----
+    function sayPaint() {
+      const host = document.querySelector(".say-live"); if (!host) return;
+      host.replaceChildren(sayLive());
+    }
+    function sayLive() {
+      const p = sayG.prob, box = el("div", { class: "say-in" });
+      const micTxt = sayG.status === "on" ? "Listening\u2026" : sayG.status === "denied" ? "Mic is blocked. Allow the microphone in your browser settings, then tap here." : "Mic is off. Tap to turn it on.";
+      box.appendChild(el("button", { type: "button", class: "say-mic " + sayG.status, "aria-live": "polite", onClick: function () { sayG.denied = false; sayMicStart(); } }, [el("span", { class: "say-dot", "aria-hidden": "true" }), el("span", { text: "\uD83C\uDFA4 " + micTxt })]));
+      box.appendChild(el("div", { class: "say-streak", text: sayG.streak + " in a row" }));
+      const q = el("div", { class: "say-q" + (sayG.msgKind === "wrong" ? " shake" : ""), text: p ? p.a + " \u00D7 " + p.b + " = ?" : "" });
+      box.appendChild(withBuddy(q));
+      box.appendChild(el("p", { class: "say-tip", text: "Say the whole fact, like \u201C7 times 8 is 56\u201D." }));
+      box.appendChild(el("div", { class: "say-heard", "aria-live": "polite" }, [el("span", { class: "say-heard-l", text: "I heard: " }), el("b", { text: sayG.heard ? "\u201C" + sayG.heard + "\u201D" : "\u2026" })]));
+      if (sayG.msg) box.appendChild(el("div", { class: "say-msg " + sayG.msgKind, role: "status", text: sayG.msg }));
+      return box;
+    }
+    function sayCard() {
+      const card = el("section", { class: "card say-card" });
+      if (!SAY_SR) {
+        card.appendChild(el("p", { class: "say-note", text: "Say It needs a browser that can listen, like Chrome or Safari. Try it on another device!" }));
+        return card;
+      }
+      if (!sayUnlocked()) {
+        sayMicStop();
+        const inp = el("input", { type: "text", class: "say-code", placeholder: "Code", autocomplete: "off", autocapitalize: "off", spellcheck: "false", "aria-label": "Say It code" });
+        const go = function () {
+          if (sayCodeOk(inp.value)) { try { localStorage.setItem(SAY_KEY, "1"); } catch (e) {} sayG.codeErr = ""; render(); }
+          else { sayG.codeErr = "That's not the code. Ask your teacher!"; render(); }
+        };
+        inp.addEventListener("keydown", function (e) { if (e.key === "Enter") go(); });
+        card.appendChild(el("h2", { class: "say-h", text: "\uD83C\uDFA4 Say It" }));
+        card.appendChild(el("p", { class: "say-note", text: "Enter the code to play." }));
+        card.appendChild(el("div", { class: "say-gate" }, [inp, el("button", { type: "button", class: "say-go", text: "Go", onClick: go })]));
+        if (sayG.codeErr) card.appendChild(el("p", { class: "say-err", role: "alert", text: sayG.codeErr }));
+        setTimeout(function () { try { inp.focus(); } catch (e) {} }, 50);
+        return card;
+      }
+      if (!sayG.prob) sayNext();
+      const N = sayNetInit();
+      card.appendChild(N.cv);
+      card.appendChild(el("div", { class: "say-live" }, [sayLive()]));
+      setTimeout(function () { sayNetKick(); sayNetDraw(performance.now()); sayMicStart(); }, 0);
       return card;
     }
     // ===== Head to Head: two kids race the same facts. No beats or items. Points: +1 per right, +15 to the winner, saved for signed-in players. =====
