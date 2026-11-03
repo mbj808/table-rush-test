@@ -10491,7 +10491,7 @@
       copy.wear[it.slot] = itemId;
       return copy;
     }
-    // ---- Prize: every 10 in a row, pick anything from the full list. Gold items need a streak of 50+. ----
+    // ---- Prize: every 10 in a row, pick anything from the full list. Gold items too (no streak gate). ----
     const AV_PRIZE_EVERY = 10;
     // A beat unlock can land on the same streak: wait for its burst / congrats popup to finish, then show the prize.
     function avPrizeWhenClear(at, tries) {
@@ -10504,7 +10504,7 @@
     function avAll(cat) {
       return AV_LOOK.filter(function (i) { return i.cat === cat; }).concat(AV_ITEMS.filter(function (i) { return i.slot === cat && !i.pack; }));
     }
-    function avCanWin(it) { return !avOwns(it.id) && (!it.gold || avatar.pg); }
+    function avCanWin(it) { return !avOwns(it.id); }
     function avAnyToWin() { return AV_CATS.some(function (c) { return avAll(c[0]).some(avCanWin); }); }
     function avPreview(it) {
       const a = Object.assign({}, avatar);
@@ -10537,7 +10537,7 @@
       wrap.appendChild(tabs);
       const grid = el("div", { class: "pz-grid" });
       avAll(avTab).forEach(function (it) {
-        const have = avOwns(it.id), goldLock = !have && it.gold && !avatar.pg;
+        const have = avOwns(it.id), goldLock = false;
         const pic = it.swatch ? el("span", { class: "pz-swatch", style: "background:" + it.swatch }) : avNode(avPreview(it), 56);
         const kids = [pic, el("span", { class: "pz-name", text: it.name })];
         if (have) kids.push(el("span", { class: "pz-badge ok", text: "\u2713" }));
