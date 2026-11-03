@@ -3627,6 +3627,14 @@
     .shp-sim { position: fixed; right: 10px; left: 10px; bottom: calc(env(safe-area-inset-bottom, 0px) + 68px); z-index: 60; max-width: 24rem; margin-left: auto; }
     .shp-sim[hidden] { display: none; }
     @media (prefers-reduced-motion: reduce) { .shp-hero.bounce .av, .shp-card:active { animation: none; transform: none; } }
+    .hd-av { position: relative; display: inline-block; }
+    .hd-av img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; pointer-events: none; user-select: none; }
+    .shp-hero .hd-av { display: block; }
+    .shp-stage.hd .shp-hero { bottom: calc(var(--pb) + 4px); }
+    .shp-mode { position: absolute; top: 10px; right: 10px; z-index: 2; min-height: 44px; padding: 0 .9rem; border-radius: 999px; border: 3px solid #fff3a0; background: linear-gradient(#ff7ab8, #8a4dff); color: #fff; font: 900 .95rem/1 var(--ui-font); box-shadow: 0 3px 0 #4a2a9a; cursor: pointer; }
+    .shp-mode[hidden] { display: none; }
+    .shp-pack.hdpk { background: linear-gradient(135deg, #12c2e9, #c471ed 55%, #f64f59); box-shadow: 0 5px 0 rgba(0,0,0,.35), 0 0 18px rgba(196,113,237,.7); }
+    .shp-card .hd-av { margin: 0 auto; }
     .av-shake { animation: avShake .4s ease; }
     @keyframes avShake { 0%, 100% { transform: translateX(0); } 20% { transform: translateX(-6px); } 40% { transform: translateX(6px); } 60% { transform: translateX(-4px); } 80% { transform: translateX(4px); } }
     .coin-bump { animation: coinBump .35s ease-out; }
@@ -10013,6 +10021,37 @@
     // An avatar exists once the kid has made one, won anything, or opened their look in the Closet.
     function avHas() { return !!(avatar.made || avatar.owned.length); }
     function avOwns(id) { return !id || AV_FREE.indexOf(id) >= 0 || avatar.owned.indexOf(id) >= 0; }
+    // ---- HD avatar (test site starter set). Saved as avatar.hd = { o: owned ids, w: {slot: id}, b: body id, on: 1 when shown }.
+    const HD_PACK_COST = 250, HD_PIECE_COST = 5, HD_DIR = "./assets/hd/";
+    const HD_ITEMS = [
+      { id: "xbA", slot: "look", name: "Sunny", f: "bodyA", free: 1 }, { id: "xbB", slot: "look", name: "Cocoa", f: "bodyB" },
+      { id: "xcap", slot: "hat", name: "Blue cap", f: "cap" }, { id: "xwiz", slot: "hat", name: "Star wizard hat", f: "wizhat" },
+      { id: "xhood", slot: "shirt", name: "Red hoodie", f: "hoodie" }, { id: "xstar", slot: "shirt", name: "Star tee", f: "star" },
+      { id: "xheart", slot: "glasses", name: "Heart shades", f: "heart" }, { id: "xround", slot: "glasses", name: "Gold specs", f: "round" },
+      { id: "xsneak", slot: "shoes", name: "Red sneakers", f: "sneak" }, { id: "xboot", slot: "shoes", name: "Rain boots", f: "boots" },
+      { id: "xpup", slot: "pet", name: "Puppy", f: "pup" }, { id: "xkit", slot: "pet", name: "Kitten", f: "kit" },
+      { id: "xice", slot: "hand", name: "Ice cream", f: "ice" }, { id: "xbal", slot: "hand", name: "Balloon", f: "bal" }
+    ];
+    const HD_ORDER = ["shoes", "shirt", "pet", "hand", "glasses", "hat"];
+    function hdItem(id) { return HD_ITEMS.find(function (i) { return i.id === id; }) || null; }
+    function hdClean(h) {
+      h = h && typeof h === "object" ? h : {};
+      const o = Array.isArray(h.o) ? h.o.filter(function (id, i, arr) { const it = hdItem(id); return it && !it.free && arr.indexOf(id) === i; }) : [];
+      const w = {};
+      Object.keys(h.w || {}).forEach(function (k) { const it = hdItem(h.w[k]); if (it && it.slot === k && k !== "look" && o.indexOf(it.id) >= 0) w[k] = it.id; });
+      const b = hdItem(h.b) && (hdItem(h.b).free || o.indexOf(h.b) >= 0) ? h.b : "xbA";
+      return { o: o, w: w, b: b, on: h.on ? 1 : 0 };
+    }
+    function hdHas(id) { const it = hdItem(id); return !!it && (it.free || avatar.hd.o.indexOf(id) >= 0); }
+    function hdOn() { return avatar.pk.indexOf("hd") >= 0 && avatar.hd.on === 1; }
+    // Stacked transparent WebP layers on one fixed 512x750 template. Images load only when this is called.
+    function hdNode(h, size) {
+      const box = el("span", { class: "hd-av", style: "width:" + Math.round(size * 0.683) + "px;height:" + size + "px" });
+      const add = function (f) { box.appendChild(el("img", { src: HD_DIR + f + ".webp", alt: "", decoding: "async", draggable: "false" })); };
+      add((hdItem(h.b) || HD_ITEMS[0]).f);
+      HD_ORDER.forEach(function (k) { const it = h.w[k] && hdItem(h.w[k]); if (it) add(it.f); });
+      return box;
+    }
     function avClean(a) {
       a = a && typeof a === "object" ? a : {};
       const ok = function (list, v, d) { return list.some(function (x) { return x[0] === v; }) ? v : d; };
@@ -10029,7 +10068,8 @@
         color: AV_COLORS.indexOf(a.color) >= 0 ? a.color : AV_COLORS[3], face: ok(AV_FACES, a.face, "smile"),
         hair: ok(AV_HAIRS, a.hair, "none"), hairColor: AV_HAIR_COLORS.indexOf(a.hairColor) >= 0 ? a.hairColor : AV_HAIR_COLORS[1], wear: wear, owned: owned,
         pz: Math.max(0, Math.min(99, Number(a.pz) || 0)), pg: a.pg ? 1 : 0,
-        pk: Array.isArray(a.pk) ? a.pk.filter(function (k, i, arr) { return AV_PACKS.some(function (x) { return x[0] === k; }) && arr.indexOf(k) === i; }) : [],
+        pk: Array.isArray(a.pk) ? a.pk.filter(function (k, i, arr) { return (k === "hd" || AV_PACKS.some(function (x) { return x[0] === k; })) && arr.indexOf(k) === i; }) : [],
+        hd: hdClean(a.hd),
         updated: Number(a.updated) || 0 };
     }
     let avatar = (function () { try { return avClean(JSON.parse(localStorage.getItem(AV_KEY) || "null")); } catch (e) { return avClean(null); } })();
@@ -10113,7 +10153,8 @@
         const localNewer = avatar.updated !== startedAt || avPending() || avatar.updated >= remote.updated;
         const base = localNewer ? avatar : remote;
         const upd = Math.max(remote.updated, avatar.updated);
-        avatar = avClean(Object.assign({}, base, { owned: owned, made: avatar.made || remote.made, pk: (avatar.pk || []).concat(remote.pk || []) }));
+        avatar = avClean(Object.assign({}, base, { owned: owned, made: avatar.made || remote.made, pk: (avatar.pk || []).concat(remote.pk || []),
+          hd: Object.assign({}, base.hd, { o: (avatar.hd.o || []).concat(remote.hd.o || []) }) }));
         avatar.updated = upd;
         try { localStorage.setItem(AV_KEY, JSON.stringify(avatar)); } catch (e) {}
         if (JSON.stringify(Object.assign({}, remote, { updated: 0 })) !== JSON.stringify(Object.assign({}, avatar, { updated: 0 }))) avSetPending(true);
@@ -10622,10 +10663,11 @@
     const SHOP_PACK_BG = { hw: "#ff8a1f,#5b2a8a", bh: "#1fb5a8,#ff8a3d", sp: "#22308a,#6f8cff", sw: "#3550c8,#e8414f", tg: "#a0522d,#f2a65a",
       wz: "#5a1020,#c9a24a", bb: "#e8414f,#ffb703", ft: "#ff7ab8,#6f8cff", jg: "#2f7d3a,#9ccc3a" };
     function shopFind(id) { return avItem(id) || avLook(id); }
-    function shopCost(it) { return it.gold ? AV_GOLD_COST : AV_PIECE_COST; }
+    function shopCost(it) { return it.f ? HD_PIECE_COST : it.gold ? AV_GOLD_COST : AV_PIECE_COST; }
+    function shopHas(it) { return it.f ? hdHas(it.id) : avOwns(it.id); }
     function shopPackOpen(k) { return avatar.pk.indexOf(k) >= 0; }
     function shopPackName(k) { const x = AV_PACKS.find(function (q) { return q[0] === k; }); return x ? x[1] : ""; }
-    function shopWearing(it) { return it.slot ? avatar.wear[it.slot] === it.id : avatar[it.key] === it.val && (it.cat !== "animal" || avatar.style === "animal"); }
+    function shopWearing(it) { if (it.f) return it.slot === "look" ? avatar.hd.b === it.id : avatar.hd.w[it.slot] === it.id; return it.slot ? avatar.wear[it.slot] === it.id : avatar[it.key] === it.val && (it.cat !== "animal" || avatar.style === "animal"); }
     function shopLook(it) {
       const a = JSON.parse(JSON.stringify(avatar));
       if (!it) return a;
@@ -10633,6 +10675,7 @@
       const pv = avPreview(it); pv.wear = a.wear; pv.owned = a.owned; return pv;
     }
     function shopItems(tab) {
+      if (hdOn()) return HD_ITEMS.filter(function (i) { return i.slot === tab; });
       if (tab === "look") return AV_LOOK.slice();
       return AV_ITEMS.filter(function (i) { return i.slot === tab && (!i.pack || shopPackOpen(i.pack) || avOwns(i.id)); });
     }
@@ -10662,7 +10705,8 @@
       const tryBuy = el("button", { type: "button", class: "shp-buy" });
       const tryBar = el("div", { class: "shp-try", hidden: "" }, [tryTxt,
         el("button", { type: "button", class: "shp-no", "aria-label": "Stop trying on", text: "\u2715", onClick: function () { shopTry = ""; paintAll(); } }), tryBuy]);
-      const stage = el("div", { class: "shp-stage" }, [el("div", { class: "shp-beam" }), el("div", { class: "shp-ped" }), hero]);
+      const modeBtn = el("button", { type: "button", class: "shp-mode", hidden: "", onClick: function () { avatar.hd.on = hdOn() ? 0 : 1; avSaveSoon(); say(hdOn() ? "HD avatar on!" : "Classic avatar on!"); paintAll(true); } });
+      const stage = el("div", { class: "shp-stage" }, [el("div", { class: "shp-beam" }), el("div", { class: "shp-ped" }), hero, modeBtn]);
       const tabs = el("div", { class: "shp-tabs", role: "tablist" });
       const seg = el("div", { class: "shp-seg" });
       const body = el("div", { class: "shp-body" });
@@ -10675,7 +10719,10 @@
       const shake = function (n) { n.classList.remove("av-shake"); void n.offsetWidth; n.classList.add("av-shake"); };
       const paintHero = function (bounce) {
         hero.innerHTML = "";
-        hero.appendChild(avNode(shopLook(shopTry ? shopFind(shopTry) : null), wide ? 300 : 230));
+        hero.appendChild(hdOn() ? hdNode(avatar.hd, wide ? 330 : 250) : avNode(shopLook(shopTry ? shopFind(shopTry) : null), wide ? 300 : 230));
+        modeBtn.hidden = avatar.pk.indexOf("hd") < 0;
+        modeBtn.textContent = hdOn() ? "\u21BA Classic avatar" : "\u2728 HD avatar";
+        stage.classList.toggle("hd", hdOn());
         if (bounce) { hero.classList.remove("bounce"); void hero.offsetWidth; hero.classList.add("bounce"); }
       };
       const packOpen = function (k, btn) {
@@ -10691,8 +10738,9 @@
         const cost = shopCost(it);
         if (coinGet() < cost) { shake(node); say("You need $" + cost + ". You have $" + coinGet() + "."); return; }
         if (!coinSpend(cost)) return;
-        if (avatar.owned.indexOf(it.id) < 0) avatar.owned.push(it.id);
-        avApply(it); avatar.made = true;
+        if (it.f) { if (avatar.hd.o.indexOf(it.id) < 0) avatar.hd.o.push(it.id); if (it.slot === "look") avatar.hd.b = it.id; else avatar.hd.w[it.slot] = it.id; }
+        else { if (avatar.owned.indexOf(it.id) < 0) avatar.owned.push(it.id); avApply(it); }
+        avatar.made = true;
         if (shopBought.indexOf(it.id) < 0) shopBought.push(it.id);
         shopTry = ""; avSaveSoon(); say("You got " + it.name + "!");
         paintAll(true);
@@ -10711,11 +10759,12 @@
         tryBuy.onclick = function () { if (locked) packOpen(it.pack, tryBuy); else buy(it); };
       };
       const cardFor = function (it) {
-        const have = avOwns(it.id), on = have && shopWearing(it), hand = it.slot === "hand";
+        const have = shopHas(it), on = have && shopWearing(it), hand = it.slot === "hand" && !it.f;
         const locked = !have && it.pack && !shopPackOpen(it.pack);
         let pic;
         if (it.swatch) pic = el("span", { class: "shp-swatch", style: "background:" + it.swatch });
         else if (hand) { pic = el("span", { class: "shp-handpic" }); pic.innerHTML = avHandSVG(it.id, 80); }
+        else if (it.f) { const h = JSON.parse(JSON.stringify(avatar.hd)); if (it.slot === "look") h.b = it.id; else h.w[it.slot] = it.id; pic = hdNode(h, 120); }
         else pic = avNode(shopLook(it), 84);
         const tag = on ? el("span", { class: "shp-st wear", text: hand ? "Holding" : "Wearing" })
           : have ? el("span", { class: "shp-st own", text: hand ? "\u2713 Hold" : "\u2713 Wear" })
@@ -10725,6 +10774,10 @@
         return el("button", { type: "button", class: "shp-card" + (it.gold ? " gold" : "") + (on ? " wearing" : "") + (shopTry === it.id ? " sel" : ""),
           "aria-label": name + (on ? ", wearing" : have ? ", yours" : locked ? ", pack locked" : ", $" + shopCost(it)),
           onClick: function () {
+            if (have && it.f) {
+              if (it.slot === "look") avatar.hd.b = it.id; else if (on) delete avatar.hd.w[it.slot]; else avatar.hd.w[it.slot] = it.id;
+              avatar.made = true; avSaveSoon(); paintAll(true); return;
+            }
             if (have) {
               if (on && it.slot) delete avatar.wear[it.slot]; else avApply(it);
               avatar.made = true; shopTry = ""; avSaveSoon(); paintAll(true); return;
@@ -10756,6 +10809,21 @@
             return;
           }
           const list = el("div", { class: "shp-packs" });
+          const hdOpen = avatar.pk.indexOf("hd") >= 0;
+          list.appendChild(el("button", { type: "button", class: "shp-pack hdpk", "aria-label": "HD avatar pack" + (hdOpen ? ", open" : ", $" + HD_PACK_COST + " to open"),
+            onClick: function () {
+              if (hdOpen) { avatar.hd.on = 1; avSaveSoon(); shopTab = "hat"; shopMode = "shop"; paintAll(true); return; }
+              const me2 = this;
+              if (coinGet() < HD_PACK_COST) { shake(me2); say("You need $" + HD_PACK_COST + " to open the HD pack. You have $" + coinGet() + "."); return; }
+              avConfirm("Open the HD avatar pack for $" + HD_PACK_COST + "?", "Then each HD piece costs $" + HD_PIECE_COST + ".", function () {
+                if (!coinSpend(HD_PACK_COST)) return;
+                if (avatar.pk.indexOf("hd") < 0) avatar.pk.push("hd");
+                avatar.hd.on = 1; avatar.made = true; avSaveSoon(); say("HD avatar pack is open!");
+                shopTab = "hat"; shopMode = "shop"; paintAll(true);
+              });
+            } }, [el("span", { class: "shp-pack-art", text: "\u2728" }), el("span", { class: "shp-pack-txt" }, [el("b", { text: "HD Avatar \u00B7 NEW" }),
+              el("small", { text: "A movie-style 3D you! Hats, shirts, glasses, shoes, pets, looks and hand items. $" + HD_PIECE_COST + " each." }),
+              hdOpen ? el("span", { class: "shp-st own", text: "\u2713 Open \u00B7 Shop HD" }) : el("span", { class: "shp-buy" + (coinGet() < HD_PACK_COST ? " poor" : "") }, [el("span", { class: "coin-ico", "aria-hidden": "true", text: "$" }), el("span", { text: HD_PACK_COST + " Open" })])])]));
           AV_PACKS.forEach(function (pk) {
             const k = pk[0], open = shopPackOpen(k);
             const names = AV_ITEMS.filter(function (i) { return i.pack === k; }).map(function (i) { return i.name; }).join(" \u00B7 ");
@@ -10770,14 +10838,14 @@
         }
         seg.removeAttribute("hidden");
         const all = shopItems(shopTab);
-        const toBuy = all.filter(function (i) { return !avOwns(i.id); }), mine = all.filter(function (i) { return avOwns(i.id); });
+        const toBuy = all.filter(function (i) { return !shopHas(i); }), mine = all.filter(function (i) { return shopHas(i); });
         [["shop", "\uD83D\uDED2", "Shop", toBuy.length], ["closet", "\uD83C\uDF92", "My Closet", mine.length]].forEach(function (m) {
           seg.appendChild(el("button", { type: "button", class: "shp-segb " + m[0] + (shopMode === m[0] ? " on" : ""), "aria-pressed": String(shopMode === m[0]),
             onClick: function () { shopMode = m[0]; shopTry = ""; shopBought = []; paintAll(); } }, [el("i", { "aria-hidden": "true", text: m[1] }), el("span", { text: m[2] }), el("span", { class: "n", text: String(m[3]) })]));
         });
-        const show = shopMode === "shop" ? all.filter(function (i) { return !avOwns(i.id) || shopBought.indexOf(i.id) >= 0; }) : mine;
+        const show = shopMode === "shop" ? all.filter(function (i) { return !shopHas(i) || shopBought.indexOf(i.id) >= 0; }) : mine;
         if (!show.length) { body.appendChild(el("p", { class: "av-tip", text: shopMode === "shop" ? "You have them all! \uD83C\uDF89" : "Nothing here yet. Tap Shop!" })); return; }
-        if (shopTab === "look") {
+        if (shopTab === "look" && !hdOn()) {
           [["style", "Styles"], ["animal", "Animals"], ["color", "Colors"], ["face", "Faces"], ["hair", "Hair"]].forEach(function (c) {
             const l = show.filter(function (i) { return i.cat === c[0]; });
             if (!l.length) return;
