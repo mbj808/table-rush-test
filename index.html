@@ -3540,6 +3540,27 @@
     .av-tile-on { position: absolute; top: 6px; right: 6px; width: 26px; height: 26px; border-radius: 50%; background: #ffd34e; color: #2a1d00; font: 900 0.95rem/26px var(--ui-font); }
     .av-tile-lock { position: absolute; top: 6px; right: 6px; font-size: 1rem; }
     @media (prefers-reduced-motion: reduce) { .av-tile { transition: none; } .av-tile:active { transform: none; } }
+    .av-shake { animation: avShake .4s ease; }
+    @keyframes avShake { 0%, 100% { transform: translateX(0); } 20% { transform: translateX(-6px); } 40% { transform: translateX(6px); } 60% { transform: translateX(-4px); } 80% { transform: translateX(4px); } }
+    .coin-bump { animation: coinBump .35s ease-out; }
+    @keyframes coinBump { 0% { transform: scale(1); } 40% { transform: scale(1.15); } 100% { transform: scale(1); } }
+    .av-tile.poor .av-cost, .pack-buy.poor { filter: grayscale(1); opacity: .55; }
+    .av-tile.bought { border-color: #7ee07a; }
+    .av-tile.preview { cursor: default; }
+    .av-tile .av-cost { top: 4px; right: 4px; font-size: .95rem; }
+    .pack { display: flex; flex-direction: column; gap: .5rem; padding: .7rem; border-radius: 1.1rem; border: 3px solid #e0a91f; background: rgba(60,36,6,.55); }
+    .pack.shut { border-style: dashed; }
+    .pack-head { display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto auto; column-gap: .6rem; align-items: center; }
+    .pack-art { grid-row: span 2; }
+    .pack-title { font: 900 1.3rem/1.1 var(--ui-font); color: #fff; }
+    .pack-sub { font: 700 .95rem/1.2 var(--ui-font); color: #ffe58a; }
+    .pack-buy { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; align-self: center; min-height: 52px; padding: .35rem 1.2rem .35rem .4rem; border-radius: 999px; border: 4px solid #8a5200; background: linear-gradient(#fff3a0, #ffc21a); color: #3a2400; font: 900 1.35rem/1 var(--ui-font); box-shadow: 0 4px 0 #6b3d00; cursor: pointer; }
+    .pack-buy:active { transform: translateY(2px); box-shadow: 0 2px 0 #6b3d00; }
+    .pack-yn { display: flex; gap: .7rem; justify-content: center; margin-top: .8rem; }
+    .pack-yn button { min-height: 52px; padding: 0 1.2rem; border-radius: 999px; font: 900 1.1rem/1 var(--ui-font); border: 3px solid #fff; }
+    .pack-yes { background: #ffc21a; color: #3a2400; border-color: #8a5200 !important; }
+    .pack-no { background: rgba(255,255,255,.15); color: #fff; }
+    @media (prefers-reduced-motion: reduce) { .av-shake, .coin-bump { animation: none; } }
     .av-items { display: flex; flex-direction: column; gap: 1rem; padding: 0.9rem 0.2rem 1.5rem; }
     .closet-h { font: 700 1.05rem/1.2 var(--ui-font); letter-spacing: 0.03em; text-transform: uppercase; opacity: 0.9; }
     .closet-card .closet-opts { display: grid; grid-template-columns: repeat(auto-fill, minmax(5.2rem, 1fr)); gap: 0.55rem; overflow: visible; padding: 0.2rem 0; scroll-snap-type: none; }
@@ -9832,8 +9853,25 @@
       { id: "flippers", slot: "shoes", name: "Flippers" }, { id: "skates", slot: "shoes", name: "Roller skates" },
       { id: "pbunny", slot: "pet", name: "Bunny", emoji: "\uD83D\uDC30" }, { id: "ppenguin", slot: "pet", name: "Penguin", emoji: "\uD83D\uDC27" },
       { id: "phamster", slot: "pet", name: "Hamster", emoji: "\uD83D\uDC39" }, { id: "plion", slot: "pet", name: "Gold lion", emoji: "\uD83E\uDD81", gold: true },
-      { id: "pdragon", slot: "pet", name: "Gold dragon", emoji: "\uD83D\uDC09", gold: true }, { id: "punicorn", slot: "pet", name: "Unicorn", emoji: "\uD83E\uDD84", gold: true }
+      { id: "pdragon", slot: "pet", name: "Gold dragon", emoji: "\uD83D\uDC09", gold: true }, { id: "punicorn", slot: "pet", name: "Unicorn", emoji: "\uD83E\uDD84", gold: true },
+      // Theme packs: $75 opens the pack, then each piece is bought on its own ($1, gold $50).
+      { id: "witch", slot: "hat", name: "Witch hat", pack: "hw" }, { id: "pumpkin", slot: "hat", name: "Pumpkin head", pack: "hw" },
+      { id: "ncape", slot: "shirt", name: "Night cape", pack: "hw" }, { id: "wboots", slot: "shoes", name: "Witch boots", pack: "hw" },
+      { id: "pbat", slot: "pet", name: "Bat", emoji: "\uD83E\uDD87", pack: "hw" }, { id: "gpump", slot: "hat", name: "Gold pumpkin", pack: "hw", gold: true },
+      { id: "saloha", slot: "shirt", name: "Sunset aloha", pack: "bh" }, { id: "plei", slot: "hat", name: "Haku lei", pack: "bh" },
+      { id: "snorkel", slot: "glasses", name: "Snorkel mask", pack: "bh" }, { id: "slippers", slot: "shoes", name: "Slippers", pack: "bh" },
+      { id: "phonu", slot: "pet", name: "Honu", emoji: "\uD83D\uDC22", pack: "bh" },
+      { id: "helmet", slot: "hat", name: "Space helmet", pack: "sp" }, { id: "jetpack", slot: "shirt", name: "Jetpack suit", pack: "sp" },
+      { id: "visor", slot: "glasses", name: "Star visor", pack: "sp" }, { id: "moonboots", slot: "shoes", name: "Moon boots", pack: "sp" },
+      { id: "probot", slot: "pet", name: "Robot pal", emoji: "\uD83E\uDD16", pack: "sp" }, { id: "palien", slot: "pet", name: "Gold alien", emoji: "\uD83D\uDC7D", pack: "sp", gold: true },
+      { id: "jersey", slot: "shirt", name: "Team jersey", pack: "sw" }, { id: "tcap", slot: "hat", name: "Team cap", pack: "sw" },
+      { id: "cleats", slot: "shoes", name: "Cleats", pack: "sw" }, { id: "eyeblack", slot: "glasses", name: "Eye black", pack: "sw" },
+      { id: "pball", slot: "pet", name: "Soccer ball", emoji: "\u26BD", pack: "sw" }, { id: "ptrophy", slot: "pet", name: "Gold trophy", emoji: "\uD83C\uDFC6", pack: "sw", gold: true },
+      { id: "pilgrim", slot: "hat", name: "Pilgrim hat", pack: "tg" }, { id: "sweater", slot: "shirt", name: "Harvest sweater", pack: "tg" },
+      { id: "buckle", slot: "shoes", name: "Buckle shoes", pack: "tg" }, { id: "pturkey", slot: "pet", name: "Turkey", emoji: "\uD83E\uDD83", pack: "tg" }
     ];
+    const AV_PACKS = [["hw", "Halloween", "\uD83C\uDF83"], ["bh", "Beach & Hawai\u02BBi", "\uD83C\uDF3A"], ["sp", "Space", "\uD83D\uDE80"], ["sw", "Sports", "\uD83C\uDFC5"], ["tg", "Thanksgiving", "\uD83E\uDD83"]];
+    const AV_PACK_COST = 75, AV_PIECE_COST = 1, AV_GOLD_COST = 50;
     const AV_GOLD_AT = 50;
     function avItem(id) { return AV_ITEMS.find(function (i) { return i.id === id; }) || null; }
     // Look parts are unlockable too. Short ids keep the saved data small: s.robot, a.fox, c5, f.wow, h.bun, k3.
@@ -9865,7 +9903,9 @@
       return { v: 2, made: !!a.made, style: ok(AV_STYLES, a.style, "buddy"), animal: ok(AV_ANIMALS, a.animal, "cat"),
         color: AV_COLORS.indexOf(a.color) >= 0 ? a.color : AV_COLORS[3], face: ok(AV_FACES, a.face, "smile"),
         hair: ok(AV_HAIRS, a.hair, "none"), hairColor: AV_HAIR_COLORS.indexOf(a.hairColor) >= 0 ? a.hairColor : AV_HAIR_COLORS[1], wear: wear, owned: owned,
-        pz: Math.max(0, Math.min(99, Number(a.pz) || 0)), pg: a.pg ? 1 : 0, updated: Number(a.updated) || 0 };
+        pz: Math.max(0, Math.min(99, Number(a.pz) || 0)), pg: a.pg ? 1 : 0,
+        pk: Array.isArray(a.pk) ? a.pk.filter(function (k, i, arr) { return AV_PACKS.some(function (x) { return x[0] === k; }) && arr.indexOf(k) === i; }) : [],
+        updated: Number(a.updated) || 0 };
     }
     let avatar = (function () { try { return avClean(JSON.parse(localStorage.getItem(AV_KEY) || "null")); } catch (e) { return avClean(null); } })();
     // ---- Saving: every change is saved on this device at once, then sent to the sheet with retries.
@@ -9948,7 +9988,7 @@
         const localNewer = avatar.updated !== startedAt || avPending() || avatar.updated >= remote.updated;
         const base = localNewer ? avatar : remote;
         const upd = Math.max(remote.updated, avatar.updated);
-        avatar = avClean(Object.assign({}, base, { owned: owned, made: avatar.made || remote.made }));
+        avatar = avClean(Object.assign({}, base, { owned: owned, made: avatar.made || remote.made, pk: (avatar.pk || []).concat(remote.pk || []) }));
         avatar.updated = upd;
         try { localStorage.setItem(AV_KEY, JSON.stringify(avatar)); } catch (e) {}
         if (JSON.stringify(Object.assign({}, remote, { updated: 0 })) !== JSON.stringify(Object.assign({}, avatar, { updated: 0 }))) avSetPending(true);
@@ -9983,22 +10023,29 @@
       const p = [];
       // feet
       const shoe = w.shoes;
-      const shoeFill = shoe === "sneakers" ? "#e8414f" : shoe === "boots" ? "#7a4a22" : shoe === "goldshoes" ? "#f5c542" : shoe === "rainbow" ? "url(#" + rb + ")" : shoe === "flippers" ? "#1fb5a8" : shoe === "skates" ? "#ff7ab8" : dk;
+      const shoeFill = shoe === "sneakers" ? "#e8414f" : shoe === "boots" ? "#7a4a22" : shoe === "goldshoes" ? "#f5c542" : shoe === "rainbow" ? "url(#" + rb + ")" : shoe === "flippers" ? "#1fb5a8" : shoe === "skates" ? "#ff7ab8" : shoe === "wboots" ? "#2a1d3a" : shoe === "moonboots" ? "#dfe6f0" : shoe === "cleats" ? "#22202c" : shoe === "slippers" ? "#ffd34e" : shoe === "buckle" ? "#3a2a1a" : dk;
       if (st === "animal" && a.animal === "turtle") p.push('<ellipse cx="50" cy="78" rx="29" ry="21" fill="#3f8a3a"/><path d="M24 70 L30 62 M76 70 L70 62 M22 84 H30 M78 84 H70" stroke="#2f6a2a" stroke-width="2"/>');
       if (st === "dino") p.push('<path d="M31 84 Q14 86 8 70 Q18 80 31 76 Z" fill="' + c + '"/>');
       if (shoe === "rainbow" || w.shirt === "rainbowtee") p.push('<defs><linearGradient id="' + rb + '" x1="0" x2="1"><stop offset="0" stop-color="#ff5a5a"/><stop offset=".33" stop-color="#ffd34e"/><stop offset=".66" stop-color="#5fe07a"/><stop offset="1" stop-color="#5f8cff"/></linearGradient></defs>');
       [38, 62].forEach(function (x) {
-        if (shoe === "boots") p.push('<rect x="' + (x - 8) + '" y="88" width="16" height="14" rx="4" fill="' + shoeFill + '"/>');
+        if (shoe === "boots" || shoe === "wboots" || shoe === "moonboots") p.push('<rect x="' + (x - 8) + '" y="88" width="16" height="14" rx="4" fill="' + shoeFill + '"/>');
         else if (shoe === "flippers") p.push('<path d="M' + (x - 7) + ' 94 L' + (x - 12) + ' 104 L' + (x + 12) + ' 104 L' + (x + 7) + ' 94 Z" fill="' + shoeFill + '"/>');
         else if (pix) p.push('<rect x="' + (x - 9) + '" y="94" width="18" height="8" fill="' + shoeFill + '"/>');
         else p.push('<ellipse cx="' + x + '" cy="98" rx="10" ry="6" fill="' + shoeFill + '"/>');
         if (shoe === "skates") p.push('<circle cx="' + (x - 6) + '" cy="105" r="2.6" fill="#ffd34e"/><circle cx="' + (x + 6) + '" cy="105" r="2.6" fill="#ffd34e"/>');
+        if (shoe === "wboots") p.push('<path d="M' + (x + 6) + ' 98 Q' + (x + 14) + ' 98 ' + (x + 13) + ' 92" stroke="#2a1d3a" stroke-width="3" fill="none"/>');
+        if (shoe === "moonboots") p.push('<rect x="' + (x - 8) + '" y="92" width="16" height="3" fill="#8aa0c8"/>');
+        if (shoe === "cleats") p.push('<path d="M' + (x - 6) + ' 104 v2 M' + x + ' 104 v2 M' + (x + 6) + ' 104 v2" stroke="#fff" stroke-width="2"/><path d="M' + (x - 6) + ' 96 H' + (x + 6) + '" stroke="#ffd34e" stroke-width="1.5"/>');
+        if (shoe === "slippers") p.push('<path d="M' + (x - 4) + ' 93 L' + x + ' 98 L' + (x + 4) + ' 93" stroke="#1fb5a8" stroke-width="2" fill="none"/>');
+        if (shoe === "buckle") p.push('<rect x="' + (x - 3.5) + '" y="93" width="7" height="5" fill="none" stroke="#f5c542" stroke-width="1.6"/>');
         if (shoe === "sneakers") p.push('<rect x="' + (x - 10) + '" y="100" width="20" height="3" rx="1.5" fill="#fff"/>');
       });
       // torso / shirt
       const sh = w.shirt;
-      const shirtFill = { tee: "#e8414f", stripes: "#fff", stars: "#3550c8", aloha: "#1fb5a8", hoodie: "#3fa34d", goldjersey: "#f5c542", tux: "#22202c", rainbowtee: "url(#" + rb + ")", goldsuit: "#f5c542", cape: "#e8414f" }[sh] || c;
+      const shirtFill = { tee: "#e8414f", stripes: "#fff", stars: "#3550c8", aloha: "#1fb5a8", hoodie: "#3fa34d", goldjersey: "#f5c542", tux: "#22202c", rainbowtee: "url(#" + rb + ")", goldsuit: "#f5c542", cape: "#e8414f", ncape: "#2a1d3a", saloha: "#ff8a3d", jetpack: "#dfe6f0", jersey: "#3550c8", sweater: "#d2691e" }[sh] || c;
       if (sh === "cape") p.push('<path d="M30 64 L20 98 L80 98 L70 64 Z" fill="#b8202e"/>');
+      if (sh === "ncape") p.push('<path d="M30 62 L16 100 L84 100 L70 62 Z" fill="#5b2a8a"/><path d="M26 64 L22 54 L36 62 M74 64 L78 54 L64 62" fill="#5b2a8a"/>');
+      if (sh === "jetpack") p.push('<rect x="17" y="62" width="12" height="26" rx="5" fill="#9aa3b5" stroke="#5a6478" stroke-width="1.5"/><rect x="71" y="62" width="12" height="26" rx="5" fill="#9aa3b5" stroke="#5a6478" stroke-width="1.5"/><path d="M19 88 L23 100 L27 88 Z M73 88 L77 100 L81 88 Z" fill="#ff8a3d"/><path d="M21 88 L23 95 L25 88 Z M75 88 L77 95 L79 88 Z" fill="#ffd34e"/>');
       const trx = pix ? 0 : st === "robot" ? 4 : 12;
       p.push('<rect x="29" y="62" width="42" height="32" rx="' + trx + '" fill="' + shirtFill + '"/>');
       if (sh === "stripes") [68, 76, 84].forEach(function (y) { p.push('<rect x="29" y="' + y + '" width="42" height="4" fill="#e8414f"/>'); });
@@ -10009,6 +10056,11 @@
       if (sh === "cape") p.push('<rect x="29" y="62" width="42" height="32" rx="' + trx + '" fill="' + c + '"/><path d="M42 64 L50 72 L58 64" fill="#e8414f"/><text x="50" y="86" font-size="11" font-weight="900" fill="#ffd34e" text-anchor="middle">\u2605</text>');
       if (sh === "tux") p.push('<path d="M44 62 L50 80 L56 62 Z" fill="#fff"/><path d="M45 65 L50 68 L55 65 L55 69 L50 66 L45 69 Z" fill="#e8414f"/><circle cx="50" cy="76" r="1.2" fill="#22202c"/><circle cx="50" cy="82" r="1.2" fill="#fff"/>');
       if (sh === "goldsuit") p.push('<path d="M44 62 L50 78 L56 62 Z" fill="#fff6d8"/><path d="M29 66 H71" stroke="#a87412" stroke-width="1.5"/><circle cx="50" cy="84" r="2" fill="#a87412"/>');
+      if (sh === "ncape") p.push('<path d="M38 62 L50 74 L62 62" fill="#e8414f"/><circle cx="50" cy="66" r="2.2" fill="#ffd34e"/>');
+      if (sh === "saloha") p.push('<path d="M42 62 L50 70 L58 62" fill="#fff"/>' + [[37, 74], [60, 72], [48, 86], [64, 87]].map(function (q) { return '<circle cx="' + q[0] + '" cy="' + q[1] + '" r="4" fill="#e8414f"/><circle cx="' + q[0] + '" cy="' + q[1] + '" r="1.4" fill="#ffd34e"/>'; }).join("") + '<path d="M31 80 Q38 76 42 80" stroke="#3fa34d" stroke-width="2" fill="none"/>');
+      if (sh === "jetpack") p.push('<rect x="40" y="70" width="20" height="12" rx="3" fill="#6f8cff"/><circle cx="45" cy="76" r="2" fill="#ff5a5a"/><circle cx="55" cy="76" r="2" fill="#5fe07a"/><path d="M29 66 H71" stroke="#8aa0c8" stroke-width="2"/>');
+      if (sh === "jersey") p.push('<path d="M29 66 H71 M29 90 H71" stroke="#fff" stroke-width="3"/><text x="50" y="86" font-size="16" font-weight="900" font-family="Arial Black,Arial" fill="#fff" text-anchor="middle">10</text>');
+      if (sh === "sweater") p.push('<path d="M29 70 H71 M29 86 H71" stroke="#ffd34e" stroke-width="2" stroke-dasharray="3 2"/><path d="M50 72 L46 78 L50 77 L54 78 Z" fill="#b8202e"/><path d="M44 80 L48 76 M56 80 L52 76" stroke="#7a3a10" stroke-width="1.5"/>');
       if (sh === "lei") [[33, 64, "#ff7ab8"], [39, 69, "#ffd34e"], [45, 72, "#ff5a5a"], [51, 73, "#b47cff"], [57, 71, "#ff7ab8"], [63, 68, "#ffd34e"], [68, 64, "#ff5a5a"]].forEach(function (q) { p.push('<circle cx="' + q[0] + '" cy="' + q[1] + '" r="3.6" fill="' + q[2] + '"/>'); });
       if (st === "robot" && !sh) p.push('<rect x="42" y="70" width="16" height="10" rx="2" fill="' + dk + '"/><circle cx="46" cy="75" r="1.6" fill="#7ef"/><circle cx="54" cy="75" r="1.6" fill="#f7a"/>');
       // head
@@ -10092,6 +10144,9 @@
       if (g === "goggles") p.push('<path d="M22 40 H78" stroke="#1fb5a8" stroke-width="3"/><circle cx="41" cy="41" r="8" fill="#9ff0e4" fill-opacity=".55" stroke="#1fb5a8" stroke-width="3"/><circle cx="59" cy="41" r="8" fill="#9ff0e4" fill-opacity=".55" stroke="#1fb5a8" stroke-width="3"/>');
       if (g === "mask") p.push('<path d="M28 36 Q50 31 72 36 Q74 46 62 47 Q55 46 50 42 Q45 46 38 47 Q26 46 28 36 Z" fill="#e8414f"/><ellipse cx="41" cy="40.5" rx="4" ry="3" fill="#fff"/><ellipse cx="59" cy="40.5" rx="4" ry="3" fill="#fff"/><circle cx="41" cy="40.5" r="1.8" fill="' + ink + '"/><circle cx="59" cy="40.5" r="1.8" fill="' + ink + '"/>');
       if (g === "diamond") p.push('<path d="M33 41 L41 33 L49 41 L41 49 Z M51 41 L59 33 L67 41 L59 49 Z" fill="#bff4ff" fill-opacity=".85" stroke="#f5c542" stroke-width="2"/><path d="M49 41 H51" stroke="#f5c542" stroke-width="2"/>');
+      if (g === "snorkel") p.push('<rect x="30" y="33" width="40" height="15" rx="7" fill="#9ff0e4" fill-opacity=".5" stroke="#ff8a3d" stroke-width="3"/><path d="M22 40 H30 M70 40 H78" stroke="#ff8a3d" stroke-width="3"/><path d="M74 46 V22 Q74 18 78 18" stroke="#ffd34e" stroke-width="3.5" fill="none" stroke-linecap="round"/>');
+      if (g === "visor") p.push('<path d="M27 34 Q50 28 73 34 L71 47 Q50 52 29 47 Z" fill="#6f8cff" fill-opacity=".7" stroke="#dfe6f0" stroke-width="2.5"/><text x="60" y="44" font-size="7" fill="#ffd34e" text-anchor="middle">\u2605</text><path d="M34 37 H44" stroke="#fff" stroke-width="1.5" opacity=".7"/>');
+      if (g === "eyeblack") p.push('<rect x="35" y="47" width="11" height="3" rx="1.5" fill="#22202c"/><rect x="54" y="47" width="11" height="3" rx="1.5" fill="#22202c"/>');
       // hats (head top ~ y18-20)
       const h = w.hat;
       if (h === "cap") p.push('<path d="M27 26 Q28 10 50 9 Q72 10 73 26 Z" fill="#e8414f"/><path d="M60 24 Q78 22 86 27 Q74 30 60 28 Z" fill="#b8202e"/><circle cx="50" cy="9.5" r="2" fill="#b8202e"/>');
@@ -10107,6 +10162,12 @@
       if (h === "viking") p.push('<path d="M30 22 Q22 14 22 2 Q28 12 36 14 Z M70 22 Q78 14 78 2 Q72 12 64 14 Z" fill="#fff3d6" stroke="#b8a070"/><path d="M27 24 Q27 6 50 6 Q73 6 73 24 Z" fill="#9aa3b5"/><rect x="26" y="20" width="48" height="5" rx="2" fill="#6b7385"/>');
       if (h === "bow") p.push('<path d="M50 16 L34 6 L34 26 Z M50 16 L66 6 L66 26 Z" fill="#ff4f8b"/><circle cx="50" cy="16" r="4" fill="#d02a6a"/>');
       if (h === "headphones") p.push('<path d="M24 40 Q24 12 50 12 Q76 12 76 40" stroke="#22202c" stroke-width="4" fill="none"/><rect x="18" y="34" width="10" height="16" rx="4" fill="#e8414f"/><rect x="72" y="34" width="10" height="16" rx="4" fill="#e8414f"/>');
+      if (h === "witch") p.push('<path d="M34 20 L56 -8 L52 6 L66 20 Z" fill="#2a1d3a"/><rect x="36" y="14" width="28" height="4" fill="#7ee07a"/><ellipse cx="50" cy="20" rx="27" ry="4.5" fill="#22162e"/>');
+      if (h === "pumpkin" || h === "gpump") { const pf = h === "gpump" ? "#f5c542" : "#ff8a1f", pe = h === "gpump" ? "#a87412" : "#c85a00"; p.push('<path d="M50 14 Q54 6 58 8" stroke="#3f8a3a" stroke-width="4" fill="none"/><ellipse cx="50" cy="40" rx="31" ry="27" fill="' + pf + '" stroke="' + pe + '" stroke-width="2"/><path d="M36 15 Q30 40 36 66 M64 15 Q70 40 64 66 M50 13 V67" stroke="' + pe + '" stroke-width="1.5" fill="none" opacity=".6"/><path d="M34 40 L41 32 L48 40 Z M52 40 L59 32 L66 40 Z M36 50 L42 55 L46 51 L50 56 L54 51 L58 55 L64 50 Q50 64 36 50 Z" fill="#3a1d00"/>'); }
+      if (h === "plei") [[28, 26, "#fff"], [35, 20, "#ffd34e"], [43, 17, "#fff"], [50, 16, "#ff7ab8"], [57, 17, "#fff"], [65, 20, "#ffd34e"], [72, 26, "#fff"]].forEach(function (q) { p.push('<circle cx="' + q[0] + '" cy="' + q[1] + '" r="4.6" fill="' + q[2] + '" stroke="#3fa34d" stroke-width="1"/><circle cx="' + q[0] + '" cy="' + q[1] + '" r="1.6" fill="#ffb703"/>'); });
+      if (h === "helmet") p.push('<circle cx="50" cy="40" r="33" fill="#bfe8ff" fill-opacity=".28" stroke="#dfe6f0" stroke-width="4"/><path d="M30 24 Q36 14 46 12" stroke="#fff" stroke-width="3" fill="none" opacity=".8" stroke-linecap="round"/><path d="M50 7 V-3" stroke="#9aa3b5" stroke-width="2"/><circle cx="50" cy="-4" r="3" fill="#ff5a5a"/>');
+      if (h === "tcap") p.push('<path d="M27 26 Q28 10 50 9 Q72 10 73 26 Z" fill="#3550c8"/><path d="M27 26 Q14 26 12 30 Q24 31 40 28 Z" fill="#22308a"/><text x="54" y="23" font-size="9" font-weight="900" fill="#fff" text-anchor="middle">\u2605</text>');
+      if (h === "pilgrim") p.push('<path d="M36 20 L38 -2 L62 -2 L64 20 Z" fill="#22202c"/><rect x="37" y="10" width="26" height="5" fill="#7a4a22"/><rect x="45" y="9" width="10" height="7" fill="none" stroke="#f5c542" stroke-width="2"/><rect x="24" y="18" width="52" height="5" rx="2.5" fill="#22202c"/>');
       if (h === "halo") p.push('<ellipse cx="50" cy="6" rx="16" ry="4.5" fill="none" stroke="#f5c542" stroke-width="3.5"/>');
       // pet
       const pet = w.pet && avItem(w.pet);
@@ -10139,7 +10200,7 @@
     }
     const AV_CATS = [["style", "Styles"], ["animal", "Animals"], ["color", "Colors"], ["face", "Faces"], ["hair", "Hair"]].concat(AV_SLOTS);
     function avAll(cat) {
-      return AV_LOOK.filter(function (i) { return i.cat === cat; }).concat(AV_ITEMS.filter(function (i) { return i.slot === cat; }));
+      return AV_LOOK.filter(function (i) { return i.cat === cat; }).concat(AV_ITEMS.filter(function (i) { return i.slot === cat && !i.pack; }));
     }
     function avCanWin(it) { return !avOwns(it.id) && (!it.gold || avatar.pg); }
     function avAnyToWin() { return AV_CATS.some(function (c) { return avAll(c[0]).some(avCanWin); }); }
@@ -10335,7 +10396,8 @@
     const COIN_KEY = "mf-coins";
     function coinGet() { try { return Math.max(0, parseInt(localStorage.getItem(COIN_KEY) || "0", 10) || 0); } catch (e) { return 0; } }
     function coinSet(n) { try { localStorage.setItem(COIN_KEY, String(Math.max(0, n))); } catch (e) {} }
-    function coinSpend() { const c = coinGet(); if (c < 1) { say("You need a coin. Get 10 in a row to earn one!"); return false; } coinSet(c - 1); return true; }
+    function coinSpend(amount) { const n = Math.max(1, Math.floor(Number(amount) || 1)), c = coinGet(); if (c < n) { say(n === 1 ? "You need a coin. Get 10 in a row to earn one!" : "You need " + n + " coins. You have " + c + "."); return false; } coinSet(c - n); coinPillUpdate(); return true; }
+    function coinPillUpdate() { const c = coinGet(), t = c + (c === 1 ? " coin" : " coins"); document.querySelectorAll(".coin-bank").forEach(function (b) { b.setAttribute("aria-label", t); const s = b.lastChild; if (s) s.textContent = t; b.classList.remove("coin-bump"); void b.offsetWidth; b.classList.add("coin-bump"); }); }
     function coinPill() { const c = coinGet(); return el("p", { class: "coin-bank", role: "status", "aria-label": c + (c === 1 ? " coin" : " coins") }, [el("span", { class: "coin-ico", "aria-hidden": "true", text: "$" }), el("span", { text: c + (c === 1 ? " coin" : " coins") })]); }
     function coinDrop(preview) {
       if (!preview) { coinSet(coinGet() + 1); say("You got a coin!"); }
@@ -10377,6 +10439,18 @@
         if (it.key === "hairColor" && avatar.hair === "none") return false;
         return true;
       });
+    }
+    let avSoonTimer = 0;
+    function avSaveSoon() { try { localStorage.setItem(AV_KEY, JSON.stringify(avatar)); } catch (e) {} clearTimeout(avSoonTimer); avSoonTimer = setTimeout(function () { avSave(); }, 700); }
+    window.addEventListener("pagehide", function () { if (avSoonTimer) { clearTimeout(avSoonTimer); avSoonTimer = 0; avSave(); } });
+    function avConfirm(title, sub, yes) {
+      const ov = el("div", { class: "prize-ov", role: "dialog", "aria-modal": "true", "aria-label": title });
+      const close = function () { ov.remove(); };
+      ov.appendChild(el("div", { class: "prize-box pack-confirm" }, [el("p", { class: "prize-title", text: title }), el("p", { class: "prize-sub", text: sub }),
+        el("div", { class: "pack-yn" }, [el("button", { type: "button", class: "pack-no", text: "Not now", onClick: close }),
+          el("button", { type: "button", class: "pack-yes", text: "Yes, open it!", onClick: function () { close(); yes(); } })])]));
+      document.body.appendChild(ov);
+      const f = ov.querySelector(".pack-yes"); if (f) f.focus({ preventScroll: true });
     }
     function closetCard() {
       const card = el("div", { class: "card closet-card" });
@@ -10449,23 +10523,69 @@
           })));
         });
       } else {
-        items.appendChild(el("p", { class: "av-tip", text: "Each piece costs 1 coin. Tap one to buy it. Get 10 in a row to earn a coin." }));
+        items.appendChild(el("p", { class: "av-tip", text: "Pieces cost $1. Gold pieces cost $50. Theme packs cost $75 to open. Get 10 in a row to earn a coin." }));
         let any = false;
+        const bigBox = top.querySelector(".closet-preview");
+        // Buying stays on this spot: the tile turns into a check, the big avatar and coin count update in place.
+        const shake = function (node) { node.classList.remove("av-shake"); void node.offsetWidth; node.classList.add("av-shake"); };
+        const showMe = function () { bigBox.innerHTML = ""; bigBox.appendChild(avNode(avatar, 260)); bigBox.classList.remove("bounce"); void bigBox.offsetWidth; bigBox.classList.add("bounce"); };
+        const poorMark = function () { const c = coinGet(); items.querySelectorAll("[data-cost]").forEach(function (n) { n.classList.toggle("poor", c < Number(n.getAttribute("data-cost"))); }); };
+        const buyTile = function (it, lockedPack) {
+          const cost = it.gold ? AV_GOLD_COST : AV_PIECE_COST;
+          const pic = it.swatch ? el("span", { class: "av-tile-swatch", style: "background:" + it.swatch }) : avNode(avPreview(it), 72);
+          const tag = el("span", { class: "av-tile-lock av-cost", "aria-hidden": "true", text: lockedPack ? "\uD83D\uDD12" : "$" + cost });
+          const btn = el("button", { type: "button", class: "av-tile locked" + (it.gold ? " gold" : "") + (lockedPack ? " preview" : ""), "aria-label": it.name + (lockedPack ? ", open the pack first" : ", tap to buy for $" + cost) }, [pic, el("span", { class: "av-tile-name", text: it.swatch ? "Color" : it.name }), tag]);
+          if (!lockedPack) btn.setAttribute("data-cost", String(cost));
+          btn.addEventListener("click", function () {
+            if (lockedPack) { say("Open the " + lockedPack + " pack first."); shake(btn); return; }
+            if (btn.classList.contains("bought")) { avApply(it); avatar.made = true; showMe(); avSaveSoon(); return; }
+            if (coinGet() < cost) { shake(tag); say("You need $" + cost + ". You have $" + coinGet() + "."); return; }
+            if (!coinSpend(cost)) return;
+            if (avatar.owned.indexOf(it.id) < 0) avatar.owned.push(it.id);
+            avApply(it); avatar.made = true;
+            btn.classList.remove("locked"); btn.classList.add("bought", "on"); btn.removeAttribute("data-cost");
+            tag.className = "av-tile-on"; tag.textContent = "\u2713";
+            btn.setAttribute("aria-label", it.name + ", yours");
+            showMe(); poorMark(); say("You got " + it.name + "!"); avSaveSoon();
+          });
+          return btn;
+        };
+        // Theme packs first.
+        items.appendChild(el("p", { class: "closet-h", text: "Theme packs" }));
+        AV_PACKS.forEach(function (pk) {
+          const open = avatar.pk.indexOf(pk[0]) >= 0;
+          const list = AV_ITEMS.filter(function (i) { return i.pack === pk[0]; });
+          const left = list.filter(function (i) { return !avOwns(i.id); });
+          if (open && !left.length) return;
+          const look = JSON.parse(JSON.stringify(avatar)); look.wear = {}; look.owned = look.owned.concat(list.map(function (i) { return i.id; }));
+          list.forEach(function (i) { if (!look.wear[i.slot] && (i.slot !== "hat" || i.id !== "pumpkin")) look.wear[i.slot] = i.id; });
+          const head = el("div", { class: "pack-head" }, [el("span", { class: "pack-art" }, [avNode(look, 84)]), el("span", { class: "pack-title", text: pk[2] + " " + pk[1] }),
+            el("span", { class: "pack-sub", text: open ? "Open! Buy pieces below." : list.length + " pieces inside" })]);
+          const box = el("div", { class: "pack" + (open ? " open" : " shut") }, [head]);
+          if (!open) {
+            const unlock = el("button", { type: "button", class: "pack-buy", "data-cost": String(AV_PACK_COST), "aria-label": "Open the " + pk[1] + " pack for $" + AV_PACK_COST },
+              [el("span", { class: "coin-ico", "aria-hidden": "true", text: "$" }), el("span", { text: "75 \u00B7 Open pack" })]);
+            unlock.addEventListener("click", function () {
+              if (coinGet() < AV_PACK_COST) { shake(unlock); say("You need $" + AV_PACK_COST + " to open this pack. You have $" + coinGet() + "."); return; }
+              avConfirm("Open the " + pk[1] + " pack for $" + AV_PACK_COST + "?", "Then each piece costs $1 (gold $50).", function () {
+                if (!coinSpend(AV_PACK_COST)) return;
+                if (avatar.pk.indexOf(pk[0]) < 0) avatar.pk.push(pk[0]);
+                avatar.made = true; avSaveSoon(); say(pk[1] + " pack is open!");
+                const keepY = window.scrollY; render(); window.scrollTo(0, keepY);
+              });
+            });
+            box.appendChild(unlock);
+          }
+          box.appendChild(el("div", { class: "av-tiles" }, (open ? left : list).map(function (it) { return buyTile(it, open ? "" : pk[1]); })));
+          items.appendChild(box);
+        });
         AV_CATS.forEach(function (c) {
           const list = avAll(c[0]).filter(function (it) { return !avOwns(it.id); });
           if (!list.length) return;
           any = true;
-          items.appendChild(sec(c[1], list.map(function (it) {
-            const pic = it.swatch ? el("span", { class: "av-tile-swatch", style: "background:" + it.swatch }) : avNode(avPreview(it), 72);
-            const btn = el("button", { type: "button", class: "av-tile locked" + (it.gold ? " gold" : ""), "aria-label": it.name + ", tap to buy for 1 coin", onClick: function () {
-              if (!coinSpend()) return;
-              if (avatar.owned.indexOf(it.id) < 0) avatar.owned.push(it.id);
-              avApply(it); avBounce = true; say("You got " + it.name + "!"); refresh();
-            } },
-              [pic, el("span", { class: "av-tile-name", text: it.swatch ? "Color" : it.name }), el("span", { class: "av-tile-lock av-cost", "aria-hidden": "true", text: "$1" })]);
-            return btn;
-          })));
+          items.appendChild(sec(c[1], list.map(function (it) { return buyTile(it, ""); })));
         });
+        poorMark();
         if (!any) items.appendChild(el("p", { class: "av-tip", text: "You won everything! \uD83C\uDF89" }));
       }
       return card;
