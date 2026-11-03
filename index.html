@@ -3633,7 +3633,7 @@
     @media (prefers-reduced-motion: reduce) { .shp-hero.bounce .av, .shp-card:active { animation: none; transform: none; } }
     .hd-av { position: relative; display: inline-block; }
     .hd-pic-box, .hd-pic-wait { display: inline-block; line-height: 0; } .hd-pic { display: block; object-fit: contain; }
-    .lb-av .hd-pic { height: 30px; width: auto; }
+    .lb-av .hd-pic { height: 30px; width: 30px; border-radius: 50%; }
     .hd-av img, .hd-av .hd-shoe { position: absolute; left: 0; top: 0; width: 100%; height: 100%; pointer-events: none; user-select: none; }
     .hd-av .hd-shoe { background-size: 200% 100%; background-repeat: no-repeat; }
     .shp-hero .hd-av { display: block; }
@@ -9683,7 +9683,7 @@
     const lbAvCache = new Map();
     function lbEsc(t) { return String(t == null ? "" : t).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
     function lbAvHTML(a) {
-      if (hdIsOn(a)) { let c = ""; try { c = avatarSVG(a, { size: 30 }); } catch (e) {} return hdPicOr(a, 30, c, a === avatar); }
+      if (hdIsOn(a)) { let c = ""; try { c = avatarSVG(a, { size: 30 }); } catch (e) {} return hdPicOr(a, 30, c, false, true); }
       const k = JSON.stringify(a);
       let h = lbAvCache.get(k);
       if (h === undefined) { try { h = avatarSVG(a, { size: 30 }); } catch (e) { h = ""; } if (lbAvCache.size > 300) lbAvCache.clear(); lbAvCache.set(k, h); }
@@ -10096,36 +10096,39 @@
     const hdPicMem = new Map(), hdPicWait = {};
     const HD_PIC_KEY = "mf-hd-pic";
     function hdIsOn(a) { return !!(a && Array.isArray(a.pk) && a.pk.indexOf("hd") >= 0 && a.hd && a.hd.on); }
-    function hdPicKey(h, px) { const g = hdLayers(h); return px + ":" + g.l.map(function (x) { return x.f; }).join(","); }
+    function hdPicKey(h, px, head) { const g = hdLayers(h); return (head ? "h" : "") + px + ":" + g.l.map(function (x) { return x.f; }).join(","); }
     function hdPicGet(k) {
       if (hdPicMem.has(k)) return hdPicMem.get(k);
       try { const o = JSON.parse(localStorage.getItem(HD_PIC_KEY) || "null"); if (o && o.k === k) { hdPicMem.set(k, o.u); return o.u; } } catch (e) {}
       return null;
     }
-    function hdPicMake(h, px, keep) {
-      const k = hdPicKey(h, px);
+    function hdPicMake(h, px, keep, head) {
+      const k = hdPicKey(h, px, head);
       if (hdPicGet(k) || hdPicWait[k]) return;
       hdPicWait[k] = 1;
-      const g = hdLayers(h), dpr = Math.min(2, window.devicePixelRatio || 1), H = Math.round(px * dpr), W = Math.round(H * g.r);
+      const g = hdLayers(h), dpr = Math.min(2, window.devicePixelRatio || 1);
+      // Head-and-shoulders: the top band of the body frame, drawn square so it reads at leaderboard size.
+      const C = head ? (g.r < 0.66 ? [0.18, 0.13, 0.64, 0.30] : [0.18, 0.04, 0.64, 0.33]) : [0, 0, 1, 1];
+      const H = Math.round(px * dpr), W = head ? H : Math.round(H * g.r), FH = H / (head ? C[3] : 1), FW = FH * g.r, OX = -C[0] * FW, OY = -C[1] * FH;
       Promise.all(g.l.map(function (x) { return new Promise(function (ok) { const im = new Image(); im.onload = function () { ok(im); }; im.onerror = function () { ok(null); }; im.src = HD_DIR + x.f + ".webp"; }); }))
         .then(function (ims) {
           const cv = document.createElement("canvas"); cv.width = W; cv.height = H;
           const cx = cv.getContext("2d");
-          ims.forEach(function (im, i) { if (!im) return; const L = g.l[i].L; if (L) cx.drawImage(im, L[0] / 100 * W, L[1] / 100 * H, L[2] / 100 * W, L[3] / 100 * H); else cx.drawImage(im, 0, 0, W, H); });
+          ims.forEach(function (im, i) { if (!im) return; const L = g.l[i].L; if (L) cx.drawImage(im, OX + L[0] / 100 * FW, OY + L[1] / 100 * FH, L[2] / 100 * FW, L[3] / 100 * FH); else cx.drawImage(im, OX, OY, FW, FH); });
           let u = ""; try { u = cv.toDataURL("image/webp", 0.85); if (u.indexOf("image/webp") < 0) u = cv.toDataURL("image/png"); } catch (e) { u = ""; }
           delete hdPicWait[k];
           if (!u) return;
           hdPicMem.set(k, u); if (hdPicMem.size > 80) hdPicMem.delete(hdPicMem.keys().next().value);
           if (keep) { try { localStorage.setItem(HD_PIC_KEY, JSON.stringify({ k: k, u: u })); } catch (e) {} }
-          document.querySelectorAll('[data-hdk="' + k + '"]').forEach(function (n) { n.innerHTML = hdPicHTML(u, px, g.r); n.removeAttribute("data-hdk"); });
+          document.querySelectorAll('[data-hdk="' + k + '"]').forEach(function (n) { n.innerHTML = hdPicHTML(u, px, head ? 1 : g.r); n.removeAttribute("data-hdk"); });
         });
     }
     function hdPicHTML(u, px, r) { return '<img class="hd-pic" src="' + u + '" alt="" draggable="false" style="height:' + px + 'px;width:' + Math.round(px * r) + 'px">'; }
     // Returns HTML: the cached HD picture, or the classic avatar until the picture is ready (then it swaps in place).
-    function hdPicOr(a, px, classic, keep) {
-      const h = hdClean(a.hd), k = hdPicKey(h, px), u = hdPicGet(k), r = hdLayers(h).r;
+    function hdPicOr(a, px, classic, keep, head) {
+      const h = hdClean(a.hd), k = hdPicKey(h, px, head), u = hdPicGet(k), r = head ? 1 : hdLayers(h).r;
       if (u) return hdPicHTML(u, px, r);
-      hdPicMake(h, px, keep);
+      hdPicMake(h, px, keep && !head, head);
       return '<span class="hd-pic-wait" data-hdk="' + k + '">' + classic + "</span>";
     }
     function hdPicNode(a, px, fallback, keep) {
