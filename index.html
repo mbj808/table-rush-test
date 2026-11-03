@@ -12096,11 +12096,13 @@
       if (v === "again") { sayG.msg = "Try again \u2014 say the whole fact, like \u201C" + p.a + " " + sayWord() + " " + p.b + " is \u2026\u201D"; sayG.msgKind = "again"; sayPaint(); return; }
       const ok = v === "right";
       try { learnMark(p, ok); } catch (e) {}
-      lbPoint(ok, sayOp());
+      // Say It pays double: 2 points per right answer (two +1 pops) and 5 coins every 5 in a row.
+      lbPoint(ok, sayOp()); if (ok) lbPoint(true, sayOp());
       if (ok) {
+        setTimeout(function () { plusOne(".say-q"); }, 0); setTimeout(function () { plusOne(".say-q"); }, 380);
         sayG.streak += 1; sayG.right += 1;
         buddyMood(sayG.streak % AV_PRIZE_EVERY === 0 ? "cheer" : "hop");
-        if (sayG.streak % AV_PRIZE_EVERY === 0) setTimeout(coinDrop, 300);
+        if (sayG.streak % AV_PRIZE_EVERY === 0) setTimeout(function () { coinSet(coinGet() + 5); say("You got 5 coins!"); coinDrop(true); const t = document.querySelector("#coin-drop .coin-plus"); if (t) t.textContent = "+5"; }, 300);
         sayG.msg = "\u2705 " + p.a + " " + saySign() + " " + p.b + " = " + sayAns(p) + "!"; sayG.msgKind = "right";
         sayNetFire(true);
         try { playTone(true); } catch (e) {}
