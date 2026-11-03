@@ -3604,6 +3604,10 @@
     .shp-card.wearing { border-color: #7ee07a; }
     .shp-card.sel { outline: 4px solid #5ff2ff; outline-offset: 2px; }
     .shp-card:active { transform: scale(.97); }
+    .shp-piece { display: grid; place-items: center; height: 96px; }
+    .shp-piece svg { display: block; filter: drop-shadow(0 3px 3px rgba(0,0,0,.35)); }
+    .shp-hdthumb { display: grid; place-items: center; width: 100%; height: 96px; }
+    .shp-hdthumb img { max-width: 92%; max-height: 96px; object-fit: contain; filter: drop-shadow(0 3px 3px rgba(0,0,0,.35)); }
     .shp-handpic { display: grid; place-items: center; height: 96px; }
     .shp-swatch { width: 64px; height: 64px; margin: 14px 0; border-radius: 50%; border: 4px solid rgba(255,255,255,.8); }
     .shp-nm { font: 800 .82rem/1.1 var(--ui-font); text-align: center; min-height: 2.1em; display: flex; align-items: center; }
@@ -10186,13 +10190,14 @@
       const c = a.color, dk = avShade(c, 0.7), ink = "#2a1d3a";
       const st = a.style, pix = st === "pixel";
       const w = a.wear;
-      const p = [];
+      const p = [], M = {};
       // feet
       const shoe = w.shoes;
       const shoeFill = shoe === "sneakers" ? "#e8414f" : shoe === "boots" ? "#7a4a22" : shoe === "goldshoes" ? "#f5c542" : shoe === "rainbow" ? "url(#" + rb + ")" : shoe === "flippers" ? "#1fb5a8" : shoe === "skates" ? "#ff7ab8" : shoe === "wboots" ? "#2a1d3a" : shoe === "moonboots" ? "#dfe6f0" : shoe === "cleats" ? "#22202c" : shoe === "slippers" ? "#ffd34e" : shoe === "buckle" ? "#3a2a1a" : shoe === "gslipper" ? "#bff4ff" : dk;
       if (st === "animal" && a.animal === "turtle") p.push('<ellipse cx="50" cy="78" rx="29" ry="21" fill="#3f8a3a"/><path d="M24 70 L30 62 M76 70 L70 62 M22 84 H30 M78 84 H70" stroke="#2f6a2a" stroke-width="2"/>');
       if (st === "dino") p.push('<path d="M31 84 Q14 86 8 70 Q18 80 31 76 Z" fill="' + c + '"/>');
       if (shoe === "rainbow" || w.shirt === "rainbowtee") p.push('<defs><linearGradient id="' + rb + '" x1="0" x2="1"><stop offset="0" stop-color="#ff5a5a"/><stop offset=".33" stop-color="#ffd34e"/><stop offset=".66" stop-color="#5fe07a"/><stop offset="1" stop-color="#5f8cff"/></linearGradient></defs>');
+      M.sh = p.length;
       [38, 62].forEach(function (x) {
         if (shoe === "boots" || shoe === "wboots" || shoe === "moonboots") p.push('<rect x="' + (x - 8) + '" y="88" width="16" height="14" rx="4" fill="' + shoeFill + '"/>');
         else if (shoe === "flippers") p.push('<path d="M' + (x - 7) + ' 94 L' + (x - 12) + ' 104 L' + (x + 12) + ' 104 L' + (x + 7) + ' 94 Z" fill="' + shoeFill + '"/>');
@@ -10208,6 +10213,7 @@
         if (shoe === "sneakers") p.push('<rect x="' + (x - 10) + '" y="100" width="20" height="3" rx="1.5" fill="#fff"/>');
       });
       // torso / shirt
+      M.sr = p.length;
       const sh = w.shirt;
       const shirtFill = { tee: "#e8414f", stripes: "#fff", stars: "#3550c8", aloha: "#1fb5a8", hoodie: "#3fa34d", goldjersey: "#f5c542", tux: "#22202c", rainbowtee: "url(#" + rb + ")", goldsuit: "#f5c542", cape: "#e8414f", ncape: "#2a1d3a", saloha: "#ff8a3d", jetpack: "#dfe6f0", jersey: "#3550c8", sweater: "#d2691e", robe: "#3a2a5a", brickarmor: "#3550c8", rcape: "#6f3cc4", leafvest: "#c9a66b" }[sh] || c;
       if (sh === "cape") p.push('<path d="M30 64 L20 98 L80 98 L70 64 Z" fill="#b8202e"/>');
@@ -10238,6 +10244,7 @@
       if (sh === "lei") [[33, 64, "#ff7ab8"], [39, 69, "#ffd34e"], [45, 72, "#ff5a5a"], [51, 73, "#b47cff"], [57, 71, "#ff7ab8"], [63, 68, "#ffd34e"], [68, 64, "#ff5a5a"]].forEach(function (q) { p.push('<circle cx="' + q[0] + '" cy="' + q[1] + '" r="3.6" fill="' + q[2] + '"/>'); });
       if (st === "robot" && !sh) p.push('<rect x="42" y="70" width="16" height="10" rx="2" fill="' + dk + '"/><circle cx="46" cy="75" r="1.6" fill="#7ef"/><circle cx="54" cy="75" r="1.6" fill="#f7a"/>');
       // head
+      M.hd = p.length;
       if (st === "robot") {
         p.push('<line x1="50" y1="20" x2="50" y2="11" stroke="' + dk + '" stroke-width="3"/><circle cx="50" cy="9" r="4" fill="#ff5a6e"/>');
         p.push('<rect x="25" y="20" width="50" height="42" rx="9" fill="' + c + '"/><rect x="20" y="34" width="6" height="14" rx="2" fill="' + dk + '"/><rect x="74" y="34" width="6" height="14" rx="2" fill="' + dk + '"/>');
@@ -10310,6 +10317,7 @@
       if (mouth === "o") p.push(pix ? '<rect x="47" y="' + my + '" width="5" height="4" fill="' + ink + '"/>' : '<ellipse cx="50" cy="' + (my + 1) + '" rx="2.6" ry="2.2" fill="' + ink + '"/>');
       if (st === "monster" || st === "dino") p.push('<path d="M44 ' + (my + 1) + ' L46 ' + (my + 5) + ' L48 ' + (my + 2) + ' Z M52 ' + (my + 2) + ' L54 ' + (my + 5) + ' L56 ' + (my + 1) + ' Z" fill="#fff"/>');
       // glasses
+      M.gl = p.length;
       const g = w.glasses;
       if (g === "round") p.push('<circle cx="41" cy="41" r="7" fill="none" stroke="#3a2a1a" stroke-width="2"/><circle cx="59" cy="41" r="7" fill="none" stroke="#3a2a1a" stroke-width="2"/><path d="M48 41 H52" stroke="#3a2a1a" stroke-width="2"/>');
       if (g === "shades" || g === "goldshades") { const f = g === "shades" ? "#1a1a24" : "#f5c542", e2 = g === "shades" ? "#000" : "#a87412"; p.push('<rect x="32" y="35" width="16" height="11" rx="4" fill="' + f + '" stroke="' + e2 + '" stroke-width="1.5"/><rect x="52" y="35" width="16" height="11" rx="4" fill="' + f + '" stroke="' + e2 + '" stroke-width="1.5"/><path d="M48 39 H52" stroke="' + e2 + '" stroke-width="2"/><path d="M35 37.5 H41" stroke="#fff" stroke-width="1.5" opacity=".6"/>'); }
@@ -10323,6 +10331,7 @@
       if (g === "specs") p.push('<circle cx="41" cy="41" r="8.5" fill="#fff" fill-opacity=".15" stroke="#22202c" stroke-width="2.5"/><circle cx="59" cy="41" r="8.5" fill="#fff" fill-opacity=".15" stroke="#22202c" stroke-width="2.5"/><path d="M49.5 40 Q50 38 50.5 40" stroke="#22202c" stroke-width="2.5" fill="none"/><path d="M32.5 40 H26 M67.5 40 H74" stroke="#22202c" stroke-width="2"/>');
       if (g === "binocs") p.push('<rect x="31" y="34" width="16" height="15" rx="4" fill="#3a3a44"/><rect x="53" y="34" width="16" height="15" rx="4" fill="#3a3a44"/><rect x="46" y="38" width="8" height="6" fill="#22202c"/><circle cx="39" cy="44" r="4.5" fill="#6f8cff" stroke="#22202c" stroke-width="1.5"/><circle cx="61" cy="44" r="4.5" fill="#6f8cff" stroke="#22202c" stroke-width="1.5"/><circle cx="37.5" cy="42.5" r="1.3" fill="#fff"/><circle cx="59.5" cy="42.5" r="1.3" fill="#fff"/>');
       if (g === "eyeblack") p.push('<rect x="35" y="47" width="11" height="3" rx="1.5" fill="#22202c"/><rect x="54" y="47" width="11" height="3" rx="1.5" fill="#22202c"/>');
+      M.ht = p.length;
       // hats (head top ~ y18-20)
       const h = w.hat;
       if (h === "cap") p.push('<path d="M27 26 Q28 10 50 9 Q72 10 73 26 Z" fill="#e8414f"/><path d="M60 24 Q78 22 86 27 Q74 30 60 28 Z" fill="#b8202e"/><circle cx="50" cy="9.5" r="2" fill="#b8202e"/>');
@@ -10350,12 +10359,21 @@
       if (h === "pilgrim") p.push('<path d="M36 20 L38 -2 L62 -2 L64 20 Z" fill="#22202c"/><rect x="37" y="10" width="26" height="5" fill="#7a4a22"/><rect x="45" y="9" width="10" height="7" fill="none" stroke="#f5c542" stroke-width="2"/><rect x="24" y="18" width="52" height="5" rx="2.5" fill="#22202c"/>');
       if (h === "halo") p.push('<ellipse cx="50" cy="6" rx="16" ry="4.5" fill="none" stroke="#f5c542" stroke-width="3.5"/>');
       // pet
+      M.pt = p.length;
       const pet = w.pet && avItem(w.pet);
       if (pet && AV_PET_ART[pet.id]) p.push(AV_PET_ART[pet.id]);
       else if (pet) p.push((pet.gold ? '<circle cx="88" cy="96" r="12" fill="#f5c542" opacity=".35"/>' : "") + '<text x="88" y="103" font-size="20" text-anchor="middle">' + pet.emoji + '</text>');
       // hand item: held in the left hand
+      M.hn = p.length;
       const hd = w.hand && AV_HAND_ART[w.hand];
       if (hd) p.push('<g transform="matrix(-1 0 0 1 98 0)">' + hd + '</g><circle cx="22" cy="82" r="5" fill="' + c + '" stroke="rgba(0,0,0,.25)"/>');
+      // opts.only: just one piece (shop cards). Returns the inner markup in a <g>; the page measures and crops it.
+      if (opts.only) {
+        const rg = { shoes: [M.sh, M.sr], shirt: [M.sr, M.hd], head: [M.hd, M.gl], glasses: [M.gl, M.ht], hat: [M.ht, M.pt], pet: [M.pt, M.hn] }[opts.only];
+        const defs = p.filter(function (x) { return x.indexOf("<defs>") === 0; }).join("");
+        const inner = opts.only === "hand" ? (AV_HAND_ART[w.hand] || "") : rg ? p.slice(rg[0], rg[1]).join("") : "";
+        return defs + "<g>" + inner + "</g>";
+      }
       const size = opts.size || 96;
       return '<svg class="av-svg" xmlns="http://www.w3.org/2000/svg" viewBox="' + (pet ? "0 -8 104 114" : "0 -8 100 114") + '" width="' + size + '" height="' + Math.round(size * 1.14) + '"' + (pix ? ' shape-rendering="crispEdges"' : "") + ' aria-hidden="true">' + p.join("") + "</svg>";
     }
@@ -10363,6 +10381,25 @@
     function avNode(a, size, cls) {
       const span = el("span", { class: "av " + (cls || "") });
       span.innerHTML = avatarSVG(a, { size: size });
+      return span;
+    }
+    // One piece alone, cropped to its own size (measured once, then cached).
+    const avPieceBox = {};
+    let avMeasure = null;
+    function avPieceNode(a, only, key, size) {
+      const inner = avatarSVG(a, { only: only });
+      let vb = avPieceBox[key];
+      if (!vb) {
+        if (!avMeasure) { avMeasure = document.createElementNS("http://www.w3.org/2000/svg", "svg"); avMeasure.setAttribute("style", "position:absolute;left:-9999px;top:0;width:200px;height:200px;visibility:hidden"); avMeasure.setAttribute("viewBox", "-20 -20 160 160"); document.body.appendChild(avMeasure); }
+        avMeasure.innerHTML = inner;
+        let bb = null; try { const g = avMeasure.querySelector("g"); bb = g && g.getBBox(); } catch (e) {}
+        if (!bb || !bb.width) bb = { x: 0, y: -8, width: 104, height: 114 };
+        const side = Math.max(bb.width, bb.height) * 1.1 + 2;
+        vb = [bb.x + bb.width / 2 - side / 2, bb.y + bb.height / 2 - side / 2, side, side].map(function (n) { return Math.round(n * 10) / 10; }).join(" ");
+        avPieceBox[key] = vb;
+      }
+      const span = el("span", { class: "av shp-piece" });
+      span.innerHTML = '<svg class="av-svg" xmlns="http://www.w3.org/2000/svg" viewBox="' + vb + '" width="' + size + '" height="' + size + '" aria-hidden="true">' + inner + "</svg>";
       return span;
     }
     function avWith(itemId) {
@@ -10763,9 +10800,9 @@
         const locked = !have && it.pack && !shopPackOpen(it.pack);
         let pic;
         if (it.swatch) pic = el("span", { class: "shp-swatch", style: "background:" + it.swatch });
-        else if (hand) { pic = el("span", { class: "shp-handpic" }); pic.innerHTML = avHandSVG(it.id, 80); }
-        else if (it.f) { const h = JSON.parse(JSON.stringify(avatar.hd)); if (it.slot === "look") h.b = it.id; else h.w[it.slot] = it.id; pic = hdNode(h, 120); }
-        else pic = avNode(shopLook(it), 84);
+        else if (it.f) pic = el("span", { class: "shp-hdthumb" }, [el("img", { src: HD_DIR + "thumbs/" + it.f + ".webp", alt: "", decoding: "async", draggable: "false" })]);
+        else if (it.slot) { const a = { owned: [it.id], wear: {}, color: avatar.color, style: "buddy" }; a.wear[it.slot] = it.id; pic = avPieceNode(a, it.slot, it.id, 88); }
+        else { const pv = avPreview(it); pv.wear = {}; pv.owned = avatar.owned.concat([it.id]); pic = avPieceNode(pv, "head", "look:" + it.id, 88); }
         const tag = on ? el("span", { class: "shp-st wear", text: hand ? "Holding" : "Wearing" })
           : have ? el("span", { class: "shp-st own", text: hand ? "\u2713 Hold" : "\u2713 Wear" })
           : locked ? el("span", { class: "shp-st lock", text: "\uD83D\uDD12" })
