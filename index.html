@@ -3540,6 +3540,10 @@
     .av-tile-on { position: absolute; top: 6px; right: 6px; width: 26px; height: 26px; border-radius: 50%; background: #ffd34e; color: #2a1d00; font: 900 0.95rem/26px var(--ui-font); }
     .av-tile-lock { position: absolute; top: 6px; right: 6px; font-size: 1rem; }
     @media (prefers-reduced-motion: reduce) { .av-tile { transition: none; } .av-tile:active { transform: none; } }
+    .sim-bar { display: flex; flex-wrap: wrap; gap: .4rem; justify-content: center; align-items: center; margin: .2rem auto .5rem; padding: .45rem .6rem; border-radius: .8rem; border: 2px dashed #ff7ab8; background: rgba(40,0,40,.6); }
+    .sim-h { width: 100%; text-align: center; font: 800 .8rem/1 var(--ui-font); color: #ffb3d9; letter-spacing: .04em; }
+    .sim-bar button { min-height: 40px; padding: 0 .8rem; border-radius: 999px; border: 2px solid #fff; background: #7c3aed; color: #fff; font: 800 .95rem/1 var(--ui-font); }
+    .sim-bar .sim-reset { background: #b8202e; }
     .av-shake { animation: avShake .4s ease; }
     @keyframes avShake { 0%, 100% { transform: translateX(0); } 20% { transform: translateX(-6px); } 40% { transform: translateX(6px); } 60% { transform: translateX(-4px); } 80% { transform: translateX(4px); } }
     .coin-bump { animation: coinBump .35s ease-out; }
@@ -10443,12 +10447,32 @@
     let avSoonTimer = 0;
     function avSaveSoon() { try { localStorage.setItem(AV_KEY, JSON.stringify(avatar)); } catch (e) {} clearTimeout(avSoonTimer); avSoonTimer = setTimeout(function () { avSave(); }, 700); }
     window.addEventListener("pagehide", function () { if (avSoonTimer) { clearTimeout(avSoonTimer); avSoonTimer = 0; avSave(); } });
-    function avConfirm(title, sub, yes) {
+    // TEST SITE ONLY: buying simulator. Shows only when the page path is /table-rush-test/, so a copy on the live site never shows it.
+    const SIM_ON = /\/table-rush-test(\/|$)/.test(location.pathname);
+    function simBar() {
+      if (!SIM_ON) return null;
+      const redo = function () { const y = window.scrollY; render(); window.scrollTo(0, y); };
+      const add = function (n) { coinSet(n === 0 ? 0 : coinGet() + n); coinPillUpdate(); redo(); say("Coins: " + coinGet()); };
+      return el("div", { class: "sim-bar", role: "group", "aria-label": "Test buying tools" }, [
+        el("span", { class: "sim-h", text: "\uD83E\uDDEA Test tools" }),
+        el("button", { type: "button", text: "+$10", onClick: function () { add(10); } }),
+        el("button", { type: "button", text: "+$100", onClick: function () { add(100); } }),
+        el("button", { type: "button", text: "Set $0", onClick: function () { add(0); } }),
+        el("button", { type: "button", class: "sim-reset", text: "Reset purchases", onClick: function () {
+          const me = LEADERBOARD_URL ? lbMe() : null;
+          avConfirm("Reset purchases?", "Removes every bought piece and opened pack" + (me ? " for " + me.name + " (also on the TEST sheet)" : " on this device") + ". Coins stay.", function () {
+            avatar.owned = []; avatar.pk = []; avatar.wear = {}; avatar = avClean(avatar); avatar.made = true;
+            avSave(); say("Purchases reset."); redo();
+          }, "Yes, reset");
+        } })
+      ]);
+    }
+    function avConfirm(title, sub, yes, yesText) {
       const ov = el("div", { class: "prize-ov", role: "dialog", "aria-modal": "true", "aria-label": title });
       const close = function () { ov.remove(); };
       ov.appendChild(el("div", { class: "prize-box pack-confirm" }, [el("p", { class: "prize-title", text: title }), el("p", { class: "prize-sub", text: sub }),
         el("div", { class: "pack-yn" }, [el("button", { type: "button", class: "pack-no", text: "Not now", onClick: close }),
-          el("button", { type: "button", class: "pack-yes", text: "Yes, open it!", onClick: function () { close(); yes(); } })])]));
+          el("button", { type: "button", class: "pack-yes", text: yesText || "Yes, open it!", onClick: function () { close(); yes(); } })])]));
       document.body.appendChild(ov);
       const f = ov.querySelector(".pack-yes"); if (f) f.focus({ preventScroll: true });
     }
@@ -10470,6 +10494,7 @@
       const status = el("p", { class: "av-status " + avStatus, id: "av-status", role: "status" });
       top.appendChild(status);
       top.appendChild(coinPill());
+      if (SIM_ON) top.appendChild(simBar());
       if (avatar.pz > 0 && avAnyToWin()) top.appendChild(el("button", { type: "button", class: "pz-claim", text: "\uD83C\uDF81 Pick your prize!", onClick: function () { avPrizeShow(""); } }));
       const tabs = el("div", { class: "lb-tabs av-tabs", role: "tablist" });
       [["mine", "My Stuff"], ["win", "Buy More"]].forEach(function (t) {
@@ -11033,6 +11058,7 @@
       }
       card.appendChild(beatsTitle());
       card.appendChild(coinPill());
+      if (SIM_ON) card.appendChild(simBar());
       card.appendChild(el("p", { class: "beat-unlock-note", text: "Each beat costs 1 coin. Get " + BEAT_UNLOCK_STEP + " in a row to earn a coin." }));
       if (includeReset) {
         const list = el("div", { class: "beat-pills" });
