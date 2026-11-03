@@ -10012,7 +10012,7 @@
       const art = AV_HAND_ART[id]; if (!art) return "";
       return '<svg class="av-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 26 44 70" width="' + Math.round(size * 0.63) + '" height="' + size + '" aria-hidden="true"><g transform="matrix(-1 0 0 1 98 0)">' + art + '</g><circle cx="22" cy="82" r="5" fill="#ffd9b8" stroke="rgba(0,0,0,.25)"/></svg>';
     }
-    const AV_PACK_COST = 75, AV_PIECE_COST = 1, AV_GOLD_COST = 50;
+    const AV_PACK_COST = 5, AV_PIECE_COST = 1, AV_GOLD_COST = 50;
     const AV_GOLD_AT = 50;
     function avItem(id) { return AV_ITEMS.find(function (i) { return i.id === id; }) || null; }
     // Look parts are unlockable too. Short ids keep the saved data small: s.robot, a.fox, c5, f.wow, h.bun, k3.
