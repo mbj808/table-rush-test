@@ -10491,8 +10491,8 @@
       copy.wear[it.slot] = itemId;
       return copy;
     }
-    // ---- Prize: every 10 in a row, pick anything from the full list. Gold items too (no streak gate). ----
-    const AV_PRIZE_EVERY = 10;
+    // ---- Prize: every AV_PRIZE_EVERY in a row, pick anything from the full list. Gold items too (no streak gate). ----
+    const AV_PRIZE_EVERY = 5;
     // A beat unlock can land on the same streak: wait for its burst / congrats popup to finish, then show the prize.
     function avPrizeWhenClear(at, tries) {
       if (state.phase !== "play" && state.phase !== "quiz") return;
@@ -10546,7 +10546,7 @@
         const can = win && !have && !goldLock;
         grid.appendChild(el("button", { type: "button", class: "pz-item" + (have ? " have" : "") + (locked ? " locked" : "") + (goldLock ? " goldlock" : "") + (it.gold ? " gold" : "") + (can ? " can" : ""),
           "aria-label": it.name + (have ? ", yours" : goldLock ? ", locked, needs 50 in a row" : locked ? ", locked" : ", locked, tap to unlock it"), "aria-disabled": String(!can),
-          onClick: function (ev) { if (can) onWin(it, ev.currentTarget); else if (goldLock) say("Gold needs 50 in a row."); else if (locked) say("Win it with 10 in a row!"); } }, kids));
+          onClick: function (ev) { if (can) onWin(it, ev.currentTarget); else if (goldLock) say("Gold needs 50 in a row."); else if (locked) say("Win it with " + AV_PRIZE_EVERY + " in a row!"); } }, kids));
       });
       wrap.appendChild(grid);
       return wrap;
@@ -10698,7 +10698,7 @@
     const COIN_KEY = "mf-coins";
     function coinGet() { try { return Math.max(0, parseInt(localStorage.getItem(COIN_KEY) || "0", 10) || 0); } catch (e) { return 0; } }
     function coinSet(n) { try { localStorage.setItem(COIN_KEY, String(Math.max(0, n))); } catch (e) {} }
-    function coinSpend(amount) { const n = Math.max(1, Math.floor(Number(amount) || 1)), c = coinGet(); if (c < n) { say(n === 1 ? "You need a coin. Get 10 in a row to earn one!" : "You need " + n + " coins. You have " + c + "."); return false; } coinSet(c - n); coinPillUpdate(); return true; }
+    function coinSpend(amount) { const n = Math.max(1, Math.floor(Number(amount) || 1)), c = coinGet(); if (c < n) { say(n === 1 ? "You need a coin. Get " + AV_PRIZE_EVERY + " in a row to earn one!" : "You need " + n + " coins. You have " + c + "."); return false; } coinSet(c - n); coinPillUpdate(); return true; }
     function coinPillUpdate() { const c = coinGet(), t = c + (c === 1 ? " coin" : " coins"); document.querySelectorAll(".coin-bank").forEach(function (b) { b.setAttribute("aria-label", t); const s = b.lastChild; if (s) s.textContent = b.getAttribute("data-short") ? String(c) : t; b.classList.remove("coin-bump"); void b.offsetWidth; b.classList.add("coin-bump"); }); }
     function coinPill() { const c = coinGet(); return el("p", { class: "coin-bank", role: "status", "aria-label": c + (c === 1 ? " coin" : " coins") }, [el("span", { class: "coin-ico", "aria-hidden": "true", text: "$" }), el("span", { text: c + (c === 1 ? " coin" : " coins") })]); }
     function coinDrop(preview) {
@@ -11440,7 +11440,7 @@
       card.appendChild(beatsTitle());
       card.appendChild(coinPill());
       if (SIM_ON) card.appendChild(simBar());
-      card.appendChild(el("p", { class: "beat-unlock-note", text: "Each beat costs 1 coin. Get " + BEAT_UNLOCK_STEP + " in a row to earn a coin." }));
+      card.appendChild(el("p", { class: "beat-unlock-note", text: "Each beat costs 1 coin. Get " + AV_PRIZE_EVERY + " in a row to earn a coin." }));
       if (includeReset) {
         const list = el("div", { class: "beat-pills" });
         PLAY_TRACKS.forEach(function (track, i) {
@@ -13766,7 +13766,7 @@
       learnMark(problem, ok);
       if (ok) {
         state.streak += 1;
-        buddyMood(state.streak % 10 === 0 ? "cheer" : "hop");
+        buddyMood(state.streak % AV_PRIZE_EVERY === 0 ? "cheer" : "hop");
         state.lbOp = problem.operation || state.operation;
         lbPoint(true, problem.operation || state.operation);
         const kqNoPrize = isKq(problem.operation);
