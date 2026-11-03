@@ -10050,11 +10050,6 @@
       {"id":"ws3","slot":"shoes","name":"Cloud slippers","f":"w_s3","ch":"wizard","L":[25.2,80.27,44.73,14.23]},
       {"id":"ws4","slot":"shoes","name":"Dragon scale boots","f":"w_s4","ch":"wizard","L":[27.15,81.52,40.82,13.36]},
       {"id":"ws5","slot":"shoes","name":"Rune boots","f":"w_s5","ch":"wizard","L":[27.34,80.27,40.43,14.86]},
-      {"id":"wk1","slot":"hand","name":"Star wand","f":"w_k1","ch":"wizard","L":[16.02,30.46,32.81,42.45]},
-      {"id":"wk2","slot":"hand","name":"Crystal staff","f":"w_k2","ch":"wizard","L":[15.62,25.59,21.09,63.42]},
-      {"id":"wk3","slot":"hand","name":"Bubbling potion","f":"w_k3","ch":"wizard","L":[21.48,37.58,16.02,25.84]},
-      {"id":"wk4","slot":"hand","name":"Magic lantern","f":"w_k4","ch":"wizard","L":[21.88,46.32,16.02,22.85]},
-      {"id":"wk5","slot":"hand","name":"Flying broom","f":"w_k5","ch":"wizard","L":[20.7,33.33,24.61,59.8]},
       {"id":"wp1","slot":"pet","name":"Owl buddy","f":"w_p1","ch":"wizard","L":[66.02,72.16,24.02,21.85]},
       {"id":"wp2","slot":"pet","name":"Star kitten","f":"w_p2","ch":"wizard","L":[61.91,70.41,29.69,23.85]},
       {"id":"wp3","slot":"pet","name":"Baby dragon","f":"w_p3","ch":"wizard","L":[66.8,69.04,28.71,24.72]},
@@ -10078,7 +10073,7 @@
     // Wizard: one 512x801 body per outfit (base robe is free); hat, shoes, pet and hand item are layers cut from
     // renders of this exact wizard, so they sit at fixed spots (L = left, top, width, height in %). Other characters: body only.
     // Images load only when this is called, and only for the selected character.
-    const HD_LAYER_ORDER = ["shoes", "pet", "hand", "hat"];
+    const HD_LAYER_ORDER = ["shoes", "pet", "hat"];
     function hdNode(h, size) {
       const c = hdItem(h.b) || HD_ITEMS[0], wiz = c.ch === "wizard";
       const box = el("span", { class: "hd-av", style: "width:" + Math.round(size * (wiz ? 0.639 : 0.683)) + "px;height:" + size + "px" });
@@ -10862,9 +10857,9 @@
       const paintTabs = function () {
         tabs.innerHTML = "";
         const hd = hdOn();
-        if (hd && shopTab === "glasses") shopTab = "hat";
+        if (hd && (shopTab === "glasses" || shopTab === "hand")) shopTab = "hat";
         SHOP_TABS.forEach(function (t) {
-          if (hd && t[0] === "glasses") return;
+          if (hd && (t[0] === "glasses" || t[0] === "hand")) return;
           if (hd && t[0] === "shirt") t = ["shirt", "\uD83E\uDDE5", "Outfits"];
           if (hd && t[0] === "look") t = ["look", "\uD83E\uDDD9", "Characters"];
           tabs.appendChild(el("button", { type: "button", role: "tab", class: "shp-tab" + (t[0] === "pack" ? " pk" : "") + (shopTab === t[0] ? " on" : ""), "aria-selected": String(shopTab === t[0]),
@@ -10900,7 +10895,7 @@
                 shopTab = "hat"; shopMode = "shop"; paintAll(true);
               });
             } }, [el("span", { class: "shp-pack-art", text: "\u2728" }), el("span", { class: "shp-pack-txt" }, [el("b", { text: "HD Avatar \u00B7 NEW" }),
-              el("small", { text: "6 movie-style 3D characters! Wizard free, others $" + HD_CHAR_COST + ". 25 Wizard items, $" + HD_PIECE_COST + " each. More coming soon." }),
+              el("small", { text: "6 movie-style 3D characters! Wizard free, others $" + HD_CHAR_COST + ". 20 Wizard items, $" + HD_PIECE_COST + " each. More coming soon." }),
               hdOpen ? el("span", { class: "shp-st own", text: "\u2713 Open \u00B7 Shop HD" }) : el("span", { class: "shp-buy" + (coinGet() < HD_PACK_COST ? " poor" : "") }, [el("span", { class: "coin-ico", "aria-hidden": "true", text: "$" }), el("span", { text: HD_PACK_COST + " Open" })])])]));
           AV_PACKS.forEach(function (pk) {
             const k = pk[0], open = shopPackOpen(k);
