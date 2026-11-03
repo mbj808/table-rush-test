@@ -3397,6 +3397,9 @@
     .say-mic.on .say-dot { background: #ff4d6d; box-shadow: 0 0 10px #ff4d6d; animation: sayDot 1.2s ease-in-out infinite; }
     .say-mic.denied { border-color: #ffb36b; }
     @keyframes sayDot { 50% { opacity: 0.4; } }
+    .say-ops { display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; }
+    .say-op { min-height: 2.8rem; padding: 0.4rem 1rem; border-radius: 999px; border: 2px solid rgba(255,255,255,0.45); background: rgba(10,14,40,0.75); color: #fff; font: 800 1.05rem/1.1 var(--ui-font); }
+    .say-op.on { background: #ffd23f; border-color: #ffd23f; color: #241944; }
     .say-streak { font: 800 1.1rem/1 var(--ui-font); color: #9ff3ff; }
     .say-q { font: 900 clamp(2.6rem, 11vw, 4.5rem)/1.1 var(--ui-font); text-shadow: 0 0 18px rgba(95,242,255,0.6); }
     .say-q.shake { animation: sayShake 0.45s ease-in-out; }
@@ -11949,6 +11952,11 @@
     const SAY_KEY = "tr-sayit-unlock";
     const SAY_SR = window.SpeechRecognition || window.webkitSpeechRecognition || null;
     const sayG = { rec: null, on: false, want: false, denied: false, heard: "", status: "off", prob: null, streak: 0, right: 0, lock: 0, seen: 0, msg: "", msgKind: "", err: "", net: null, codeErr: "" };
+    function sayOp() { try { return localStorage.getItem("tr-sayit-op") === "add" ? "add" : "multiply"; } catch (e) { return "multiply"; } }
+    function saySetOp(op) { if (op === sayOp()) return; try { localStorage.setItem("tr-sayit-op", op); } catch (e) {} if (sayG.streak > 0) lbStreakEnded(sayG.streak, sayOp() === "add" ? "multiply" : "add"); sayG.streak = 0; sessEnd(); lbFlush(); sayG.prob = null; sayNext(); sayG.heard = ""; sayG.msg = ""; sayPaint(); }
+    function saySign() { return sayOp() === "add" ? "+" : "\u00D7"; }
+    function sayWord() { return sayOp() === "add" ? "plus" : "times"; }
+    function sayAns(p) { return sayOp() === "add" ? p.a + p.b : p.a * p.b; }
     function sayUnlocked() { try { return localStorage.getItem(SAY_KEY) === "1"; } catch (e) { return false; } }
     function sayCodeOk(v) { return String(v || "").toLowerCase().replace(/[\s'\u2018\u2019\u02BB\u02BC`\u00B4\-.]/g, "") === "oahu"; }
     // ---- Spoken numbers -> list of numbers in order ----
@@ -11965,7 +11973,7 @@
       return null;
     }
     function sayNums(text) {
-      const t = String(text || "").toLowerCase().replace(/(\d),(\d{3})/g, "$1$2").replace(/[\u00D7*]/g, " x ").replace(/(\d)\s*x\s*(\d)/g, "$1 x $2").replace(/(\d)([a-z])/g, function (s, d, l) { return l === "s" ? s : d + " " + l; }).replace(/[-=?!.,:;]/g, " ");
+      const t = String(text || "").toLowerCase().replace(/(\d),(\d{3})/g, "$1$2").replace(/[\u00D7*]/g, " x ").replace(/(\d)\s*x\s*(\d)/g, "$1 x $2").replace(/(\d)([a-z])/g, function (s, d, l) { return l === "s" ? s : d + " " + l; }).replace(/[-+=?!.,:;]/g, " ");
       const toks = t.split(/\s+/).filter(Boolean), out = [];
       let cur = null, lastWasTen = false;
       const flush = function () { if (cur != null) out.push(cur); cur = null; lastWasTen = false; };
@@ -11983,8 +11991,8 @@
       return out;
     }
     // "right" | "wrong" | "again" for one transcript
-    function sayJudge(text, a, b) {
-      const p = a * b, n = sayNums(text);
+    function sayJudge(text, a, b, op) {
+      const p = op === "add" ? a + b : a * b, n = sayNums(text);
       if (!n.length) return "again";
       const digits = n.join(""), ab = "" + a + b, ba = "" + b + a;
       const has = function (arr, x, y) { const i = arr.indexOf(x); if (i < 0) return -1; const j = arr.indexOf(y, x === y ? i + 1 : 0); if (j < 0) return -1; return Math.max(i, j); };
@@ -12001,19 +12009,20 @@
       if (d0 && digits.length > d0.length && n.length >= 2 && String(n[0]) === d0) return "wrong";
       return "again";
     }
-    function sayJudgeAll(alts, a, b) {
+    function sayJudgeAll(alts, a, b, op) {
       let best = "again";
-      for (let i = 0; i < alts.length; i++) { const r = sayJudge(alts[i], a, b); if (r === "right") return "right"; if (r === "wrong") best = "wrong"; }
+      for (let i = 0; i < alts.length; i++) { const r = sayJudge(alts[i], a, b, op); if (r === "right") return "right"; if (r === "wrong") best = "wrong"; }
       return best;
     }
     // ---- Facts: same picker as normal multiplication mode ----
     function sayNext() {
       const keep = { operation: state.operation, mode: state.mode, drill: state.drill, tables: state.tables.slice() };
       try {
-        if (state.operation !== "multiply") state.tables = defaultMathTables();
-        state.operation = "multiply"; state.mode = "product"; state.drill = null;
+        const op = sayOp();
+        if (state.operation !== op) state.tables = op === "add" ? defaultAddTables() : defaultMathTables();
+        state.operation = op; state.mode = op === "add" ? "sum" : "product"; state.drill = null;
         sayG.prob = makeProblem(sayG.prob && sayG.prob.key);
-      } catch (e) { const a = 2 + Math.floor(Math.random() * 11), b = 2 + Math.floor(Math.random() * 11); sayG.prob = { a: a, b: b, product: a * b, answer: a * b, operation: "multiply", mode: "product", key: a + "x" + b }; }
+      } catch (e) { const a = 2 + Math.floor(Math.random() * 11), b = 2 + Math.floor(Math.random() * 11); sayG.prob = sayOp() === "add" ? { a: a, b: b, sum: a + b, answer: a + b, operation: "add", mode: "sum", key: a + "+" + b } : { a: a, b: b, product: a * b, answer: a * b, operation: "multiply", mode: "product", key: a + "x" + b }; }
       finally { state.operation = keep.operation; state.mode = keep.mode; state.drill = keep.drill; state.tables = keep.tables; }
       sayG.lock = 0;
     }
@@ -12045,7 +12054,7 @@
         if (!alts.length) continue;
         sayG.heard = alts[0].trim();
         if (performance.now() < sayG.lock) { if (res.isFinal) sayG.seen = i + 1; continue; }
-        const v = sayJudgeAll(alts, p.a, p.b);
+        const v = sayJudgeAll(alts, p.a, p.b, sayOp());
         // Interim results count only when right (fast); wrong or unclear waits for the final words.
         if (v === "right" || res.isFinal) { sayG.seen = i + 1; sayAnswer(v); if (v !== "again") return; }
       }
@@ -12053,24 +12062,24 @@
     }
     function sayAnswer(v) {
       const p = sayG.prob;
-      if (v === "again") { sayG.msg = "Try again \u2014 say the whole fact, like \u201C" + p.a + " times " + p.b + " is \u2026\u201D"; sayG.msgKind = "again"; sayPaint(); return; }
+      if (v === "again") { sayG.msg = "Try again \u2014 say the whole fact, like \u201C" + p.a + " " + sayWord() + " " + p.b + " is \u2026\u201D"; sayG.msgKind = "again"; sayPaint(); return; }
       const ok = v === "right";
       try { learnMark(p, ok); } catch (e) {}
-      lbPoint(ok, "multiply");
+      lbPoint(ok, sayOp());
       if (ok) {
         sayG.streak += 1; sayG.right += 1;
         buddyMood(sayG.streak % AV_PRIZE_EVERY === 0 ? "cheer" : "hop");
         if (sayG.streak % AV_PRIZE_EVERY === 0) setTimeout(coinDrop, 300);
-        sayG.msg = "\u2705 " + p.a + " \u00D7 " + p.b + " = " + p.product + "!"; sayG.msgKind = "right";
+        sayG.msg = "\u2705 " + p.a + " " + saySign() + " " + p.b + " = " + sayAns(p) + "!"; sayG.msgKind = "right";
         sayNetFire(true);
         try { playTone(true); } catch (e) {}
         sayG.lock = performance.now() + 900;
         setTimeout(function () { sayNext(); sayG.heard = ""; sayG.msg = ""; sayPaint(); }, 700);
       } else {
-        if (sayG.streak > 0) lbStreakEnded(sayG.streak, "multiply");
+        if (sayG.streak > 0) lbStreakEnded(sayG.streak, sayOp());
         sayG.streak = 0;
         buddyMood("shake");
-        sayG.msg = "Not quite. " + p.a + " \u00D7 " + p.b + " = " + p.product + ". Next one!"; sayG.msgKind = "wrong";
+        sayG.msg = "Not quite. " + p.a + " " + saySign() + " " + p.b + " = " + sayAns(p) + ". Next one!"; sayG.msgKind = "wrong";
         sayNetFire(false);
         try { playTone(false); } catch (e) {}
         sayG.lock = performance.now() + 2200;
@@ -12149,13 +12158,16 @@
       host.replaceChildren(sayLive());
     }
     function sayLive() {
-      const p = sayG.prob, box = el("div", { class: "say-in" });
+      const p = sayG.prob, box = el("div", { class: "say-in" }), cur = sayOp();
+      box.appendChild(el("div", { class: "say-ops", role: "group", "aria-label": "Pick facts" }, [["multiply", "\u2716\uFE0F Multiplication"], ["add", "\u2795 Addition"]].map(function (o) {
+        return el("button", { type: "button", class: "say-op" + (cur === o[0] ? " on" : ""), "aria-pressed": String(cur === o[0]), text: o[1], onClick: function () { saySetOp(o[0]); } });
+      })));
       const micTxt = sayG.status === "on" ? "Listening\u2026" : sayG.status === "denied" ? "Mic is blocked. Allow the microphone in your browser settings, then tap here." : "Mic is off. Tap to turn it on.";
       box.appendChild(el("button", { type: "button", class: "say-mic " + sayG.status, "aria-live": "polite", onClick: function () { sayG.denied = false; sayMicStart(); } }, [el("span", { class: "say-dot", "aria-hidden": "true" }), el("span", { text: "\uD83C\uDFA4 " + micTxt })]));
       box.appendChild(el("div", { class: "say-streak", text: sayG.streak + " in a row" }));
-      const q = el("div", { class: "say-q" + (sayG.msgKind === "wrong" ? " shake" : ""), text: p ? p.a + " \u00D7 " + p.b + " = ?" : "" });
+      const q = el("div", { class: "say-q" + (sayG.msgKind === "wrong" ? " shake" : ""), text: p ? p.a + " " + saySign() + " " + p.b + " = ?" : "" });
       box.appendChild(withBuddy(q));
-      box.appendChild(el("p", { class: "say-tip", text: "Say the whole fact, like \u201C7 times 8 is 56\u201D." }));
+      box.appendChild(el("p", { class: "say-tip", text: sayOp() === "add" ? "Say the whole fact, like \u201C7 plus 8 is 15\u201D." : "Say the whole fact, like \u201C7 times 8 is 56\u201D." }));
       box.appendChild(el("div", { class: "say-heard", "aria-live": "polite" }, [el("span", { class: "say-heard-l", text: "I heard: " }), el("b", { text: sayG.heard ? "\u201C" + sayG.heard + "\u201D" : "\u2026" })]));
       if (sayG.msg) box.appendChild(el("div", { class: "say-msg " + sayG.msgKind, role: "status", text: sayG.msg }));
       return box;
