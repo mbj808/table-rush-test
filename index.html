@@ -10662,7 +10662,7 @@
       const tryBuy = el("button", { type: "button", class: "shp-buy" });
       const tryBar = el("div", { class: "shp-try", hidden: "" }, [tryTxt,
         el("button", { type: "button", class: "shp-no", "aria-label": "Stop trying on", text: "\u2715", onClick: function () { shopTry = ""; paintAll(); } }), tryBuy]);
-      const stage = el("div", { class: "shp-stage" }, [el("div", { class: "shp-beam" }), el("div", { class: "shp-ped" }), hero, tryBar]);
+      const stage = el("div", { class: "shp-stage" }, [el("div", { class: "shp-beam" }), el("div", { class: "shp-ped" }), hero]);
       const tabs = el("div", { class: "shp-tabs", role: "tablist" });
       const seg = el("div", { class: "shp-seg" });
       const body = el("div", { class: "shp-body" });
@@ -10687,9 +10687,9 @@
           shopPack = k; paintAll();
         });
       };
-      const buy = function (it) {
+      const buy = function (it, node) {
         const cost = shopCost(it);
-        if (coinGet() < cost) { shake(tryBuy); say("You need $" + cost + ". You have $" + coinGet() + "."); return; }
+        if (coinGet() < cost) { shake(node); say("You need $" + cost + ". You have $" + coinGet() + "."); return; }
         if (!coinSpend(cost)) return;
         if (avatar.owned.indexOf(it.id) < 0) avatar.owned.push(it.id);
         avApply(it); avatar.made = true;
@@ -10697,7 +10697,7 @@
         shopTry = ""; avSaveSoon(); say("You got " + it.name + "!");
         paintAll(true);
       };
-      const paintTry = function () {
+      const paintTry = function () { return;
         const it = shopTry && shopFind(shopTry);
         if (!it) { tryBar.setAttribute("hidden", ""); stage.classList.remove("trying"); return; }
         tryBar.removeAttribute("hidden"); stage.classList.add("trying");
@@ -10729,7 +10729,7 @@
               if (on && it.slot) delete avatar.wear[it.slot]; else avApply(it);
               avatar.made = true; shopTry = ""; avSaveSoon(); paintAll(true); return;
             }
-            shopTry = shopTry === it.id ? "" : it.id; paintAll();
+            if (it.pack && !shopPackOpen(it.pack)) packOpen(it.pack, this); else buy(it, this);
           } }, [it.gold ? el("span", { class: "shp-rib", text: "GOLD" }) : null, pic, el("span", { class: "shp-nm", text: name }), tag].filter(Boolean));
       };
       const grid = function (list) { return el("div", { class: "shp-grid" }, list.map(cardFor)); };
@@ -10749,7 +10749,7 @@
             const k = shopPack, open = shopPackOpen(k), pk = AV_PACKS.find(function (q) { return q[0] === k; });
             body.appendChild(el("button", { type: "button", class: "shp-chip", text: "\u2039 All packs", onClick: function () { shopPack = ""; shopTry = ""; paintAll(); } }));
             const ban = el("div", { class: "shp-pack big", style: "background:linear-gradient(135deg," + SHOP_PACK_BG[k] + ")" }, [el("span", { class: "shp-pack-art", text: pk[2] }),
-              el("span", { class: "shp-pack-txt" }, [el("b", { text: pk[1] }), el("small", { text: open ? "Open! Tap a piece to try it on." : "Tap a piece to try it on. Open the pack to buy." })])]);
+              el("span", { class: "shp-pack-txt" }, [el("b", { text: pk[1] }), el("small", { text: open ? "Open! Tap a piece to buy it." : "Open the pack to buy its pieces." })])]);
             if (!open) { const ob = el("button", { type: "button", class: "shp-buy" + (coinGet() < AV_PACK_COST ? " poor" : "") }, [el("span", { class: "coin-ico", "aria-hidden": "true", text: "$" }), el("span", { text: AV_PACK_COST + " Open" })]); ob.onclick = function () { packOpen(k, ob); }; ban.appendChild(ob); }
             body.appendChild(ban);
             body.appendChild(grid(AV_ITEMS.filter(function (i) { return i.pack === k; })));
