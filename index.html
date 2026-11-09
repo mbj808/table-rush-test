@@ -3544,6 +3544,7 @@
     body[data-page="leaders"] .lb-tab { font-family: var(--ui-font); font-weight: 700; min-height: 2.7rem; }
     /* ===== Avatar page redesign ===== */
     body[data-page="closet"] header h1, body[data-page="closet"] .page-head { display: none; }
+    body[data-page="scene"] header h1, body[data-page="scene"] .page-head { display: none; }
     .closet-card { max-width: 34rem; gap: 0; padding-top: 0; color: #fff; }
     .av-top { position: sticky; top: 0; z-index: 20; display: flex; flex-direction: column; gap: 0.55rem; padding: 0.6rem 0.2rem 0.7rem;
       background: linear-gradient(180deg, #24123f 0%, #1c0f33 100%); border-bottom: 1px solid rgba(255,255,255,0.15); box-shadow: 0 8px 14px -8px rgba(0,0,0,0.6); }
@@ -3889,6 +3890,52 @@
     .td-btn.small { min-height: 2.3rem; padding: 0 .7rem; font-size: .82rem; } .td-btn.ghost { background: transparent; color: #ffd23f; margin-top: .3rem; }
     .td-kid { margin: .4rem 0; padding: .5rem; border-radius: .7rem; background: rgba(255,255,255,.06); }
     .td-h { margin-top: .8rem; }
+    /* ===== Scene builder (test site) ===== */
+    .sc-card { max-width: 68rem; margin: 0 auto; padding: 0 0 4rem; color: #fff; }
+    .sc-wrap { display: grid; gap: .75rem; min-width: 0; }
+    .sc-stage { position: relative; width: min(100%, 920px); aspect-ratio: 16 / 9; border-radius: 22px; overflow: hidden; box-shadow: inset 0 0 0 3px rgba(255,255,255,.55), 0 6px 0 rgba(0,0,0,.25); touch-action: none; background: #8fd4ff; }
+    .sc-card .shp-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    @media (min-width: 720px) { .sc-card .shp-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+    .sc-card .shp-nm { font-size: .8rem; line-height: 1.15; overflow-wrap: normal; word-break: normal; }
+    .sc-swatch { position: relative; overflow: hidden; }
+    .sc-mark { position: absolute; left: 18%; right: 18%; top: 6px; bottom: 6px; }
+    .sc-card .shp-card { overflow: hidden; min-width: 0; }
+    .sc-view { position: absolute; inset: 0; overflow: hidden; }
+    .sc-sky { position: absolute; inset: 0; }
+    .sc-star { position: absolute; width: 4px; height: 4px; margin: -2px 0 0 -2px; border-radius: 50%; background: #fff8d8; box-shadow: 0 0 0 2px rgba(255,248,216,.35); }
+    .sc-ground { position: absolute; left: -8%; right: -8%; bottom: 0; height: 40%; border-radius: 50% 50% 0 0 / 22% 22% 0 0; }
+    .sc-layer { position: absolute; inset: 0; }
+    .sc-bit { position: absolute; width: 27%; aspect-ratio: 5 / 6; transform: translate(-50%, -90%) scale(var(--s, 1)); transform-origin: 50% 92%; }
+    .sc-piece { margin: 0; padding: 0; border: 0; background: transparent; cursor: grab; touch-action: none; }
+    .sc-piece.sel { z-index: 30; outline: 3px solid #fff; outline-offset: 2px; border-radius: 12px; }
+    .sc-piece svg, .sc-thumb svg { width: 100%; height: 100%; overflow: visible; display: block; }
+    .sc-svg { overflow: visible; filter: url(#sc-stick); }
+    .sc-thumb { display: grid; place-items: center; height: 78px; }
+    .sc-thumb svg { height: 72px; width: auto; }
+    .sc-tools { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .sc-tools button, .sc-count { min-height: 44px; padding: 0 .85rem; border-radius: 999px; border: 3px solid #fff; background: rgba(255,255,255,.14); color: #fff; font: 900 .95rem/1 var(--ui-font); }
+    .sc-tools .sc-trash { background: #e23b4a; }
+    .sc-tools .sc-trash:disabled, .sc-tools .sc-size:disabled { opacity: .45; }
+    .sc-count { border-color: transparent; background: transparent; padding: 0 .2rem; }
+    .sc-tabs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+    .sc-tab { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-width: 0; min-height: 58px; padding: 6px 2px; border-radius: 16px; border: 0; background: rgba(255,255,255,.1); color: #efe7ff; font: 800 .82rem/1.05 var(--ui-font); text-align: center; cursor: pointer; }
+    .sc-tab.on { background: #ffd34e; color: #3a2400; box-shadow: 0 3px 0 #a87412; }
+    .sc-hint { margin: 0; font: 700 .92rem/1.35 var(--ui-font); color: #ffe9a8; }
+    .sc-swatch { width: 100%; height: 72px; border-radius: 14px; box-shadow: inset 0 0 0 3px #fff; }
+    .shp-stage.has-scene { --pb: 10px; background: #87c8f0; }
+    .shp-stage.has-scene .shp-beam, .shp-stage.has-scene .shp-ped { display: none; }
+    .shp-stage .sc-view { z-index: 0; border-radius: inherit; }
+    .shp-stage .sc-jump { left: 10px; right: auto; background: linear-gradient(#7ed957, #2f9e4a); border-color: #e8ffd0; }
+    body.sc-on .wave-bg > :not(.sc-live) { visibility: hidden; }
+    body.sc-on .wave-bg { background: #7ec8ff; }
+    .wave-bg .sc-live { position: absolute; inset: 0; z-index: 2; overflow: hidden; pointer-events: none; }
+    .wave-bg .sc-live svg, .wave-bg.night .sc-live svg { display: block !important; position: static !important; left: auto !important; top: auto !important; width: 100% !important; height: 100% !important; min-height: 0 !important; transform: none !important; animation: none !important; opacity: 1 !important; will-change: auto !important; }
+    .wave-bg .sc-live .sc-bit { width: 15%; }
+    body.sc-on .wave-bg::after { content: ""; position: absolute; inset: 0; z-index: 4; pointer-events: none; background: linear-gradient(180deg, rgba(18,8,40,.42) 0%, rgba(18,8,40,.22) 38%, rgba(18,8,40,.5) 100%); }
+    @media (prefers-reduced-motion: reduce) {
+      .sc-piece { cursor: pointer; }
+    }
+
   </style>
 </head>
 <body>
@@ -8670,6 +8717,7 @@
       if (siteTheme === "thanksgiving") tgSetBeat(level);
       else if (siteTheme === "halloween2") hw2SetBeat(level);
       sceneWake(siteTheme + level);
+      if (typeof scApplyLive === "function") scApplyLive();
     }
     function render() {
       cleanMathTables();
@@ -9060,6 +9108,7 @@
       if (page === "beats") stack.appendChild(musicCard(true, true));
       if (page === "backgrounds") stack.appendChild(backgroundsCard());
       if (page === "closet") { stack.appendChild(closetCard()); app.appendChild(stack); return; }
+      if (page === "scene") { stack.appendChild(sceneCard()); app.appendChild(stack); return; }
       if (page === "bricks") { stack.appendChild(bricksCard()); app.appendChild(stack); return; }
       if (page === "h2h") { stack.appendChild(h2hCard()); app.appendChild(stack); return; }
       if (page === "sayit") { stack.appendChild(sayCard()); app.appendChild(stack); return; }
@@ -10236,6 +10285,290 @@
       const w = box.querySelector(".hd-pic-wait"); if (w && fallback) w.appendChild(fallback);
       return box;
     }
+    // ---- Build your own scene. Saved on avatar.sc with the rest of the kid's account. ----
+    const SC_MAX = 15;
+    const SC_ITEMS = [
+      { id: "sky.day", slot: "sky", name: "Day", cost: 0, free: 1, bg: "linear-gradient(#7ecbff,#d8f3ff 72%,#fff4c8)", mark: '<circle cx="70" cy="36" r="14" fill="#ffd23a"/>' },
+      { id: "sky.sunset", slot: "sky", name: "Sunset", cost: 5, bg: "linear-gradient(#ff7a59,#ffc15a 48%,#ff8fb8)", mark: '<circle cx="50" cy="78" r="18" fill="#ffb020"/><path d="M10 84 H90" stroke="#ff8a3d" stroke-width="6"/>' },
+      { id: "sky.night", slot: "sky", name: "Night", cost: 5, bg: "linear-gradient(#0d1440,#24306e 62%,#3a2a58)", stars: 1, mark: '<path d="M68 34 A22 22 0 1 0 68 90 A16 16 0 1 1 68 34 Z" fill="#fff4c8"/>' },
+      { id: "sky.starry", slot: "sky", name: "Starry", cost: 5, bg: "linear-gradient(#07091c,#1a2458 68%,#2c1a4e)", stars: 2, mark: '<polygon points="30,30 33,40 44,40 35,46 38,56 30,50 22,56 25,46 16,40 27,40" fill="#ffd23a"/><polygon points="70,48 72,56 80,56 74,60 76,68 70,64 64,68 66,60 60,56 68,56" fill="#fff"/>' },
+      { id: "g.grass", slot: "ground", name: "Grass", cost: 0, free: 1, bg: "radial-gradient(circle at 18% 72%, #2f7d2c 4px, transparent 5px), radial-gradient(circle at 46% 80%, #8ee06a 4px, transparent 5px), radial-gradient(circle at 74% 68%, #2f7d2c 4px, transparent 5px), linear-gradient(#7ed957,#3d9a32)", mark: '<path d="M30 90 Q28 60 40 48 Q36 70 48 90 Z" fill="#2f9e45"/><path d="M50 92 Q54 50 68 40 Q60 64 72 92 Z" fill="#67d86a"/>' },
+      { id: "g.beach", slot: "ground", name: "Beach", cost: 5, bg: "radial-gradient(circle at 22% 62%, #fff 3px, transparent 4px), radial-gradient(circle at 68% 74%, #f7f1e4 4px, transparent 5px), linear-gradient(#ffe08a,#e8b84a)", mark: '<path d="M34 70 Q50 40 66 70 Q50 62 34 70 Z" fill="#fff"/><ellipse cx="50" cy="66" rx="10" ry="6" fill="#f7c9d4"/>' },
+      { id: "g.snow", slot: "ground", name: "Snow", cost: 5, bg: "radial-gradient(circle at 30% 60%, #fff 5px, transparent 6px), radial-gradient(circle at 70% 78%, #e7f3ff 6px, transparent 7px), linear-gradient(#ffffff,#d5e6f6)", mark: '<circle cx="50" cy="58" r="16" fill="#fff"/><circle cx="34" cy="72" r="12" fill="#fff"/><circle cx="66" cy="72" r="12" fill="#fff"/>' },
+      { id: "g.desert", slot: "ground", name: "Desert", cost: 5, bg: "repeating-linear-gradient(115deg, transparent 0 18px, rgba(255,255,255,.2) 18px 22px), linear-gradient(#f2c56a,#d08a3a)", mark: '<path d="M6 78 Q30 48 54 78 T100 70 V110 H6 Z" fill="#e09a45"/><circle cx="76" cy="40" r="8" fill="#ffd23a"/>' },
+      { id: "n.palm", slot: "nature", name: "Palm tree", cost: 2, y: 70, s: 1.35, d: '<path d="M52 114 C56 90 44 70 50 50 C54 70 64 90 58 114 Z" fill="#8a4e28"/><path d="M50 52 C22 40 8 16 2 4 C22 18 36 34 48 48 Z" fill="#1f8a3c"/><path d="M50 50 C30 26 24 4 34 0 C38 18 46 34 52 48 Z" fill="#2f9e45"/><path d="M50 50 C74 24 96 8 108 4 C90 22 72 36 54 48 Z" fill="#3cbf58"/><path d="M50 52 C78 38 102 42 114 28 C96 48 74 52 54 54 Z" fill="#67d86a"/><path d="M48 54 C28 66 6 60 0 74 C18 62 34 58 48 54 Z" fill="#186b30"/><circle class="d" cx="44" cy="58" r="5" fill="#6b3a1c"/><circle class="d" cx="56" cy="60" r="4.5" fill="#5c3014"/>' },
+      { id: "n.pine", slot: "nature", name: "Pine tree", cost: 2, y: 70, s: 1.3, d: '<rect x="44" y="86" width="12" height="26" rx="4" fill="#7a4524"/><polygon points="50,8 78,52 22,52" fill="#1f7a3a"/><polygon points="50,28 84,74 16,74" fill="#2f9e45"/><polygon points="50,50 90,100 10,100" fill="#3cbf58"/>' },
+      { id: "n.flowers", slot: "nature", name: "Flowers", cost: 2, y: 80, s: 0.95, d: '<path d="M28 108 V62 M50 110 V54 M72 108 V66" stroke="#2f8a32" stroke-width="4" fill="none"/><circle cx="28" cy="52" r="10" fill="#ff5a8a"/><circle cx="50" cy="42" r="12" fill="#ffd23a"/><circle cx="72" cy="54" r="10" fill="#b56bff"/><circle class="d" cx="28" cy="52" r="4" fill="#ffe27a"/><circle class="d" cx="50" cy="42" r="5" fill="#ff8a1f"/><circle class="d" cx="72" cy="54" r="4" fill="#fff"/>' },
+      { id: "n.rock", slot: "nature", name: "Rock", cost: 2, y: 82, s: 0.9, d: '<polygon points="10,92 18,60 36,46 58,42 86,56 98,90 72,108 28,108" fill="#7d8794"/><polygon points="24,72 46,50 64,68 40,84" fill="#c5cedb"/><polygon points="60,78 78,62 90,80 70,92" fill="#9aa4b0"/>' },
+      { id: "n.mountain", slot: "nature", name: "Mountain", cost: 2, y: 72, s: 1.4, d: '<polygon points="28,108 58,28 88,108" fill="#6d7c92"/><polygon points="58,108 92,48 118,108" fill="#556579"/><polygon points="46,52 58,28 68,50" fill="#fff"/><polygon points="84,64 92,48 100,64" fill="#fff"/>' },
+      { id: "n.volcano", slot: "nature", name: "Volcano", cost: 2, y: 72, s: 1.25, d: '<polygon points="18,112 50,28 82,112" fill="#6b4a3a"/><polygon points="40,48 50,28 60,48" fill="#ff5a2a"/><ellipse cx="50" cy="36" rx="10" ry="6" fill="#ffd23a"/><ellipse cx="36" cy="22" rx="10" ry="7" fill="#f4f4f4"/><ellipse cx="52" cy="14" rx="12" ry="8" fill="#fff"/>' },
+      { id: "n.waves", slot: "nature", name: "Waves", cost: 2, y: 74, s: 1.25, d: '<path d="M6 70 Q22 50 38 70 T70 70 T102 70" fill="none" stroke="#1f8fd0" stroke-width="8"/><path d="M6 88 Q24 68 42 88 T78 88 T110 88" fill="none" stroke="#5ad1ff" stroke-width="8"/><path d="M14 104 Q30 90 46 104 T78 104" fill="none" stroke="#fff" stroke-width="6"/>' },
+      { id: "n.hibiscus", slot: "nature", name: "Hibiscus", cost: 2, y: 78, s: 0.9, d: '<circle cx="50" cy="58" r="16" fill="#ff4f86"/><circle cx="50" cy="40" r="16" fill="#ff6b9a"/><circle cx="32" cy="52" r="16" fill="#ff3d78"/><circle cx="68" cy="52" r="16" fill="#ff3d78"/><circle cx="50" cy="70" r="16" fill="#ff5a8a"/><circle class="d" cx="50" cy="56" r="8" fill="#ffd23a"/><circle class="d" cx="50" cy="56" r="3" fill="#e23b4a"/><path d="M50 96 V118" stroke="#2f8a32" stroke-width="5" fill="none"/><ellipse cx="68" cy="108" rx="12" ry="6" fill="#3cbf58" transform="rotate(-30 68 108)"/>' },
+      { id: "n.bush", slot: "nature", name: "Bush", cost: 2, y: 80, s: 0.95, d: '<ellipse cx="34" cy="78" rx="22" ry="18" fill="#2f9e45"/><ellipse cx="66" cy="76" rx="24" ry="20" fill="#3cbf58"/><ellipse cx="50" cy="64" rx="20" ry="16" fill="#67d86a"/><circle class="d" cx="40" cy="70" r="4" fill="#ff5a7a"/><circle class="d" cx="58" cy="66" r="4" fill="#ffd23a"/><circle class="d" cx="70" cy="78" r="4" fill="#ff5a7a"/>' },
+      { id: "n.cactus", slot: "nature", name: "Cactus", cost: 2, y: 76, s: 1.05, d: '<rect x="40" y="40" width="20" height="70" rx="10" fill="#3cbf58"/><rect x="18" y="58" width="28" height="14" rx="7" fill="#2f9e45"/><rect x="18" y="46" width="14" height="26" rx="7" fill="#2f9e45"/><rect x="54" y="50" width="28" height="14" rx="7" fill="#67d86a"/><rect x="68" y="38" width="14" height="26" rx="7" fill="#67d86a"/><circle cx="62" cy="36" r="6" fill="#ff5a8a"/>' },
+      { id: "b.house", slot: "building", name: "House", cost: 3, y: 70, s: 1.15, d: '<polygon points="50,16 92,52 8,52" fill="#e23b4a"/><rect x="18" y="50" width="64" height="52" rx="4" fill="#ffe08a"/><rect x="40" y="72" width="20" height="30" rx="3" fill="#8a4e28"/><rect x="26" y="62" width="16" height="14" rx="2" fill="#7ecbff"/><rect x="58" y="62" width="16" height="14" rx="2" fill="#7ecbff"/><rect x="70" y="36" width="10" height="20" fill="#c96a4a"/>' },
+      { id: "b.castle", slot: "building", name: "Castle", cost: 3, y: 68, s: 1.2, d: '<rect x="16" y="48" width="22" height="58" fill="#c5cedb"/><rect x="62" y="48" width="22" height="58" fill="#c5cedb"/><rect x="30" y="62" width="40" height="44" fill="#aeb8c8"/><rect x="14" y="40" width="8" height="12" fill="#c5cedb"/><rect x="28" y="40" width="8" height="12" fill="#c5cedb"/><rect x="64" y="40" width="8" height="12" fill="#c5cedb"/><rect x="78" y="40" width="8" height="12" fill="#c5cedb"/><rect x="42" y="78" width="16" height="28" rx="8" fill="#5c3a28"/><polygon points="50,18 58,40 42,40" fill="#e23b4a"/><rect x="48" y="8" width="4" height="16" fill="#8a4e28"/>' },
+      { id: "b.school", slot: "building", name: "School", cost: 3, y: 68, s: 1.2, d: '<rect x="12" y="50" width="76" height="56" rx="4" fill="#e07060"/><polygon points="50,18 86,50 14,50" fill="#8a3a32"/><rect x="42" y="8" width="16" height="22" fill="#f2f2f2"/><polygon points="50,2 60,12 40,12" fill="#e23b4a"/><circle cx="50" cy="16" r="4" fill="#ffd23a"/><rect x="22" y="62" width="14" height="12" fill="#fff4c8"/><rect x="42" y="62" width="14" height="12" fill="#fff4c8"/><rect x="62" y="62" width="14" height="12" fill="#fff4c8"/><rect x="40" y="80" width="20" height="26" fill="#5c3a28"/>' },
+      { id: "b.lighthouse", slot: "building", name: "Lighthouse", cost: 3, y: 66, s: 1.2, d: '<polygon points="18,112 82,112 70,96 30,96" fill="#8d96a3"/><rect x="38" y="36" width="24" height="62" fill="#e23b4a"/><rect x="38" y="48" width="24" height="10" fill="#fff"/><rect x="38" y="68" width="24" height="10" fill="#fff"/><rect x="32" y="28" width="36" height="12" rx="2" fill="#24306e"/><polygon points="50,8 78,40 22,40" fill="#ffe08a" opacity=".85"/><circle cx="50" cy="32" r="6" fill="#ffd23a"/>' },
+      { id: "b.tent", slot: "building", name: "Tent", cost: 3, y: 74, s: 1.05, d: '<polygon points="50,22 92,100 8,100" fill="#ff8a3d"/><polygon points="50,22 62,100 38,100" fill="#e07020"/><path d="M50 22 V8" stroke="#6b3a1c" stroke-width="3" fill="none"/><polygon points="50,8 62,16 50,14" fill="#e23b4a"/>' },
+      { id: "b.hut", slot: "building", name: "Beach hut", cost: 3, y: 72, s: 1.1, d: '<polygon points="4,64 50,26 96,64" fill="#e8b84a"/><path d="M16 48 H84 M22 40 H76" stroke="#c4922e" stroke-width="3"/><rect x="20" y="62" width="60" height="42" rx="3" fill="#f3d7a4"/><rect x="40" y="74" width="20" height="30" rx="2" fill="#6b3a1c"/><circle cx="80" cy="46" r="7" fill="#ff4f86"/><circle class="d" cx="80" cy="46" r="3" fill="#ffd23a"/>' },
+      { id: "a.turtle", slot: "animal", name: "Sea turtle", cost: 2, y: 80, s: 0.95, d: '<ellipse cx="58" cy="68" rx="28" ry="18" fill="#2f9e45"/><ellipse cx="58" cy="66" rx="16" ry="11" fill="#b6ef8a"/><path d="M50 58 H68 M58 52 V78" stroke="#1f7a38" stroke-width="2.5"/><ellipse cx="26" cy="66" rx="14" ry="9" fill="#67d86a"/><circle class="d" cx="18" cy="64" r="2.4" fill="#24306e"/><ellipse cx="42" cy="50" rx="12" ry="7" fill="#3cbf58"/><ellipse cx="82" cy="52" rx="12" ry="7" fill="#3cbf58"/><ellipse cx="44" cy="86" rx="12" ry="6" fill="#3cbf58"/><ellipse cx="80" cy="84" rx="12" ry="6" fill="#3cbf58"/>' },
+      { id: "a.dolphin", slot: "animal", name: "Dolphin", cost: 2, y: 58, s: 1.05, d: '<path d="M16 78 Q40 20 78 46 Q60 50 70 70 Q48 60 30 84 Q28 70 16 78 Z" fill="#5ad1ff"/><polygon points="48,34 58,16 62,40" fill="#7ee0ff"/><circle class="d" cx="62" cy="46" r="3" fill="#24306e"/><path class="d" d="M66 52 Q72 54 70 58" stroke="#24306e" stroke-width="2" fill="none"/>' },
+      { id: "a.dog", slot: "animal", name: "Dog", cost: 2, y: 80, s: 0.95, d: '<ellipse cx="50" cy="78" rx="26" ry="20" fill="#e0a15a"/><ellipse cx="28" cy="48" rx="10" ry="16" fill="#c4843c"/><ellipse cx="72" cy="48" rx="10" ry="16" fill="#c4843c"/><circle cx="50" cy="52" r="20" fill="#f0c48a"/><ellipse cx="50" cy="60" rx="8" ry="6" fill="#fff"/><circle class="d" cx="42" cy="48" r="3" fill="#24306e"/><circle class="d" cx="58" cy="48" r="3" fill="#24306e"/><circle class="d" cx="50" cy="58" r="3" fill="#24306e"/><path class="d" d="M44 66 Q50 72 56 66" stroke="#e23b4a" stroke-width="2" fill="none"/><ellipse cx="78" cy="90" rx="10" ry="6" fill="#e0a15a"/>' },
+      { id: "a.cat", slot: "animal", name: "Cat", cost: 2, y: 80, s: 0.95, d: '<ellipse cx="50" cy="82" rx="24" ry="18" fill="#f0a050"/><circle cx="50" cy="54" r="20" fill="#ffb86a"/><polygon points="32,42 38,22 46,44" fill="#ffb86a"/><polygon points="68,42 62,22 54,44" fill="#ffb86a"/><polygon points="34,40 39,28 44,40" fill="#ffd0e0"/><polygon points="66,40 61,28 56,40" fill="#ffd0e0"/><circle class="d" cx="42" cy="52" r="3" fill="#24306e"/><circle class="d" cx="58" cy="52" r="3" fill="#24306e"/><path d="M74 78 Q96 60 88 96" stroke="#f0a050" stroke-width="6" fill="none"/>' },
+      { id: "a.bird", slot: "animal", name: "Bird", cost: 2, y: 40, s: 0.85, d: '<ellipse cx="48" cy="64" rx="22" ry="16" fill="#5ad1ff"/><ellipse cx="30" cy="58" rx="16" ry="8" fill="#7ee0ff"/><ellipse cx="66" cy="58" rx="16" ry="8" fill="#3aa8e0"/><circle cx="70" cy="52" r="10" fill="#7ee0ff"/><polygon points="78,50 92,54 78,58" fill="#ffb020"/><circle class="d" cx="74" cy="50" r="2" fill="#24306e"/><path d="M40 80 L34 96 M52 82 L56 98" stroke="#ffb020" stroke-width="3" fill="none"/>' },
+      { id: "a.nene", slot: "animal", name: "Nene goose", cost: 2, y: 80, s: 1, d: '<ellipse cx="40" cy="78" rx="26" ry="16" fill="#c9b48a"/><path d="M58 76 C72 62 70 42 78 28" stroke="#2a241c" stroke-width="11" fill="none" stroke-linecap="round"/><circle cx="82" cy="24" r="12" fill="#2a241c"/><polygon points="90,22 108,28 90,34" fill="#e07a2a"/><path d="M66 46 H80 M66 56 H80" stroke="#f4efe4" stroke-width="3.5"/><ellipse cx="26" cy="70" rx="12" ry="8" fill="#ddc7a0"/><circle class="d" cx="86" cy="20" r="2.2" fill="#fff"/><path d="M28 92 H48 M32 92 v12 M44 92 v12" stroke="#e07a2a" stroke-width="3.5" fill="none" stroke-linecap="round"/>' },
+      { id: "a.fish", slot: "animal", name: "Fish", cost: 2, y: 62, s: 0.9, d: '<ellipse cx="48" cy="62" rx="28" ry="16" fill="#ff8a3d"/><polygon points="74,62 96,46 96,78" fill="#ffb020"/><path d="M30 50 Q48 62 30 74" fill="#ffe08a"/><circle class="d" cx="36" cy="58" r="3" fill="#24306e"/><circle class="d" cx="35" cy="57" r="1" fill="#fff"/>' },
+      { id: "a.crab", slot: "animal", name: "Crab", cost: 2, y: 82, s: 0.9, d: '<ellipse cx="50" cy="70" rx="26" ry="16" fill="#e23b4a"/><circle cx="38" cy="64" r="4" fill="#fff"/><circle cx="62" cy="64" r="4" fill="#fff"/><circle class="d" cx="38" cy="64" r="2" fill="#24306e"/><circle class="d" cx="62" cy="64" r="2" fill="#24306e"/><path d="M24 58 Q8 40 20 28" stroke="#e23b4a" stroke-width="5" fill="none"/><path d="M76 58 Q92 40 80 28" stroke="#e23b4a" stroke-width="5" fill="none"/><circle cx="16" cy="26" r="6" fill="#ff6b6b"/><circle cx="84" cy="26" r="6" fill="#ff6b6b"/><path d="M36 86 V100 M46 88 V104 M56 88 V104 M66 86 V100" stroke="#c42838" stroke-width="3"/>' },
+      { id: "e.sun", slot: "extra", name: "Sun", cost: 1, y: 22, s: 1, d: '<circle cx="50" cy="60" r="22" fill="#ffd23a"/><g stroke="#ffd23a" stroke-width="6" stroke-linecap="round"><path d="M50 24 V12 M50 96 V108 M14 60 H2 M86 60 H98 M24 34 L14 24 M76 34 L86 24 M24 86 L14 96 M76 86 L86 96"/></g>' },
+      { id: "e.moon", slot: "extra", name: "Moon", cost: 1, y: 22, s: 1, d: '<path d="M62 24 A28 28 0 1 0 62 100 A20 20 0 1 1 62 24 Z" fill="#fff4c8"/>' },
+      { id: "e.rainbow", slot: "extra", name: "Rainbow", cost: 1, y: 30, s: 1.3, d: '<path d="M10 96 A40 40 0 0 1 90 96" fill="none" stroke="#e23b4a" stroke-width="8"/><path d="M18 96 A32 32 0 0 1 82 96" fill="none" stroke="#ffb020" stroke-width="8"/><path d="M26 96 A24 24 0 0 1 74 96" fill="none" stroke="#ffe04a" stroke-width="8"/><path d="M34 96 A16 16 0 0 1 66 96" fill="none" stroke="#3cbf58" stroke-width="8"/>' },
+      { id: "e.clouds", slot: "extra", name: "Clouds", cost: 1, y: 24, s: 1.15, d: '<ellipse cx="38" cy="78" rx="24" ry="14" fill="#d5e4f4"/><ellipse cx="64" cy="74" rx="22" ry="14" fill="#e7f0fa"/><ellipse cx="48" cy="62" rx="20" ry="16" fill="#fff"/><ellipse cx="68" cy="58" rx="16" ry="12" fill="#fff"/>' },
+      { id: "e.stars", slot: "extra", name: "Stars", cost: 1, y: 20, s: 0.9, d: '<polygon points="28,18 32,30 44,30 34,38 38,50 28,42 18,50 22,38 12,30 24,30" fill="#ffd23a"/><polygon points="70,40 73,50 84,50 75,56 78,66 70,60 62,66 65,56 56,50 67,50" fill="#fff4c8"/><polygon points="48,62 51,72 60,72 53,78 56,88 48,82 40,88 43,78 36,72 45,72" fill="#ffe27a"/>' },
+      { id: "e.surf", slot: "extra", name: "Surfboard", cost: 1, y: 74, s: 1.05, d: '<ellipse cx="50" cy="62" rx="16" ry="46" fill="#ff5a8a" transform="rotate(-18 50 62)"/><ellipse cx="50" cy="62" rx="6" ry="40" fill="#fff" transform="rotate(-18 50 62)"/><ellipse cx="50" cy="70" rx="4" ry="10" fill="#5ad1ff" transform="rotate(-18 50 70)"/>' },
+      { id: "e.butterfly", slot: "extra", name: "Butterfly", cost: 1, y: 42, s: 0.85, d: '<ellipse cx="32" cy="52" rx="18" ry="22" fill="#ff6bb0"/><ellipse cx="68" cy="52" rx="18" ry="22" fill="#c56bff"/><ellipse cx="34" cy="78" rx="12" ry="14" fill="#ffd23a"/><ellipse cx="66" cy="78" rx="12" ry="14" fill="#7ee0ff"/><ellipse cx="50" cy="64" rx="6" ry="22" fill="#3a2a1a"/><path d="M46 44 Q36 28 40 22 M54 44 Q64 28 60 22" stroke="#3a2a1a" stroke-width="2" fill="none"/><circle class="d" cx="28" cy="48" r="3" fill="#fff"/><circle class="d" cx="72" cy="48" r="3" fill="#fff"/>' }
+    ];
+    function scItem(id) { return SC_ITEMS.find(function (i) { return i.id === id; }) || null; }
+    function scClean(s) {
+      s = s && typeof s === "object" ? s : {};
+      const o = [];
+      (Array.isArray(s.o) ? s.o : []).forEach(function (id) { const it = scItem(id); if (it && !it.free && o.indexOf(id) < 0) o.push(id); });
+      function owns(id, slot) { const it = scItem(id); return !!(it && it.slot === slot && (it.free || o.indexOf(id) >= 0)); }
+      const sky = owns(s.sky, "sky") ? s.sky : "sky.day";
+      const ground = owns(s.ground, "ground") ? s.ground : "g.grass";
+      const p = [];
+      (Array.isArray(s.p) ? s.p : []).forEach(function (raw) {
+        if (p.length >= SC_MAX || !raw) return;
+        const it = scItem(raw.id);
+        if (!it || it.slot === "sky" || it.slot === "ground") return;
+        if (!it.free && o.indexOf(it.id) < 0) return;
+        p.push({ id: it.id, x: Math.round(Math.max(6, Math.min(94, Number(raw.x) || 50)) * 10) / 10, y: Math.round(Math.max(8, Math.min(94, Number(raw.y) || 60)) * 10) / 10, s: Math.round(Math.max(0.45, Math.min(2.5, Number(raw.s) || 1)) * 100) / 100 });
+      });
+      const custom = p.length > 0 || sky !== "sky.day" || ground !== "g.grass";
+      return { o: o, sky: sky, ground: ground, p: p, on: s.on && custom ? 1 : 0 };
+    }
+    function scOn() { return !!(avatar && avatar.sc && avatar.sc.on === 1); }
+    function scOwns(id) { if (id && id.id) id = id.id; const it = scItem(id); return !!(it && (it.free || (avatar.sc && avatar.sc.o.indexOf(id) >= 0))); }
+    function scEnsureFilter() {
+      if (document.getElementById("sc-stick")) return;
+      const s = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      s.setAttribute("aria-hidden", "true"); s.setAttribute("width", "0"); s.setAttribute("height", "0");
+      s.style.cssText = "position:absolute;width:0;height:0";
+      s.innerHTML = '<defs><filter id="sc-stick" x="-35%" y="-35%" width="170%" height="170%"><feMorphology in="SourceAlpha" operator="dilate" radius="3" result="d"></feMorphology><feFlood flood-color="#ffffff" result="f"></feFlood><feComposite in="f" in2="d" operator="in" result="o"></feComposite><feMerge><feMergeNode in="o"></feMergeNode><feMergeNode in="SourceGraphic"></feMergeNode></feMerge></filter></defs>';
+      document.body.appendChild(s);
+    }
+    let scSvgN = 0;
+    function scSvg(d) { return '<svg class="sc-svg" viewBox="0 0 100 120" aria-hidden="true">' + d + "</svg>"; }
+    const SC_STARS = [[12, 18], [22, 40], [38, 14], [48, 32], [63, 12], [74, 36], [86, 20], [18, 58], [80, 52], [30, 22], [55, 48], [90, 42], [8, 30], [42, 8]];
+    function scView(sc) {
+      scEnsureFilter();
+      sc = sc || scClean(null);
+      const box = el("div", { class: "sc-view" });
+      const sky = el("div", { class: "sc-sky", style: "background:" + ((scItem(sc.sky) || SC_ITEMS[0]).bg) });
+      const skyIt = scItem(sc.sky);
+      if (skyIt && skyIt.stars) SC_STARS.slice(0, skyIt.stars === 2 ? 14 : 8).forEach(function (xy) { sky.appendChild(el("i", { class: "sc-star", style: "left:" + xy[0] + "%;top:" + xy[1] + "%" })); });
+      box.appendChild(sky);
+      box.appendChild(el("div", { class: "sc-ground", style: "background:" + ((scItem(sc.ground) || SC_ITEMS[4]).bg) }));
+      const layer = el("div", { class: "sc-layer" });
+      (sc.p || []).forEach(function (p, i) {
+        const it = scItem(p.id); if (!it) return;
+        const node = el("div", { class: "sc-bit", style: "left:" + p.x + "%;top:" + p.y + "%;--s:" + p.s + ";z-index:" + (i + 1) });
+        node.innerHTML = scSvg(it.d);
+        layer.appendChild(node);
+      });
+      box.appendChild(layer);
+      return box;
+    }
+    function scApplyLive() {
+      const bg = document.querySelector(".wave-bg");
+      if (!bg) return;
+      const here = state.phase === "setup" ? currentPage() : "play";
+      const on = scOn() && here !== "scene" && here !== "closet";
+      document.body.classList.toggle("sc-on", on);
+      let live = bg.querySelector(".sc-live");
+      if (!on) { if (live) live.remove(); return; }
+      if (!live) { live = document.createElement("div"); live.className = "sc-live"; live.setAttribute("aria-hidden", "true"); bg.appendChild(live); }
+      const view = scView(avatar.sc);
+      live.replaceChildren(view);
+    }
+    function scAsk(title, sub, yes) {
+      const ov = el("div", { class: "prize-ov", role: "dialog", "aria-modal": "true", "aria-label": title });
+      const close = function () { ov.remove(); };
+      ov.appendChild(el("div", { class: "prize-box pack-confirm" }, [el("p", { class: "prize-title", text: title }), el("p", { class: "prize-sub", text: sub }),
+        el("div", { class: "pack-yn" }, [el("button", { type: "button", class: "pack-no", text: "Cancel", onClick: close }),
+          el("button", { type: "button", class: "pack-yes", text: "Yes", onClick: function () { close(); yes(); } })])]));
+      document.body.appendChild(ov);
+      const f = ov.querySelector(".pack-yes"); if (f) f.focus({ preventScroll: true });
+    }
+    function menuArtScene() {
+      return '<svg viewBox="0 0 120 78" class="art-svg"><rect width="120" height="78" rx="12" fill="#7ecbff"/><path d="M0 50 Q30 40 60 52 T120 48 V78 H0Z" fill="#f0c14a"/><path d="M28 62 C30 40 24 28 30 16" stroke="#8a4e28" stroke-width="4" fill="none"/><ellipse cx="30" cy="16" rx="14" ry="5" fill="#2f9e45" transform="rotate(-30 30 16)"/><ellipse cx="30" cy="16" rx="14" ry="5" fill="#67d86a" transform="rotate(40 30 16)"/><circle cx="92" cy="18" r="8" fill="#ffd23a"/></svg>';
+    }
+    let scTab = "nature", scMode = "shop", scSel = -1;
+    function sceneCard() {
+      const card = el("div", { class: "card sc-card" });
+      const me = LEADERBOARD_URL ? lbMe() : null;
+      card.appendChild(el("div", { class: "shp-bar" }, [
+        el("button", { type: "button", class: "shp-back", "aria-label": "Back", text: "\u2039", onClick: function () { goPage("menu"); } }),
+        el("span", { class: "shp-ttl", text: "My Scene" }),
+        el("p", { class: "coin-bank shp-coins", "data-short": "1", role: "status" }, [el("span", { class: "coin-ico", "aria-hidden": "true", text: "$" }), el("span", { class: "sc-coin", text: String(coinGet()) })])
+      ]));
+      const stage = el("div", { class: "sc-stage", role: "application", "aria-label": "Your scene. Drag a piece to move it." });
+      const tools = el("div", { class: "sc-tools" });
+      const tabs = el("div", { class: "sc-tabs", role: "tablist" });
+      const seg = el("div", { class: "shp-seg" });
+      const body = el("div", { class: "shp-body" });
+      const side = el("div", { class: "sc-side" }, [stage, tools]);
+      card.appendChild(el("div", { class: "sc-wrap" }, [side, el("div", { class: "sc-shop" }, [
+        el("p", { class: "sc-hint", text: "Tap a piece to place it. Drag to move. Pinch or use + and \u2212 to resize." }),
+        tabs, seg, body])]));
+      if (SIM_ON) card.appendChild(simBar());
+      const pts = new Map();
+      let drag = null, pinch = null;
+      function clamp(n, a, b) { return Math.max(a, Math.min(b, n)); }
+      function pieceEl(i) { return stage.querySelector('.sc-piece[data-i="' + i + '"]'); }
+      function paintPiece(i) {
+        const node = pieceEl(i), p = avatar.sc.p[i];
+        if (!node || !p) return;
+        node.style.left = p.x + "%";
+        node.style.top = p.y + "%";
+        node.style.setProperty("--s", String(p.s));
+        node.classList.toggle("sel", i === scSel);
+        node.style.zIndex = i === scSel ? "30" : String(i + 1);
+      }
+      function dist() {
+        const a = Array.from(pts.values());
+        if (a.length < 2) return 0;
+        const dx = a[0].x - a[1].x, dy = a[0].y - a[1].y;
+        return Math.sqrt(dx * dx + dy * dy) || 1;
+      }
+      function saveScene() { avatar.made = true; avSaveSoon(); }
+      function setOn() { avatar.sc.on = 1; }
+      function place(it) {
+        if (avatar.sc.p.length >= SC_MAX) { say("That's 15 pieces. Trash one to add another."); return; }
+        const n = avatar.sc.p.length;
+        avatar.sc.p.push({ id: it.id, x: Math.round((18 + (n * 13) % 64) * 10) / 10, y: it.y || 64, s: it.s || 1 });
+        scSel = n; setOn(); saveScene(); paint();
+      }
+      function useItem(it, node) {
+        if (!scOwns(it.id)) {
+          if (coinGet() < it.cost) { if (node) { node.classList.remove("av-shake"); void node.offsetWidth; node.classList.add("av-shake"); } say("You need $" + it.cost + ". You have $" + coinGet() + "."); return; }
+          if (!coinSpend(it.cost)) return;
+          avatar.sc.o.push(it.id);
+          say("You got " + it.name + "!");
+        }
+        if (it.slot === "sky") { avatar.sc.sky = it.id; setOn(); }
+        else if (it.slot === "ground") { avatar.sc.ground = it.id; setOn(); }
+        else place(it);
+        if (it.slot === "sky" || it.slot === "ground") { saveScene(); paint(); }
+      }
+      function paint() {
+        const coin = card.querySelector(".sc-coin"); if (coin) coin.textContent = String(coinGet());
+        stage.querySelectorAll(".sc-view").forEach(function (n) { n.remove(); });
+        const view = scView(avatar.sc);
+        view.querySelectorAll(".sc-bit").forEach(function (bit, i) {
+          bit.classList.add("sc-piece");
+          bit.setAttribute("data-i", String(i));
+          bit.setAttribute("role", "button");
+          bit.setAttribute("aria-label", (scItem(avatar.sc.p[i].id) || {}).name || "Piece");
+          if (i === scSel) { bit.classList.add("sel"); bit.style.zIndex = "30"; }
+        });
+        stage.appendChild(view);
+        tools.innerHTML = "";
+        const have = scSel >= 0 && avatar.sc.p[scSel];
+        tools.appendChild(el("button", { type: "button", text: "Clear all", onClick: function () {
+          scAsk("Are you sure?", "This takes every piece off your scene. Bought pieces stay in your shop, and the regular game backgrounds come back.", function () {
+            avatar.sc.p = []; avatar.sc.sky = "sky.day"; avatar.sc.ground = "g.grass"; avatar.sc.on = 0; scSel = -1; saveScene(); paint(); say("Scene cleared.");
+          });
+        } }));
+        tools.appendChild(el("span", { class: "sc-count", text: avatar.sc.p.length + "/" + SC_MAX }));
+        [["\u2212", 1 / 1.15, "Smaller"], ["+", 1.15, "Bigger"]].forEach(function (b) {
+          const btn = el("button", { type: "button", class: "sc-size", text: b[0], "aria-label": b[2], onClick: function () {
+            if (scSel < 0 || !avatar.sc.p[scSel]) return;
+            avatar.sc.p[scSel].s = Math.round(clamp(avatar.sc.p[scSel].s * b[1], 0.45, 2.5) * 100) / 100;
+            paintPiece(scSel); saveScene();
+          } });
+          if (!have) btn.disabled = true;
+          tools.appendChild(btn);
+        });
+        const trash = el("button", { type: "button", class: "sc-trash", text: "\uD83D\uDDD1 Trash", "aria-label": "Trash", onClick: function () {
+          if (scSel < 0) return;
+          avatar.sc.p.splice(scSel, 1);
+          if (!avatar.sc.p.length && avatar.sc.sky === "sky.day" && avatar.sc.ground === "g.grass") avatar.sc.on = 0;
+          scSel = -1; saveScene(); paint();
+        } });
+        if (!have) trash.disabled = true;
+        tools.appendChild(trash);
+        const groups = [["sky", "\u2600\uFE0F", "Skies"], ["ground", "\uD83C\uDFD4\uFE0F", "Ground"], ["nature", "\uD83C\uDF34", "Nature"], ["building", "\uD83C\uDFE0", "Buildings"], ["animal", "\uD83D\uDC22", "Animals"], ["extra", "\u2728", "Extras"]];
+        tabs.innerHTML = "";
+        groups.forEach(function (g) {
+          tabs.appendChild(el("button", { type: "button", role: "tab", class: "sc-tab" + (scTab === g[0] ? " on" : ""), "aria-selected": String(scTab === g[0]), onClick: function () { scTab = g[0]; paint(); } }, [el("span", { text: g[2] })]));
+        });
+        const all = SC_ITEMS.filter(function (i) { return i.slot === scTab; });
+        const mine = all.filter(scOwns);
+        seg.innerHTML = "";
+        [["shop", "\uD83D\uDED2", "Shop", all.length], ["mine", "\uD83C\uDF92", "My pieces", mine.length]].forEach(function (m) {
+          seg.appendChild(el("button", { type: "button", class: "shp-segb " + (m[0] === "shop" ? "shop" : "closet") + (scMode === m[0] ? " on" : ""), "aria-pressed": String(scMode === m[0]),
+            onClick: function () { scMode = m[0]; paint(); } }, [el("i", { "aria-hidden": "true", text: m[1] }), el("span", { text: m[2] }), el("span", { class: "n", text: String(m[3]) })]));
+        });
+        const show = scMode === "mine" ? mine : all;
+        body.innerHTML = "";
+        if (!show.length) { body.appendChild(el("p", { class: "av-tip", text: "Nothing here yet. Tap Shop!" })); return; }
+        body.appendChild(el("div", { class: "shp-grid" }, show.map(function (it) {
+          const own = scOwns(it.id);
+          const using = (it.slot === "sky" && avatar.sc.sky === it.id) || (it.slot === "ground" && avatar.sc.ground === it.id);
+          let pic;
+          if (it.bg) {
+            pic = el("span", { class: "sc-swatch", style: "background:" + it.bg });
+            if (it.mark) { const mk = el("span", { class: "sc-mark" }); mk.innerHTML = scSvg(it.mark); pic.appendChild(mk); }
+          }
+          else { pic = el("span", { class: "sc-thumb" }); pic.innerHTML = scSvg(it.d); }
+          const tag = using ? el("span", { class: "shp-st wear", text: "Using" })
+            : own ? el("span", { class: "shp-st own", text: it.slot === "sky" || it.slot === "ground" ? "Use" : "Place" })
+            : el("span", { class: "shp-st price" + (coinGet() < it.cost ? " poor" : "") }, [el("span", { class: "coin-ico", "aria-hidden": "true", text: "$" }), el("span", { text: String(it.cost) })]);
+          return el("button", { type: "button", class: "shp-card" + (using ? " wearing" : ""), "aria-label": it.name + (own ? ", yours" : ", $" + it.cost),
+            onClick: function () { useItem(it, this); } }, [pic, el("span", { class: "shp-nm", text: it.name }), tag]);
+        })));
+      }
+      stage.addEventListener("pointerdown", function (e) {
+        stage.setPointerCapture(e.pointerId);
+        pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+        const hit = e.target.closest && e.target.closest(".sc-piece");
+        if (pts.size >= 2 && scSel >= 0 && avatar.sc.p[scSel]) { drag = null; pinch = { d: dist(), s: avatar.sc.p[scSel].s }; return; }
+        if (hit) {
+          scSel = Number(hit.dataset.i);
+          const p = avatar.sc.p[scSel];
+          if (!p) return;
+          drag = { x: e.clientX, y: e.clientY, ox: p.x, oy: p.y };
+          stage.querySelectorAll(".sc-piece").forEach(function (n) { n.classList.toggle("sel", Number(n.dataset.i) === scSel); });
+          paintPiece(scSel);
+          tools.querySelectorAll(".sc-size, .sc-trash").forEach(function (b) { b.disabled = false; });
+        }
+      });
+      stage.addEventListener("pointermove", function (e) {
+        if (!pts.has(e.pointerId)) return;
+        pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+        if (pinch && pts.size >= 2 && scSel >= 0 && avatar.sc.p[scSel]) {
+          avatar.sc.p[scSel].s = Math.round(clamp(pinch.s * (dist() / pinch.d), 0.45, 2.5) * 100) / 100;
+          paintPiece(scSel); return;
+        }
+        if (!drag || scSel < 0 || !avatar.sc.p[scSel]) return;
+        const rect = stage.getBoundingClientRect();
+        avatar.sc.p[scSel].x = Math.round(clamp(drag.ox + (e.clientX - drag.x) / rect.width * 100, 6, 94) * 10) / 10;
+        avatar.sc.p[scSel].y = Math.round(clamp(drag.oy + (e.clientY - drag.y) / rect.height * 100, 8, 94) * 10) / 10;
+        paintPiece(scSel);
+      });
+      function up(e) {
+        if (!pts.has(e.pointerId) && e.type === "pointerup") return;
+        pts.delete(e.pointerId);
+        if (pts.size < 2) pinch = null;
+        if (!pts.size && drag) { drag = null; saveScene(); }
+      }
+      stage.addEventListener("pointerup", up);
+      stage.addEventListener("pointercancel", up);
+      paint();
+      return card;
+    }
+
     function avClean(a) {
       a = a && typeof a === "object" ? a : {};
       const ok = function (list, v, d) { return list.some(function (x) { return x[0] === v; }) ? v : d; };
@@ -10254,6 +10587,7 @@
         pz: Math.max(0, Math.min(99, Number(a.pz) || 0)), pg: a.pg ? 1 : 0,
         pk: Array.isArray(a.pk) ? a.pk.filter(function (k, i, arr) { return (k === "hd" || AV_PACKS.some(function (x) { return x[0] === k; })) && arr.indexOf(k) === i; }) : [],
         hd: hdClean(a.hd, Array.isArray(a.pk) && a.pk.indexOf("hd") >= 0),
+        sc: scClean(a.sc),
         updated: Number(a.updated) || 0 };
     }
     let avatar = (function () { try { return avClean(JSON.parse(localStorage.getItem(AV_KEY) || "null")); } catch (e) { return avClean(null); } })();
@@ -10339,7 +10673,8 @@
         const base = localNewer ? avatar : remote;
         const upd = Math.max(remote.updated, avatar.updated);
         avatar = avClean(Object.assign({}, base, { owned: owned, made: avatar.made || remote.made, pk: (avatar.pk || []).concat(remote.pk || []),
-          hd: Object.assign({}, base.hd, { o: (avatar.hd.o || []).concat(remote.hd.o || []) }) }));
+          hd: Object.assign({}, base.hd, { o: (avatar.hd.o || []).concat(remote.hd.o || []) }),
+          sc: Object.assign({}, base.sc || {}, { o: ((avatar.sc && avatar.sc.o) || []).concat((remote.sc && remote.sc.o) || []) }) }));
         avatar.updated = upd;
         try { localStorage.setItem(AV_KEY, JSON.stringify(avatar)); } catch (e) {}
         if (JSON.stringify(Object.assign({}, remote, { updated: 0 })) !== JSON.stringify(Object.assign({}, avatar, { updated: 0 }))) avSetPending(true);
@@ -10953,6 +11288,7 @@
       menu.appendChild(el("p", { class: "shp-menu-name", text: me ? me.name : "My Avatar" }));
       menu.appendChild(el("p", { class: "av-status " + avStatus, id: "av-status", role: "status" }));
       if (LEADERBOARD_URL && !me) menu.appendChild(el("button", { type: "button", class: "shp-menu-btn", text: "\uD83D\uDC64 Sign in to save", onClick: siOpen }));
+      menu.appendChild(el("button", { type: "button", class: "shp-menu-btn", text: "\uD83C\uDFD6\uFE0F My scene", onClick: function () { goPage("scene"); } }));
       menu.appendChild(el("a", { class: "shp-menu-btn", href: "./print.html", target: "_blank", rel: "noopener", text: "\uD83D\uDDA8\uFE0F Print avatars" }));
       const coins = el("p", { class: "coin-bank shp-coins", "data-short": "1", role: "status", "aria-label": coinGet() + " coins" }, [el("span", { class: "coin-ico", "aria-hidden": "true", text: "$" }), el("span", { text: String(coinGet()) })]);
       card.appendChild(el("div", { class: "shp-bar" }, [
@@ -10968,7 +11304,9 @@
       const tryBar = el("div", { class: "shp-try", hidden: "" }, [tryTxt,
         el("button", { type: "button", class: "shp-no", "aria-label": "Stop trying on", text: "\u2715", onClick: function () { shopTry = ""; paintAll(); } }), tryBuy]);
       const modeBtn = el("button", { type: "button", class: "shp-mode", hidden: "", onClick: function () { avatar.hd.on = hdOn() ? 0 : 1; avSaveSoon(); say(hdOn() ? "HD avatar on!" : "Classic avatar on!"); paintAll(true); } });
-      const stage = el("div", { class: "shp-stage" }, [el("div", { class: "shp-beam" }), el("div", { class: "shp-ped" }), hero, modeBtn]);
+      const stage = el("div", { class: "shp-stage" + (scOn() ? " has-scene" : "") }, [el("div", { class: "shp-beam" }), el("div", { class: "shp-ped" }), hero, modeBtn,
+        el("button", { type: "button", class: "shp-mode sc-jump", text: scOn() ? "Edit scene" : "Build scene", onClick: function () { goPage("scene"); } })]);
+      if (scOn()) stage.insertBefore(scView(avatar.sc), stage.firstChild);
       const tabs = el("div", { class: "shp-tabs", role: "tablist" });
       const seg = el("div", { class: "shp-seg" });
       const body = el("div", { class: "shp-body" });
@@ -11132,8 +11470,8 @@
       paintAll();
       return card;
     }
-    const PAGES = ["menu", "beats", "backgrounds", "games", "minigames", "leaders", "closet", "bricks", "h2h", "sayit", "grammar", "signin"];
-    const PAGE_TITLES = { beats: "Beats", backgrounds: "Backgrounds", games: "Fact Challenge", minigames: "Mini Games", leaders: "Leaders", closet: "Avatar", bricks: "Brick by Brick", h2h: "Head to Head", sayit: "Say It", grammar: "Grammar", signin: "Your class" };
+    const PAGES = ["menu", "beats", "backgrounds", "games", "minigames", "leaders", "closet", "scene", "bricks", "h2h", "sayit", "grammar", "signin"];
+    const PAGE_TITLES = { beats: "Beats", backgrounds: "Backgrounds", games: "Fact Challenge", minigames: "Mini Games", leaders: "Leaders", closet: "Avatar", scene: "My Scene", bricks: "Brick by Brick", h2h: "Head to Head", sayit: "Say It", grammar: "Grammar", signin: "Your class" };
     let menuSmooth = false;
     function currentPage() {
       const h = (location.hash || "").replace(/^#/, "");
@@ -11243,7 +11581,7 @@
       sec.appendChild(fcRow);
       // 4. Beats, Backgrounds, Mini Games
       const grid = el("div", { class: "menu-grid" });
-      [["beats", "Beats", menuArtCassette], ["backgrounds", "Backgrounds", menuArtPolaroid], ["minigames", "Mini Games", menuArtCoin]].forEach(function (t) {
+      [["beats", "Beats", menuArtCassette], ["backgrounds", "Backgrounds", menuArtPolaroid], ["minigames", "Mini Games", menuArtCoin], ["scene", "My Scene", menuArtScene]].forEach(function (t) {
         const btn = el("button", { type: "button", class: "menu-tile tile-" + t[0], onClick: function () { goPage(t[0]); } });
         const art = el("span", { class: "menu-art", "aria-hidden": "true" });
         art.innerHTML = t[2]();
