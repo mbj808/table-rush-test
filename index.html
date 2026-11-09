@@ -10102,11 +10102,9 @@
     const HD_PACK_COST = 10, HD_PIECE_COST = 2, HD_CHAR_COST = 100, HD_DIR = "./assets/hd/";
     const HD_ITEMS = [
       {"id":"xbA","slot":"look","name":"Wizard","f":"c_wizard","ch":"wizard","free":1},
+      {"id":"xfai","slot":"look","name":"Fairy","f":"c_fairy","ch":"fairy"},
       {"id":"xbB","slot":"look","name":"Space explorer","f":"c_space","ch":"space"},
       {"id":"xrob","slot":"look","name":"Robot","f":"c_robot","ch":"robot"},
-      {"id":"xpir","slot":"look","name":"Pirate","f":"c_pirate","ch":"pirate"},
-      {"id":"xfai","slot":"look","name":"Fairy","f":"c_fairy","ch":"fairy"},
-      {"id":"xkni","slot":"look","name":"Knight","f":"c_knight","ch":"knight"},
       {"id":"wh1","slot":"hat","name":"Blue star hat","f":"w_h1","ch":"wizard","L":[26.95,10.74,45.31,26.09]},
       {"id":"wh2","slot":"hat","name":"Moon hat + gold specs","f":"w_h2","ch":"wizard","L":[26.37,10.49,46.29,23.72]},
       {"id":"wh3","slot":"hat","name":"Rainbow feather hat","f":"w_h3","ch":"wizard","L":[24.8,9.74,49.41,25.47]},
@@ -10126,32 +10124,64 @@
       {"id":"wp2","slot":"pet","name":"Star kitten","f":"w_p2","ch":"wizard","L":[61.91,70.41,29.69,23.85]},
       {"id":"wp3","slot":"pet","name":"Baby dragon","f":"w_p3","ch":"wizard","L":[66.8,69.04,28.71,24.72]},
       {"id":"wp4","slot":"pet","name":"Crowned toad","f":"w_p4","ch":"wizard","L":[71.29,79.4,21.48,15.73]},
-      {"id":"wp5","slot":"pet","name":"Phoenix chick","f":"w_p5","ch":"wizard","L":[61.91,69.41,30.27,24.84]}
+      {"id":"wp5","slot":"pet","name":"Phoenix chick","f":"w_p5","ch":"wizard","L":[61.91,69.41,30.27,24.84]},
+      {"id":"fh1","slot":"hat","name":"Flower crown","f":"f_h1","ch":"fairy","L":[38.28,21.1,23.24,6.24]},
+      {"id":"fh2","slot":"hat","name":"Star tiara","f":"f_h2","ch":"fairy","L":[38.87,22.35,21.88,14.61]},
+      {"id":"fh3","slot":"hat","name":"Daisy sun hat","f":"f_h3","ch":"fairy","L":[29.1,18.73,41.6,24.09]},
+      {"id":"fh4","slot":"hat","name":"Mushroom cap","f":"f_h4","ch":"fairy","L":[26.56,15.86,46.48,22.35]},
+      {"id":"fh5","slot":"hat","name":"Petal bonnet","f":"f_h5","ch":"fairy","L":[24.8,16.23,50.2,30.34]},
+      {"id":"fo1","slot":"shirt","name":"Rose petal gown","f":"f_o1","ch":"fairy"},
+      {"id":"fo2","slot":"shirt","name":"Forest leaf dress","f":"f_o2","ch":"fairy"},
+      {"id":"fo3","slot":"shirt","name":"Twilight star gown","f":"f_o3","ch":"fairy"},
+      {"id":"fo4","slot":"shirt","name":"Sunny daisy dress","f":"f_o4","ch":"fairy"},
+      {"id":"fo5","slot":"shirt","name":"Rainbow petal dress","f":"f_o5","ch":"fairy"},
+      {"id":"fs1","slot":"shoes","name":"Glitter slippers","f":"f_s1","ch":"fairy","L":[40.82,87.14,18.55,7.62]},
+      {"id":"fs2","slot":"shoes","name":"Rose petal shoes","f":"f_s2","ch":"fairy","L":[40.23,87.14,19.73,7.62]},
+      {"id":"fs3","slot":"shoes","name":"Leaf slippers","f":"f_s3","ch":"fairy","L":[40.23,87.14,20.12,7.62]},
+      {"id":"fs4","slot":"shoes","name":"Crystal star shoes","f":"f_s4","ch":"fairy","L":[41.21,87.14,17.77,7.62]},
+      {"id":"fs5","slot":"shoes","name":"Gold blossom boots","f":"f_s5","ch":"fairy","L":[40.82,83.4,18.75,11.36]},
+      {"id":"fp1","slot":"pet","name":"Butterfly buddy","f":"f_p1","ch":"fairy","L":[60.16,67.92,38.28,18.73]},
+      {"id":"fp2","slot":"pet","name":"Flower bunny","f":"f_p2","ch":"fairy","L":[60.16,71.91,29.3,23.47]},
+      {"id":"fp3","slot":"pet","name":"Ladybug","f":"f_p3","ch":"fairy","L":[60.16,76.65,29.88,18.73]},
+      {"id":"fp4","slot":"pet","name":"Fawn","f":"f_p4","ch":"fairy","L":[60.16,70.41,26.17,24.97]},
+      {"id":"fp5","slot":"pet","name":"Bluebird","f":"f_p5","ch":"fairy","L":[60.16,74.16,22.46,21.22]}
     ];
     function hdItem(id) { return HD_ITEMS.find(function (i) { return i.id === id; }) || null; }
-    function hdClean(h) {
+    // Pirate and Knight left the HD pack. Characters refund HD_CHAR_COST; a leftover character-specific item (none shipped) refunds $5.
+    const HD_GONE = { xpir: "char", xkni: "char" };
+    const HD_REFUND_KEY = "mf-hd-refunded";
+    function hdGoneKind(id) {
+      if (HD_GONE[id]) return HD_GONE[id];
+      if (typeof id === "string" && /^(pir|kni)[._-]/.test(id)) return "item";
+      return "";
+    }
+    function hdClean(h, pack) {
       h = h && typeof h === "object" ? h : {};
       const o = Array.isArray(h.o) ? h.o.filter(function (id, i, arr) { const it = hdItem(id); return it && !it.free && arr.indexOf(id) === i; }) : [];
       const w = {};
       Object.keys(h.w || {}).forEach(function (k) { const it = hdItem(h.w[k]); if (it && it.slot === k && k !== "look" && o.indexOf(it.id) >= 0) w[k] = it.id; });
-      const b = hdItem(h.b) && (hdItem(h.b).free || o.indexOf(h.b) >= 0) ? h.b : "xbA";
-      return { o: o, w: w, b: b, on: h.on ? 1 : 0 };
+      const cur = hdItem(h.b);
+      let b = cur && (cur.free || o.indexOf(h.b) >= 0) ? h.b : "xbA";
+      let on = h.on ? 1 : 0;
+      if (h.b && hdGoneKind(h.b) === "char") { b = "xbA"; if (!pack) on = 0; }
+      return { o: o, w: w, b: b, on: on };
     }
     function hdHas(id) { const it = hdItem(id); return !!it && (it.free || avatar.hd.o.indexOf(id) >= 0); }
     function hdOn() { return avatar.pk.indexOf("hd") >= 0 && avatar.hd.on === 1; }
     // One body per character on a 512x750 frame; each item is placed from that character's anchors
     // (h: hat [x, brim y, width], g: glasses [x, y, width], t: torso [x, top, w, h], f: feet [left x, right x, width], k: fist [x, y]).
     // Images load only when this is called.
-    // Wizard: one 512x801 body per outfit (base robe is free); hat, shoes, pet and hand item are layers cut from
-    // renders of this exact wizard, so they sit at fixed spots (L = left, top, width, height in %). Other characters: body only.
+    // Wizard and Fairy: one 512x801 body per outfit (base is free); hat, shoes and pet are layers cut from
+    // renders of that exact character, so they sit at fixed spots (L = left, top, width, height in %). Others: body only.
     // Images load only when this is called, and only for the selected character.
     const HD_LAYER_ORDER = ["shoes", "pet", "hat"];
+    const HD_BODY = { wizard: "w_base", fairy: "f_base" };
     function hdLayers(h) {
-      const c = hdItem(h.b) || HD_ITEMS[0], wiz = c.ch === "wizard";
+      const c = hdItem(h.b) || HD_ITEMS[0], body = HD_BODY[c.ch];
       const it = function (k) { const i = h.w && h.w[k] ? hdItem(h.w[k]) : null; return i && i.ch === c.ch ? i : null; };
-      if (!wiz) return { r: 0.683, l: [{ f: c.f }] };
-      const o = it("shirt"), l = [{ f: o ? o.f : "w_base" }];
-      HD_LAYER_ORDER.forEach(function (k) { const i = it(k); if (i) l.push({ f: i.f, L: i.L }); });
+      if (!body) return { r: 0.683, l: [{ f: c.f }] };
+      const o = it("shirt"), l = [{ f: o ? o.f : body }];
+      HD_LAYER_ORDER.forEach(function (k) { const i = it(k); if (i && i.L) l.push({ f: i.f, L: i.L }); });
       return { r: 0.639, l: l };
     }
     function hdNode(h, size) {
@@ -10195,7 +10225,7 @@
     function hdPicHTML(u, px, r) { return '<img class="hd-pic" src="' + u + '" alt="" draggable="false" style="height:' + px + 'px;width:' + Math.round(px * r) + 'px">'; }
     // Returns HTML: the cached HD picture, or the classic avatar until the picture is ready (then it swaps in place).
     function hdPicOr(a, px, classic, keep, head) {
-      const h = hdClean(a.hd), k = hdPicKey(h, px, head), u = hdPicGet(k), r = head ? 1 : hdLayers(h).r;
+      const h = hdClean(a.hd, !!(a.pk && a.pk.indexOf("hd") >= 0)), k = hdPicKey(h, px, head), u = hdPicGet(k), r = head ? 1 : hdLayers(h).r;
       if (u) return hdPicHTML(u, px, r);
       hdPicMake(h, px, keep && !head, head);
       return '<span class="hd-pic-wait" data-hdk="' + k + '">' + classic + "</span>";
@@ -10223,7 +10253,7 @@
         hair: ok(AV_HAIRS, a.hair, "none"), hairColor: AV_HAIR_COLORS.indexOf(a.hairColor) >= 0 ? a.hairColor : AV_HAIR_COLORS[1], wear: wear, owned: owned,
         pz: Math.max(0, Math.min(99, Number(a.pz) || 0)), pg: a.pg ? 1 : 0,
         pk: Array.isArray(a.pk) ? a.pk.filter(function (k, i, arr) { return (k === "hd" || AV_PACKS.some(function (x) { return x[0] === k; })) && arr.indexOf(k) === i; }) : [],
-        hd: hdClean(a.hd),
+        hd: hdClean(a.hd, Array.isArray(a.pk) && a.pk.indexOf("hd") >= 0),
         updated: Number(a.updated) || 0 };
     }
     let avatar = (function () { try { return avClean(JSON.parse(localStorage.getItem(AV_KEY) || "null")); } catch (e) { return avClean(null); } })();
@@ -10300,6 +10330,7 @@
         const now = lbMe();
         if (!now || now.name !== name) { avLoading = false; return; }
         try { localStorage.setItem(AV_OWNER_KEY, name); } catch (e) {}
+        if (d && d.avatar && d.avatar.hd) hdRefundSweep(d.avatar.hd, name);
         const remote = d && d.avatar ? avClean(d.avatar) : null;
         const resetAt = Number(localStorage.getItem(AV_RESET_KEY) || 0);
         if (!remote || (remote.updated && remote.updated < resetAt)) { if (avatar.made || avatar.owned.length) avSetPending(true); done(); return; }
@@ -10770,6 +10801,41 @@
     function coinSet(n) { try { localStorage.setItem(COIN_KEY, String(Math.max(0, n))); } catch (e) {} }
     function coinSpend(amount) { const n = Math.max(1, Math.floor(Number(amount) || 1)), c = coinGet(); if (c < n) { say(n === 1 ? "You need a coin. Get " + AV_PRIZE_EVERY + " in a row to earn one!" : "You need " + n + " coins. You have " + c + "."); return false; } coinSet(c - n); coinPillUpdate(); return true; }
     function coinPillUpdate() { const c = coinGet(), t = c + (c === 1 ? " coin" : " coins"); document.querySelectorAll(".coin-bank").forEach(function (b) { b.setAttribute("aria-label", t); const s = b.lastChild; if (s) s.textContent = b.getAttribute("data-short") ? String(c) : t; b.classList.remove("coin-bump"); void b.offsetWidth; b.classList.add("coin-bump"); }); }
+    // One refund per removed id per kid. Reads the raw save (before hdClean drops unknown ids) and never pays twice.
+    function hdRefundSweep(rawHd, who) {
+      if (!rawHd || typeof rawHd !== "object") return 0;
+      let map = {};
+      try { map = JSON.parse(localStorage.getItem(HD_REFUND_KEY) || "{}") || {}; } catch (e) { map = {}; }
+      const key = who || "_";
+      let changed = false;
+      if (key !== "_" && map._ && !map._moved) { map[key] = Object.assign({}, map._, map[key] || {}); map._moved = 1; changed = true; }
+      const done = map[key] && typeof map[key] === "object" ? map[key] : {};
+      const ids = [];
+      const push = function (id) { if (id && ids.indexOf(id) < 0) ids.push(id); };
+      if (Array.isArray(rawHd.o)) rawHd.o.forEach(push);
+      push(rawHd.b);
+      Object.keys(rawHd.w || {}).forEach(function (k) { push(rawHd.w[k]); });
+      let add = 0;
+      ids.forEach(function (id) {
+        const kind = hdGoneKind(id);
+        if (!kind || done[id]) return;
+        add += kind === "char" ? HD_CHAR_COST : 5;
+        done[id] = 1; changed = true;
+      });
+      if (!changed) return 0;
+      map[key] = done;
+      try { localStorage.setItem(HD_REFUND_KEY, JSON.stringify(map)); } catch (e) {}
+      if (add) { coinSet(coinGet() + add); coinPillUpdate(); }
+      return add;
+    }
+    (function () {
+      let raw = null;
+      try { raw = JSON.parse(localStorage.getItem(AV_KEY) || "null"); } catch (e) { raw = null; }
+      if (!raw || !raw.hd) return;
+      let who = "_";
+      try { who = localStorage.getItem(AV_OWNER_KEY) || "_"; } catch (e) {}
+      if (hdRefundSweep(raw.hd, who)) { try { localStorage.setItem(AV_KEY, JSON.stringify(avatar)); } catch (e) {} }
+    })();
     function coinPill() { const c = coinGet(); return el("p", { class: "coin-bank", role: "status", "aria-label": c + (c === 1 ? " coin" : " coins") }, [el("span", { class: "coin-ico", "aria-hidden": "true", text: "$" }), el("span", { text: c + (c === 1 ? " coin" : " coins") })]); }
     function coinDrop(preview) {
       if (!preview) { coinSet(coinGet() + 1); say("You got a coin!"); }
@@ -11015,7 +11081,7 @@
                 shopTab = "hat"; shopMode = "shop"; paintAll(true);
               });
             } }, [el("span", { class: "shp-pack-art", text: "\u2728" }), el("span", { class: "shp-pack-txt" }, [el("b", { text: "HD Avatar \u00B7 NEW" }),
-              el("small", { text: "6 movie-style 3D characters! Wizard free, others $" + HD_CHAR_COST + ". 20 Wizard items, $" + HD_PIECE_COST + " each. More coming soon." }),
+              el("small", { text: "4 movie-style 3D characters! Wizard free. Fairy is ready. Space Explorer and Robot coming soon. Characters $" + HD_CHAR_COST + ", 20 items each $" + HD_PIECE_COST + "." }),
               hdOpen ? el("span", { class: "shp-st own", text: "\u2713 Open \u00B7 Shop HD" }) : el("span", { class: "shp-buy" + (coinGet() < HD_PACK_COST ? " poor" : "") }, [el("span", { class: "coin-ico", "aria-hidden": "true", text: "$" }), el("span", { text: HD_PACK_COST + " Open" })])])]));
           AV_PACKS.forEach(function (pk) {
             const k = pk[0], open = shopPackOpen(k);
@@ -11034,7 +11100,7 @@
           const c = hdItem(avatar.hd.b) || HD_ITEMS[0];
           if (!HD_ITEMS.some(function (i) { return i.ch === c.ch && i.slot !== "look"; })) {
             seg.setAttribute("hidden", "");
-            body.appendChild(el("p", { class: "av-tip hd-soon", text: c.name + " items: Coming soon! \uD83D\uDEA7 Pick the Wizard in Characters to dress him now." }));
+            body.appendChild(el("p", { class: "av-tip hd-soon", text: c.name + " items: Coming soon! \uD83D\uDEA7 Pick the Wizard or the Fairy in Characters to dress them now." }));
             return;
           }
         }
