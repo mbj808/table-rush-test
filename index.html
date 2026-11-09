@@ -10103,8 +10103,6 @@
     const HD_ITEMS = [
       {"id":"xbA","slot":"look","name":"Wizard","f":"c_wizard","ch":"wizard","free":1},
       {"id":"xfai","slot":"look","name":"Fairy","f":"c_fairy","ch":"fairy"},
-      {"id":"xbB","slot":"look","name":"Space explorer","f":"c_space","ch":"space"},
-      {"id":"xrob","slot":"look","name":"Robot","f":"c_robot","ch":"robot"},
       {"id":"wh1","slot":"hat","name":"Blue star hat","f":"w_h1","ch":"wizard","L":[26.95,10.74,45.31,26.09]},
       {"id":"wh2","slot":"hat","name":"Moon hat + gold specs","f":"w_h2","ch":"wizard","L":[26.37,10.49,46.29,23.72]},
       {"id":"wh3","slot":"hat","name":"Rainbow feather hat","f":"w_h3","ch":"wizard","L":[24.8,9.74,49.41,25.47]},
@@ -10148,7 +10146,9 @@
     ];
     function hdItem(id) { return HD_ITEMS.find(function (i) { return i.id === id; }) || null; }
     // Pirate and Knight left the HD pack. Characters refund HD_CHAR_COST; a leftover character-specific item (none shipped) refunds $5.
+    // Space Explorer and Robot never shipped as owned, so an old save only falls back. No coins.
     const HD_GONE = { xpir: "char", xkni: "char" };
+    const HD_DROPPED = { xbB: 1, xrob: 1 };
     const HD_REFUND_KEY = "mf-hd-refunded";
     function hdGoneKind(id) {
       if (HD_GONE[id]) return HD_GONE[id];
@@ -10163,7 +10163,7 @@
       const cur = hdItem(h.b);
       let b = cur && (cur.free || o.indexOf(h.b) >= 0) ? h.b : "xbA";
       let on = h.on ? 1 : 0;
-      if (h.b && hdGoneKind(h.b) === "char") { b = "xbA"; if (!pack) on = 0; }
+      if (h.b && (hdGoneKind(h.b) === "char" || HD_DROPPED[h.b])) { b = "xbA"; if (!pack) on = 0; }
       return { o: o, w: w, b: b, on: on };
     }
     function hdHas(id) { const it = hdItem(id); return !!it && (it.free || avatar.hd.o.indexOf(id) >= 0); }
@@ -10828,13 +10828,22 @@
       if (add) { coinSet(coinGet() + add); coinPillUpdate(); }
       return add;
     }
+    function hdRawLeft(rawHd) {
+      if (!rawHd || typeof rawHd !== "object") return false;
+      const ids = [];
+      if (Array.isArray(rawHd.o)) rawHd.o.forEach(function (id) { ids.push(id); });
+      if (rawHd.b) ids.push(rawHd.b);
+      Object.keys(rawHd.w || {}).forEach(function (k) { ids.push(rawHd.w[k]); });
+      return ids.some(function (id) { return !!HD_DROPPED[id] || !!hdGoneKind(id); });
+    }
     (function () {
       let raw = null;
       try { raw = JSON.parse(localStorage.getItem(AV_KEY) || "null"); } catch (e) { raw = null; }
       if (!raw || !raw.hd) return;
       let who = "_";
       try { who = localStorage.getItem(AV_OWNER_KEY) || "_"; } catch (e) {}
-      if (hdRefundSweep(raw.hd, who)) { try { localStorage.setItem(AV_KEY, JSON.stringify(avatar)); } catch (e) {} }
+      const paid = hdRefundSweep(raw.hd, who);
+      if (paid || hdRawLeft(raw.hd)) { try { localStorage.setItem(AV_KEY, JSON.stringify(avatar)); } catch (e) {} }
     })();
     function coinPill() { const c = coinGet(); return el("p", { class: "coin-bank", role: "status", "aria-label": c + (c === 1 ? " coin" : " coins") }, [el("span", { class: "coin-ico", "aria-hidden": "true", text: "$" }), el("span", { text: c + (c === 1 ? " coin" : " coins") })]); }
     function coinDrop(preview) {
@@ -11081,7 +11090,7 @@
                 shopTab = "hat"; shopMode = "shop"; paintAll(true);
               });
             } }, [el("span", { class: "shp-pack-art", text: "\u2728" }), el("span", { class: "shp-pack-txt" }, [el("b", { text: "HD Avatar \u00B7 NEW" }),
-              el("small", { text: "4 movie-style 3D characters! Wizard free. Fairy is ready. Space Explorer and Robot coming soon. Characters $" + HD_CHAR_COST + ", 20 items each $" + HD_PIECE_COST + "." }),
+              el("small", { text: "2 movie-style 3D characters. Wizard is free. Fairy is $" + HD_CHAR_COST + ". 20 items each, $" + HD_PIECE_COST + "." }),
               hdOpen ? el("span", { class: "shp-st own", text: "\u2713 Open \u00B7 Shop HD" }) : el("span", { class: "shp-buy" + (coinGet() < HD_PACK_COST ? " poor" : "") }, [el("span", { class: "coin-ico", "aria-hidden": "true", text: "$" }), el("span", { text: HD_PACK_COST + " Open" })])])]));
           AV_PACKS.forEach(function (pk) {
             const k = pk[0], open = shopPackOpen(k);
@@ -11096,14 +11105,6 @@
           return;
         }
         seg.removeAttribute("hidden");
-        if (hdOn() && shopTab !== "look") {
-          const c = hdItem(avatar.hd.b) || HD_ITEMS[0];
-          if (!HD_ITEMS.some(function (i) { return i.ch === c.ch && i.slot !== "look"; })) {
-            seg.setAttribute("hidden", "");
-            body.appendChild(el("p", { class: "av-tip hd-soon", text: c.name + " items: Coming soon! \uD83D\uDEA7 Pick the Wizard or the Fairy in Characters to dress them now." }));
-            return;
-          }
-        }
         const all = shopItems(shopTab);
         const toBuy = all.filter(function (i) { return !shopHas(i); }), mine = all.filter(function (i) { return shopHas(i); });
         [["shop", "\uD83D\uDED2", "Shop", toBuy.length], ["closet", "\uD83C\uDF92", "My Closet", mine.length]].forEach(function (m) {
