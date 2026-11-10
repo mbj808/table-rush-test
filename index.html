@@ -3921,6 +3921,9 @@
     .sc-tab { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-width: 0; min-height: 58px; padding: 6px 2px; border-radius: 16px; border: 0; background: rgba(255,255,255,.1); color: #efe7ff; font: 800 .82rem/1.05 var(--ui-font); text-align: center; cursor: pointer; }
     .sc-tab.on { background: #ffd34e; color: #3a2400; box-shadow: 0 3px 0 #a87412; }
     .sc-hint { margin: 0; font: 700 .92rem/1.35 var(--ui-font); color: #ffe9a8; }
+    .sc-back { flex: none; min-height: 56px; min-width: 7.2rem; padding: 0 1.15rem; border-radius: 16px; border: 3px solid #fff; background: #ffd34e; color: #3a2400; font: 900 1.35rem/1 var(--ui-font); box-shadow: 0 4px 0 #a87412; cursor: pointer; }
+    .sc-back:active { transform: translateY(2px); box-shadow: 0 2px 0 #a87412; }
+    @media (max-width: 420px) { .sc-back { min-height: 52px; min-width: 6.4rem; font-size: 1.2rem; padding: 0 .95rem; } }
     .sc-swatch { width: 100%; height: 72px; border-radius: 14px; box-shadow: inset 0 0 0 3px #fff; }
     .shp-stage.has-scene { --pb: 10px; background: #87c8f0; }
     .shp-stage.has-scene .shp-beam, .shp-stage.has-scene .shp-ped { display: none; }
@@ -3934,6 +3937,7 @@
     body.sc-on .wave-bg::after { content: ""; position: absolute; inset: 0; z-index: 4; pointer-events: none; background: linear-gradient(180deg, rgba(18,8,40,.42) 0%, rgba(18,8,40,.22) 38%, rgba(18,8,40,.5) 100%); }
     @media (prefers-reduced-motion: reduce) {
       .sc-piece { cursor: pointer; }
+      .sc-back:active { transform: none; }
     }
 
   </style>
@@ -10408,7 +10412,7 @@
       const card = el("div", { class: "card sc-card" });
       const me = LEADERBOARD_URL ? lbMe() : null;
       card.appendChild(el("div", { class: "shp-bar" }, [
-        el("button", { type: "button", class: "shp-back", "aria-label": "Back", text: "\u2039", onClick: function () { goPage("menu"); } }),
+        el("button", { type: "button", class: "sc-back", "aria-label": "Back", text: "Back", onClick: scBack }),
         el("span", { class: "shp-ttl", text: "My Scene" }),
         el("p", { class: "coin-bank shp-coins", "data-short": "1", role: "status" }, [el("span", { class: "coin-ico", "aria-hidden": "true", text: "$" }), el("span", { class: "sc-coin", text: String(coinGet()) })])
       ]));
@@ -11477,7 +11481,16 @@
       const h = (location.hash || "").replace(/^#/, "");
       return PAGES.indexOf(h) >= 0 ? h : "home";
     }
-    function goPage(page) { location.hash = "#" + page; }
+    let sceneFrom = "menu";
+    function goPage(page) {
+      if (page === "scene" && currentPage() !== "scene") sceneFrom = currentPage() === "closet" ? "closet" : "menu";
+      location.hash = "#" + page;
+    }
+    function scBack() {
+      if (avSoonTimer) { clearTimeout(avSoonTimer); avSoonTimer = 0; }
+      avSave();
+      goPage(sceneFrom === "closet" ? "closet" : "menu");
+    }
     function scrollToMenu(smooth) {
       const target = document.getElementById("menu-page");
       if (target) target.scrollIntoView({ behavior: smooth ? "smooth" : "auto", block: "start" });
