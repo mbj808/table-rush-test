@@ -10152,7 +10152,7 @@
     function avHas() { return !!(avatar.made || avatar.owned.length); }
     function avOwns(id) { return !id || AV_FREE.indexOf(id) >= 0 || avatar.owned.indexOf(id) >= 0; }
     // ---- HD avatar (test site starter set). Saved as avatar.hd = { o: owned ids, w: {slot: id}, b: body id, on: 1 when shown }.
-    const HD_PACK_COST = 10, HD_PIECE_COST = 2, HD_CHAR_COST = 100, HD_DIR = "./assets/hd/";
+    const HD_PACK_COST = 10, HD_PIECE_COST = 2, HD_CHAR_COST = 10, HD_DIR = "./assets/hd/";
     const HD_ITEMS = [
       {"id":"xbA","slot":"look","name":"Wizard","f":"c_wizard","ch":"wizard","free":1},
       {"id":"xfai","slot":"look","name":"Fairy","f":"c_fairy","ch":"fairy"},
@@ -11158,7 +11158,7 @@
       ids.forEach(function (id) {
         const kind = hdGoneKind(id);
         if (!kind || done[id]) return;
-        add += kind === "char" ? HD_CHAR_COST : 5;
+        add += kind === "char" ? 100 : 5;
         done[id] = 1; changed = true;
       });
       if (!changed) return 0;
