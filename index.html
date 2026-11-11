@@ -3388,9 +3388,10 @@
     .home-fc-row > .home-bb.home-say, .home-fc-row > .home-bb.home-say:hover { grid-column: 1 / -1; background: linear-gradient(135deg, #3b2a8a 0%, #1b6fd1 60%, #12c2c9 100%); color: #fff; box-shadow: 0 4px 0 #14245e, 0 0 16px rgba(80, 180, 255, 0.45); }
     .home-fc-row > .home-say.say-off { opacity: 0.55; filter: grayscale(0.5); }
     .say-menu-note { grid-column: 1 / -1; margin: 0; text-align: center; font: 700 0.95rem/1.2 var(--ui-font); color: #ffe39a; }
-    .say-card { position: relative; overflow: hidden; min-height: 70vh; padding: 1rem; background: #070a1c; border-radius: 1.2rem; }
-    .say-net { position: absolute; inset: 0; width: 100%; height: 100%; display: block; z-index: 0; pointer-events: none; }
+    .say-card { position: relative; overflow: visible; min-height: 0; padding: 1rem 0; background: transparent; border-radius: 0; }
+    .say-net { position: fixed; inset: 0; width: 100%; height: 100%; display: block; z-index: 0; pointer-events: none; }
     .say-live { position: relative; z-index: 1; }
+    .say-streak, .say-tip, .say-in > .say-q, .say-in > .buddy-row { background: rgba(7, 10, 28, 0.62); border-radius: 1.1rem; padding: 0.35rem 0.9rem; }
     .say-in { display: flex; flex-direction: column; align-items: center; gap: 0.8rem; color: #fff; text-align: center; }
     .say-mic { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; border-radius: 999px; border: 2px solid rgba(255,255,255,0.4); background: rgba(10,14,40,0.75); color: #fff; font: 700 1rem/1.2 var(--ui-font); }
     .say-dot { width: 0.8rem; height: 0.8rem; border-radius: 50%; background: #888; flex: none; }
@@ -12654,7 +12655,7 @@
       } catch (e) { setTimeout(function () { if (sayG.want && !sayG.on) sayMicStart(); }, 600); }
     }
     function sayMicStop() { sayG.want = false; if (sayG.rec) try { sayG.rec.abort(); } catch (e) {} sayG.on = false; sayG.status = "off"; }
-    window.addEventListener("hashchange", function () { if (location.hash !== "#sayit" && (sayG.want || sayG.on)) { sayMicStop(); sessEnd(); lbFlush(); } });
+    window.addEventListener("hashchange", function () { if (location.hash !== "#sayit") { if (sayG.want || sayG.on) { sayMicStop(); sessEnd(); lbFlush(); } sayNetStop(); } });
     document.addEventListener("visibilitychange", function () { if (document.hidden) { if (sayG.want) { sayMicStop(); sayG.want = true; } } else if (sayG.want && document.body.dataset.page === "sayit") sayMicStart(); });
     function sayOnResult(ev) {
       const p = sayG.prob; if (!p) return;
@@ -12737,33 +12738,61 @@
       if (now - N.last > 45) { N.last = now; sayNetDraw(now); }   // ~22 fps is plenty, light for old iPads
       N.raf = requestAnimationFrame(sayNetTick);
     }
+    function sayNetStop() {
+      const N = sayG.net; if (!N) return;
+      if (N.raf) { cancelAnimationFrame(N.raf); N.raf = 0; }
+      if (N.cv.parentNode) N.cv.parentNode.removeChild(N.cv);
+    }
     function sayNetDraw(now) {
       const N = sayG.net, cv = N.cv, dpr = Math.min(2, window.devicePixelRatio || 1);
-      const w = cv.clientWidth || 300, h = cv.clientHeight || 300;
+      const w = cv.clientWidth || window.innerWidth || 300, h = cv.clientHeight || window.innerHeight || 300;
       if (cv.width !== Math.round(w * dpr) || cv.height !== Math.round(h * dpr)) { cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr); }
       const c = cv.getContext("2d"); c.setTransform(dpr, 0, 0, dpr, 0, 0);
+      const u = Math.min(w, h) / 360;
       c.fillStyle = "#070a1c"; c.fillRect(0, 0, w, h);
-      const glow = Math.min(1, 0.3 + N.edges.length * 0.025), fl = now - N.flick < 600 ? 0.55 + 0.45 * Math.abs(Math.cos((now - N.flick) / 50)) : 1;
-      c.lineWidth = 1.4;
+      const glow = Math.min(1, 0.3 + N.edges.length * 0.025);
+      const flashT = now - N.flick, flash = flashT >= 0 && flashT < 700 ? 1 - flashT / 700 : 0;
+      c.lineWidth = 2.8 * u; c.lineCap = "round";
       N.edges.forEach(function (e) {
-        const a = N.nodes[e.i], b = N.nodes[e.j], fresh = Math.max(0, 1 - (now - e.born) / 1500);
-        c.strokeStyle = "rgba(95,242,255," + ((0.12 + 0.35 * glow + 0.5 * fresh) * fl).toFixed(3) + ")";
-        c.beginPath(); c.moveTo(a.x * w, a.y * h); c.lineTo(b.x * w, b.y * h); c.stroke();
+        const a = N.nodes[e.i], b = N.nodes[e.j];
+        const grow = SAY_CALM ? 1 : Math.min(1, Math.max(0, now - (e.born || 0)) / 280);
+        const fresh = e.born ? Math.max(0, 1 - (now - e.born) / 900) : 0;
+        if (flash > 0) c.strokeStyle = "rgba(255,70,84," + (0.28 + 0.6 * flash).toFixed(3) + ")";
+        else c.strokeStyle = "rgba(95,242,255," + (0.16 + 0.4 * glow + 0.45 * fresh).toFixed(3) + ")";
+        c.beginPath(); c.moveTo(a.x * w, a.y * h); c.lineTo((a.x + (b.x - a.x) * grow) * w, (a.y + (b.y - a.y) * grow) * h); c.stroke();
       });
       N.nodes.forEach(function (n) {
         const pulse = SAY_CALM ? 0.8 : 0.65 + 0.35 * Math.sin(now / 900 + n.ph);
-        const al = (0.35 + 0.6 * glow) * pulse * fl;
-        c.fillStyle = "rgba(160,120,255," + (al * 0.25).toFixed(3) + ")"; c.beginPath(); c.arc(n.x * w, n.y * h, n.r * 3.2, 0, 6.283); c.fill();
-        c.fillStyle = "rgba(200,240,255," + al.toFixed(3) + ")"; c.beginPath(); c.arc(n.x * w, n.y * h, n.r, 0, 6.283); c.fill();
+        const al = (0.4 + 0.55 * glow) * pulse;
+        const rad = n.r * 3 * u, x = n.x * w, y = n.y * h;
+        if (flash > 0) {
+          c.fillStyle = "rgba(255,80,90," + (0.2 + 0.45 * flash).toFixed(3) + ")"; c.beginPath(); c.arc(x, y, rad * 4.2, 0, 6.283); c.fill();
+          c.fillStyle = "rgba(255,210,210," + (0.55 + 0.4 * flash).toFixed(3) + ")"; c.beginPath(); c.arc(x, y, rad, 0, 6.283); c.fill();
+        } else {
+          c.fillStyle = "rgba(150,110,255," + (al * 0.22).toFixed(3) + ")"; c.beginPath(); c.arc(x, y, rad * 4.6, 0, 6.283); c.fill();
+          c.fillStyle = "rgba(120,210,255," + (al * 0.38).toFixed(3) + ")"; c.beginPath(); c.arc(x, y, rad * 2.2, 0, 6.283); c.fill();
+          c.fillStyle = "rgba(230,250,255," + al.toFixed(3) + ")"; c.beginPath(); c.arc(x, y, rad, 0, 6.283); c.fill();
+        }
       });
       N.sparks = N.sparks.filter(function (s) {
-        const k = (now - s.t0) / 700; if (k > 1) return false;
-        const a = N.nodes[s.e.i], b = N.nodes[s.e.j], x = (a.x + (b.x - a.x) * k) * w, y = (a.y + (b.y - a.y) * k) * h;
-        c.fillStyle = "rgba(255,240,150,0.35)"; c.beginPath(); c.arc(x, y, 9, 0, 6.283); c.fill();
-        c.fillStyle = "#fff6c0"; c.beginPath(); c.arc(x, y, 3.5, 0, 6.283); c.fill();
-        return true;
+        const k = SAY_CALM ? 1 : (now - s.t0) / 900; if (k > 1) return false;
+        const a = N.nodes[s.e.i], b = N.nodes[s.e.j];
+        const travel = Math.min(1, k / 0.72);
+        const x = (a.x + (b.x - a.x) * travel) * w, y = (a.y + (b.y - a.y) * travel) * h;
+        const x0 = (a.x + (b.x - a.x) * Math.max(0, travel - 0.22)) * w, y0 = (a.y + (b.y - a.y) * Math.max(0, travel - 0.22)) * h;
+        c.strokeStyle = "rgba(255,220,120,0.85)"; c.lineWidth = 7 * u; c.beginPath(); c.moveTo(x0, y0); c.lineTo(x, y); c.stroke();
+        c.fillStyle = "rgba(255,230,140,0.4)"; c.beginPath(); c.arc(x, y, 22 * u, 0, 6.283); c.fill();
+        c.fillStyle = "#fff6c0"; c.beginPath(); c.arc(x, y, 8 * u, 0, 6.283); c.fill();
+        if (k > 0.72) {
+          const rk = (k - 0.72) / 0.28, bx = b.x * w, by = b.y * h;
+          c.strokeStyle = "rgba(255,244,190," + (1 - rk).toFixed(3) + ")"; c.lineWidth = 3 * u;
+          c.beginPath(); c.arc(bx, by, (12 + rk * 36) * u, 0, 6.283); c.stroke();
+        }
+        return !SAY_CALM;
       });
+      if (flash > 0) { c.fillStyle = "rgba(255,36,48," + (0.34 * flash).toFixed(3) + ")"; c.fillRect(0, 0, w, h); }
     }
+    window.addEventListener("resize", function () { const N = sayG.net; if (N && N.cv.isConnected) sayNetDraw(performance.now()); });
     // ---- UI ----
     function sayPaint() {
       const host = document.querySelector(".say-live"); if (!host) return;
@@ -12810,7 +12839,7 @@
       }
       if (!sayG.prob) sayNext();
       const N = sayNetInit();
-      card.appendChild(N.cv);
+      if (N.cv.parentNode !== document.body) document.body.appendChild(N.cv);
       card.appendChild(el("div", { class: "say-live" }, [sayLive()]));
       setTimeout(function () { sayNetKick(); sayNetDraw(performance.now()); sayMicStart(); }, 0);
       return card;
