@@ -12563,7 +12563,7 @@
     function saySign() { return sayOp() === "add" ? "+" : "\u00D7"; }
     function sayWord() { return sayOp() === "add" ? "plus" : "times"; }
     function sayAns(p) { return sayOp() === "add" ? p.a + p.b : p.a * p.b; }
-    function sayUnlocked() { try { return localStorage.getItem(SAY_KEY) === "1"; } catch (e) { return false; } }
+    function sayUnlocked() { return true; }   // Say It is open to everyone now (no code needed)
     function sayCodeOk(v) { return String(v || "").toLowerCase().replace(/[\s'\u2018\u2019\u02BB\u02BC`\u00B4\-.]/g, "") === "oahu"; }
     // ---- Spoken numbers -> list of numbers in order ----
     const SAY_ONES = { zero: 0, oh: 0, one: 1, won: 1, two: 2, to: 2, too: 2, three: 3, four: 4, for: 4, five: 5, six: 6, seven: 7, eight: 8, ate: 8, nine: 9, ten: 10, eleven: 11, twelve: 12, thirteen: 13, fourteen: 14, fifteen: 15, sixteen: 16, seventeen: 17, eighteen: 18, nineteen: 19 };
