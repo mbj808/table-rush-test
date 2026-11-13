@@ -3657,6 +3657,30 @@
     .shp-st.own { background: #3fa34d; color: #fff; }
     .shp-st.wear { background: #fff; color: #2a1650; }
     .shp-st.lock { background: rgba(255,255,255,.15); }
+    .sj-host:empty { display: none; }
+    .sj-box { display: flex; flex-direction: column; gap: 10px; min-width: 0; max-width: 100%; margin: 0 0 6px; }
+    .sj-hint { margin: 0; font: 800 1.05rem/1.3 var(--ui-font); color: #fff; }
+    .sj-cols { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; min-width: 0; }
+    .sj-sw { width: min(76px, 100%); aspect-ratio: 1; min-height: 52px; justify-self: center; border-radius: 50%; border: 4px solid #1a1a1a; box-shadow: inset 0 0 0 3px rgba(255,255,255,.55); cursor: pointer; padding: 0; }
+    .sj-sw.on { box-shadow: 0 0 0 4px #5ff2ff, inset 0 0 0 3px #fff; }
+    .sj-parts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; min-width: 0; }
+    @media (min-width: 900px) { .sj-parts { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+    .sj-part { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 6px; min-width: 0; min-height: 52px; padding: 8px 10px; border-radius: 14px; border: 3px dashed #ffe58a; background: rgba(255,255,255,.12); color: #fff; font: 800 1rem/1.15 var(--ui-font); text-align: center; cursor: pointer; }
+    .sj-part.own { border-style: solid; border-color: #7ee07a; background: rgba(255,255,255,.2); }
+    .sj-part.on { background: #ffd34e; color: #3a2400; border-style: solid; border-color: #fff; }
+    .sj-pc { font: 900 .95rem/1 var(--ui-font); }
+    .shp-card .sj-svg { width: auto; height: 96px; max-width: 100%; }
+    .shp-hero .av svg.sj-svg { width: 132px; height: auto; }
+    .shp-stage.sj-color { --pb: 6px; }
+    .shp-stage.sj-color .shp-hero .av svg.sj-svg { width: 142px; }
+    .shp-hero .sj-hit { cursor: pointer; }
+    .sj-svg .sj-hit.sel .sj-draw { stroke: #5ff2ff; }
+    @media (min-width: 720px) { .shp-hero .av svg.sj-svg, .shp-stage.sj-color .shp-hero .av svg.sj-svg { width: 176px; } }
+    @media (max-height: 700px) and (max-width: 719px) { .shp-hero .av svg.sj-svg, .shp-stage.sj-color .shp-hero .av svg.sj-svg { width: 112px; } }
+    .game-buddy svg.sj-svg { width: 78px; height: auto; }
+    @media (min-width: 700px) { .game-buddy svg.sj-svg { width: 108px; } }
+    .menu-av svg.sj-svg, .home-fc-row .menu-av svg.sj-svg { width: 40px; height: 40px; }
+    .lb-av svg.sj-svg { width: 26px; height: auto; }
     .shp-chip { align-self: flex-start; min-height: 42px; padding: 0 1rem; border-radius: 999px; border: 0; background: rgba(255,255,255,.14); color: #fff; font: 800 1rem/1 var(--ui-font); }
     .shp-packs { display: grid; gap: 12px; }
     @media (min-width: 1000px) { .shp-packs { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
@@ -10049,7 +10073,7 @@
     // ---- Avatar + Closet. Saved on this device (not cleared by Reset Challenge); synced to the class sheet when a leaderboard name is set. ----
     // AVATAR-RENDER-START (print.html loads this block to draw avatars; keep it free of page code)
     const AV_KEY = "mad-facts-avatar";
-    const AV_STYLES = [["buddy", "Buddy"], ["robot", "Robot"], ["animal", "Animal"], ["pixel", "Pixel"], ["alien", "Alien"], ["dino", "Dino"], ["monster", "Monster"]];
+    const AV_STYLES = [["buddy", "Buddy"], ["robot", "Robot"], ["animal", "Animal"], ["pixel", "Pixel"], ["alien", "Alien"], ["dino", "Dino"], ["monster", "Monster"], ["jester", "Star Jester"]];
     const AV_ANIMALS = [["cat", "Cat"], ["dog", "Dog"], ["bunny", "Bunny"], ["panda", "Panda"], ["fox", "Fox"], ["owl", "Owl"], ["turtle", "Turtle"], ["bear", "Bear"], ["mouse", "Mouse"]];
     const AV_COLORS = ["#ff8a5c", "#ffd34e", "#7ee07a", "#4fd1e8", "#6f8cff", "#b47cff", "#ff7ab8", "#c9c9d6",
       "#ff5a5a", "#f2a65a", "#b8e05a", "#2fbf9f", "#a0785a", "#f5e6c8"];
@@ -10574,6 +10598,79 @@
       return card;
     }
 
+    // Star Jester: one flat marker drawing. Uncolored parts stay white. Colors live on avatar.sj.
+    const SJ_PARTS = [["hoodL", "Hood left"], ["hoodR", "Hood right"], ["hoodStars", "Hood stars"], ["hoodDots", "Hood dots"], ["face", "Face"], ["faceStar", "Face star"], ["eyes", "Eyes"], ["mouth", "Mouth"], ["collar", "Collar"], ["stripeA", "Stripes A"], ["stripeB", "Stripes B"], ["bodyStars", "Body stars"], ["sleeveL", "Left sleeve"], ["sleeveR", "Right sleeve"], ["hands", "Star hands"], ["waist", "Waist"], ["legL", "Left leg"], ["legR", "Right leg"], ["legDots", "Leg dots"], ["ruffles", "Ankle ruffles"], ["shoes", "Shoes"]];
+    const SJ_COLORS = [["#e23b4a", "Red"], ["#2f6bff", "Blue"], ["#ffe14a", "Yellow"], ["#3cbf58", "Green"], ["#9b4dff", "Purple"], ["#ff7ab8", "Pink"], ["#ff8a1f", "Orange"], ["#f5c542", "Gold"]];
+    const SJ_CHAR_COST = 20, SJ_PART_COST = 1, SJ_INK = "#1a1a1a";
+    const SJ_LOOK = { hoodL: "#2f6bff", hoodR: "#e23b4a", hoodStars: "#ffe14a", hoodDots: "#ffe14a", faceStar: "#ffe14a", eyes: "#ffe14a", collar: "#ffe14a", stripeA: "#e23b4a", stripeB: "#2f6bff", bodyStars: "#ffe14a", sleeveL: "#ffe14a", sleeveR: "#ffe14a", hands: "#ffe14a", waist: "#ffe14a", legL: "#2f6bff", legR: "#e23b4a", legDots: "#ffe14a", ruffles: "#ffe14a" };
+    function sjLook() { return { o: Object.keys(SJ_LOOK), c: Object.assign({}, SJ_LOOK) }; }
+    function sjClean(s) {
+      s = s && typeof s === "object" ? s : {};
+      const ids = SJ_PARTS.map(function (p) { return p[0]; });
+      const o = [];
+      (Array.isArray(s.o) ? s.o : []).forEach(function (id) { if (ids.indexOf(id) >= 0 && o.indexOf(id) < 0) o.push(id); });
+      const c = {};
+      o.forEach(function (id) { if (s.c && SJ_COLORS.some(function (x) { return x[0] === s.c[id]; })) c[id] = s.c[id]; });
+      return { o: o, c: c };
+    }
+    function sjFill(a, id) {
+      const s = a && a.sj;
+      return s && s.o && s.o.indexOf(id) >= 0 && s.c && s.c[id] ? s.c[id] : "#fff";
+    }
+    function sjStar(cx, cy, r, ir) {
+      const p = [];
+      for (let i = 0; i < 10; i++) {
+        const ang = -Math.PI / 2 + i * Math.PI / 5, d = i % 2 ? ir : r;
+        p.push((cx + Math.cos(ang) * d).toFixed(1) + "," + (cy + Math.sin(ang) * d).toFixed(1));
+      }
+      return p.join(" ");
+    }
+    function sjDraw(tag, id, attrs, a) {
+      return "<" + tag + " " + attrs + ' fill="' + sjFill(a, id) + '" stroke="' + SJ_INK + '" stroke-width="4.2" stroke-linejoin="round" stroke-linecap="round" paint-order="stroke fill" class="sj-draw"/>';
+    }
+    function sjPart(id, inner) { return '<g class="sj-hit" data-sj="' + id + '">' + inner + "</g>"; }
+    function sjInner(a) {
+      const D = function (id, d) { return sjDraw("path", id, 'd="' + d + '"', a); };
+      const P = function (id, pts) { return sjDraw("polygon", id, 'points="' + pts + '"', a); };
+      const E = function (id, attrs) { return sjDraw("ellipse", id, attrs, a); };
+      const C = function (id, attrs) { return sjDraw("circle", id, attrs, a); };
+      let stripesA = "", stripesB = "";
+      for (let i = 0; i < 6; i++) {
+        const x = 74 + i * 9;
+        const d = "M" + x + " 198 L" + (x + 9) + " 198 L" + (x + 9) + " 268 L" + x + " 268 Z";
+        if (i % 2) stripesB += D("stripeB", d); else stripesA += D("stripeA", d);
+      }
+      const mouthInk = sjFill(a, "mouth") === "#fff" ? SJ_INK : sjFill(a, "mouth");
+      return [
+        sjPart("hoodL", D("hoodL", "M100 8 Q72 36 52 78 Q32 118 22 156 Q40 176 64 188 Q82 176 100 168 Z")),
+        sjPart("hoodR", D("hoodR", "M100 8 Q128 36 148 78 Q168 118 178 156 Q160 176 136 188 Q118 176 100 168 Z")),
+        sjPart("hoodStars", P("hoodStars", sjStar(78, 46, 9, 4)) + P("hoodStars", sjStar(58, 82, 10, 4.2)) + P("hoodStars", sjStar(76, 112, 8, 3.4))),
+        sjPart("hoodDots", E("hoodDots", 'cx="124" cy="44" rx="9" ry="11"') + E("hoodDots", 'cx="146" cy="74" rx="12" ry="9"') + E("hoodDots", 'cx="122" cy="96" rx="8" ry="10"') + E("hoodDots", 'cx="150" cy="112" rx="10" ry="8"')),
+        sjPart("sleeveL", D("sleeveL", "M76 206 Q44 214 30 240 Q42 256 58 246 Q74 234 86 216 Z") + P("sleeveL", sjStar(46, 242, 8, 3.4))),
+        sjPart("sleeveR", D("sleeveR", "M124 206 Q156 214 170 240 Q158 256 142 246 Q126 234 114 216 Z") + P("sleeveR", sjStar(154, 242, 8, 3.4))),
+        sjPart("hands", P("hands", sjStar(24, 252, 16, 7)) + P("hands", sjStar(176, 252, 16, 7))),
+        sjPart("legL", D("legL", "M78 258 Q70 300 72 332 L100 336 Q104 300 102 258 Z")),
+        sjPart("legR", D("legR", "M108 258 Q112 300 116 336 L144 332 Q148 300 136 258 Z")),
+        sjPart("legDots", C("legDots", 'cx="120" cy="286" r="7"') + C("legDots", 'cx="130" cy="306" r="7"') + C("legDots", 'cx="118" cy="322" r="6"')),
+        sjPart("shoes", D("shoes", "M74 336 L64 348 L82 358 L104 338 Z") + D("shoes", "M126 336 L136 348 L118 358 L96 338 Z")),
+        sjPart("ruffles", D("ruffles", "M62 318 Q56 306 70 314 Q80 302 90 316 Q100 306 106 320 Q94 334 78 326 Q64 336 62 318 Z") + D("ruffles", "M138 318 Q144 306 130 314 Q120 302 110 316 Q100 306 94 320 Q106 334 122 326 Q136 336 138 318 Z")),
+        sjPart("stripeA", stripesA),
+        sjPart("stripeB", stripesB),
+        sjPart("bodyStars", P("bodyStars", sjStar(90, 218, 10, 4.2)) + P("bodyStars", sjStar(116, 240, 9, 3.8))),
+        sjPart("waist", D("waist", "M66 260 Q82 250 100 258 Q118 250 134 260 L136 272 Q118 266 100 274 Q82 266 64 272 Z")),
+        sjPart("collar", D("collar", "M60 190 Q46 176 66 186 Q80 172 100 190 Q120 172 134 186 Q154 176 140 192 Q124 208 100 198 Q76 208 60 192 Z")),
+        sjPart("face", C("face", 'cx="100" cy="162" r="38"')),
+        sjPart("faceStar", P("faceStar", sjStar(100, 164, 30, 12))),
+        sjPart("eyes", P("eyes", sjStar(70, 154, 15, 6.4)) + P("eyes", sjStar(130, 154, 15, 6.4))),
+        sjPart("mouth", '<path class="sj-draw" d="M 78 178 Q 100 196 122 178" fill="none" stroke="' + mouthInk + '" stroke-width="5.5" stroke-linecap="round"/>')
+      ].join("");
+    }
+    function sjSVG(a, opts) {
+      const inner = sjInner(a);
+      if (opts && opts.only) return "<g>" + inner + "</g>";
+      const size = (opts && opts.size) || 96, h = Math.round(size * 360 / 200);
+      return '<svg class="av-svg sj-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 360" width="' + size + '" height="' + h + '" aria-hidden="true">' + inner + "</svg>";
+    }
     function avClean(a) {
       a = a && typeof a === "object" ? a : {};
       const ok = function (list, v, d) { return list.some(function (x) { return x[0] === v; }) ? v : d; };
@@ -10593,6 +10690,7 @@
         pk: Array.isArray(a.pk) ? a.pk.filter(function (k, i, arr) { return (k === "hd" || AV_PACKS.some(function (x) { return x[0] === k; })) && arr.indexOf(k) === i; }) : [],
         hd: hdClean(a.hd, Array.isArray(a.pk) && a.pk.indexOf("hd") >= 0),
         sc: scClean(a.sc),
+        sj: sjClean(a.sj),
         updated: Number(a.updated) || 0 };
     }
     let avatar = (function () { try { return avClean(JSON.parse(localStorage.getItem(AV_KEY) || "null")); } catch (e) { return avClean(null); } })();
@@ -10677,9 +10775,11 @@
         const localNewer = avatar.updated !== startedAt || avPending() || avatar.updated >= remote.updated;
         const base = localNewer ? avatar : remote;
         const upd = Math.max(remote.updated, avatar.updated);
+        const sjLocal = avatar.sj || { o: [], c: {} }, sjRemote = remote.sj || { o: [], c: {} };
         avatar = avClean(Object.assign({}, base, { owned: owned, made: avatar.made || remote.made, pk: (avatar.pk || []).concat(remote.pk || []),
           hd: Object.assign({}, base.hd, { o: (avatar.hd.o || []).concat(remote.hd.o || []) }),
-          sc: Object.assign({}, base.sc || {}, { o: ((avatar.sc && avatar.sc.o) || []).concat((remote.sc && remote.sc.o) || []) }) }));
+          sc: Object.assign({}, base.sc || {}, { o: ((avatar.sc && avatar.sc.o) || []).concat((remote.sc && remote.sc.o) || []) }),
+          sj: { o: (sjLocal.o || []).concat(sjRemote.o || []), c: Object.assign({}, localNewer ? sjRemote.c : sjLocal.c, localNewer ? sjLocal.c : sjRemote.c) } }));
         avatar.updated = upd;
         try { localStorage.setItem(AV_KEY, JSON.stringify(avatar)); } catch (e) {}
         if (JSON.stringify(Object.assign({}, remote, { updated: 0 })) !== JSON.stringify(Object.assign({}, avatar, { updated: 0 }))) avSetPending(true);
@@ -10710,6 +10810,7 @@
       opts = opts || {};
       const c = a.color, dk = avShade(c, 0.7), ink = "#2a1d3a";
       const st = a.style, pix = st === "pixel";
+      if (st === "jester") return sjSVG(a, opts);
       const w = a.wear;
       const p = [], M = {};
       // feet
@@ -11244,7 +11345,7 @@
         el("button", { type: "button", class: "sim-reset", text: "Reset purchases", onClick: function () {
           const me = LEADERBOARD_URL ? lbMe() : null;
           avConfirm("Reset purchases?", "Removes every bought piece and opened pack" + (me ? " for " + me.name + " (also on the TEST sheet)" : " on this device") + ". Coins stay.", function () {
-            avatar.owned = []; avatar.pk = []; avatar.wear = {}; avatar = avClean(avatar); avatar.made = true;
+            avatar.owned = []; avatar.pk = []; avatar.wear = {}; avatar.sj = { o: [], c: {} }; avatar = avClean(avatar); avatar.made = true;
             avSave(); say("Purchases reset."); redo();
           }, "Yes, reset");
         } })
@@ -11266,7 +11367,7 @@
     const SHOP_PACK_BG = { hw: "#ff8a1f,#5b2a8a", bh: "#1fb5a8,#ff8a3d", sp: "#22308a,#6f8cff", sw: "#3550c8,#e8414f", tg: "#a0522d,#f2a65a",
       wz: "#5a1020,#c9a24a", bb: "#e8414f,#ffb703", ft: "#ff7ab8,#6f8cff", jg: "#2f7d3a,#9ccc3a" };
     function shopFind(id) { return avItem(id) || avLook(id); }
-    function shopCost(it) { return it.f ? (it.slot === "look" ? HD_CHAR_COST : HD_PIECE_COST) : it.gold ? AV_GOLD_COST : AV_PIECE_COST; }
+    function shopCost(it) { return it && it.id === "s.jester" ? SJ_CHAR_COST : it.f ? (it.slot === "look" ? HD_CHAR_COST : HD_PIECE_COST) : it.gold ? AV_GOLD_COST : AV_PIECE_COST; }
     function shopHas(it) { return it.f ? hdHas(it.id) : avOwns(it.id); }
     function shopPackOpen(k) { return avatar.pk.indexOf(k) >= 0; }
     function shopPackName(k) { const x = AV_PACKS.find(function (q) { return q[0] === k; }); return x ? x[1] : ""; }
@@ -11315,19 +11416,85 @@
       const tabs = el("div", { class: "shp-tabs", role: "tablist" });
       const seg = el("div", { class: "shp-seg" });
       const body = el("div", { class: "shp-body" });
-      card.appendChild(el("div", { class: "shp-wrap" }, [stage, el("div", { class: "shp-main" }, [tabs, seg, body])]));
+      const sjHost = el("div", { class: "sj-host" });
+      let sjSel = "";
+      card.appendChild(el("div", { class: "shp-wrap" }, [stage, el("div", { class: "shp-main" }, [sjHost, tabs, seg, body])]));
       if (SIM_ON) {
         const pop = el("div", { class: "shp-sim", hidden: "" }, [simBar()]);
         card.appendChild(pop);
         card.appendChild(el("button", { type: "button", class: "shp-sim-btn", "aria-label": "Test tools", text: "\uD83E\uDDEA", onClick: function () { if (pop.hasAttribute("hidden")) pop.removeAttribute("hidden"); else pop.setAttribute("hidden", ""); } }));
       }
       const shake = function (n) { n.classList.remove("av-shake"); void n.offsetWidth; n.classList.add("av-shake"); };
+      function sjOn() { return avatar.style === "jester" && avOwns("s.jester") && !hdOn(); }
+      function sjMark() {
+        hero.querySelectorAll(".sj-hit").forEach(function (g) {
+          g.classList.toggle("sel", g.getAttribute("data-sj") === sjSel);
+          g.onclick = function (ev) {
+            ev.preventDefault();
+            sjSel = g.getAttribute("data-sj");
+            sjMark();
+            paintSj(true);
+          };
+        });
+      }
+      function sjApply(id, hex, name) {
+        const owned = avatar.sj.o.indexOf(id) >= 0;
+        const go = function () {
+          const already = avatar.sj.o.indexOf(id) >= 0;
+          if (!already && !coinSpend(SJ_PART_COST)) return;
+          if (!already) avatar.sj.o.push(id);
+          avatar.sj.c[id] = hex;
+          avatar.made = true;
+          avSaveSoon();
+          say(owned ? name + " recolored!" : "You colored " + name + "!");
+          paintAll(true);
+        };
+        if (owned) { go(); return; }
+        if (coinGet() < SJ_PART_COST) { say("You need $" + SJ_PART_COST + " to color " + name + ". You have $" + coinGet() + "."); return; }
+        avConfirm("Color " + name + " for $" + SJ_PART_COST + "?", "You can change this color later for free. You have $" + coinGet() + ".", go, "Yes, color it!");
+      }
+      function paintSj(scroll) {
+        sjHost.innerHTML = "";
+        if (!sjOn()) return;
+        const part = SJ_PARTS.find(function (p) { return p[0] === sjSel; });
+        const owned = part && avatar.sj.o.indexOf(part[0]) >= 0;
+        const hint = !part ? "Tap a part of Star Jester, then a color." : owned ? part[1] + " — tap a color. Changing it is free." : part[1] + " — tap a color. This part costs $" + SJ_PART_COST + ".";
+        const box = el("div", { class: "sj-box" });
+        box.appendChild(el("p", { class: "sj-hint", text: hint }));
+        const cols = el("div", { class: "sj-cols", role: "group", "aria-label": "Colors" });
+        SJ_COLORS.forEach(function (c) {
+          const on = part && owned && avatar.sj.c[part[0]] === c[0];
+          cols.appendChild(el("button", { type: "button", class: "sj-sw" + (on ? " on" : ""), style: "background:" + c[0], "aria-label": c[1] + (on ? ", selected" : ""), "aria-pressed": String(!!on), onClick: function () {
+            if (!sjSel) { say("Tap a part of Star Jester first."); return; }
+            const p = SJ_PARTS.find(function (x) { return x[0] === sjSel; });
+            if (p) sjApply(p[0], c[0], p[1]);
+          } }));
+        });
+        box.appendChild(cols);
+        const parts = el("div", { class: "sj-parts", role: "group", "aria-label": "Parts to color" });
+        SJ_PARTS.forEach(function (p) {
+          const have = avatar.sj.o.indexOf(p[0]) >= 0;
+          parts.appendChild(el("button", { type: "button", class: "sj-part" + (have ? " own" : "") + (sjSel === p[0] ? " on" : ""), "aria-pressed": String(sjSel === p[0]), "aria-label": p[1] + (have ? ", yours" : ", $" + SJ_PART_COST), onClick: function () {
+            sjSel = p[0];
+            sjMark();
+            paintSj(true);
+          } }, [el("span", { class: "sj-pn", text: p[1] }), have ? null : el("span", { class: "sj-pc", text: "$" + SJ_PART_COST })].filter(Boolean)));
+        });
+        box.appendChild(parts);
+        sjHost.appendChild(box);
+        if (scroll) {
+          const row = sjHost.querySelector(".sj-cols");
+          if (row && row.scrollIntoView) row.scrollIntoView({ block: "nearest" });
+        }
+      }
       const paintHero = function (bounce) {
         hero.innerHTML = "";
         hero.appendChild(hdOn() ? hdNode(avatar.hd, wide ? 330 : 250) : avNode(shopLook(shopTry ? shopFind(shopTry) : null), wide ? 300 : 230));
         modeBtn.hidden = avatar.pk.indexOf("hd") < 0;
         modeBtn.textContent = hdOn() ? "\u21BA Classic avatar" : "\u2728 HD avatar";
         stage.classList.toggle("hd", hdOn());
+        stage.classList.toggle("sj-color", sjOn());
+        if (sjOn()) sjMark();
         if (bounce) { hero.classList.remove("bounce"); void hero.offsetWidth; hero.classList.add("bounce"); }
       };
       const packOpen = function (k, btn) {
@@ -11342,6 +11509,7 @@
       const buy = function (it, node, ok) {
         const cost = shopCost(it);
         if (coinGet() < cost) { shake(node); say("You need $" + cost + ". You have $" + coinGet() + "."); return; }
+        if (it.id === "s.jester" && !ok) { avConfirm("Get Star Jester for $" + cost + "?", "It starts black and white. Each part is $" + SJ_PART_COST + " to color. You have $" + coinGet() + ".", function () { buy(it, node, true); }, "Yes, get it!"); return; }
         if (it.f && it.slot === "look" && !ok) { avConfirm("Get the " + it.name + " for $" + cost + "?", "HD characters cost $" + cost + ". You have $" + coinGet() + ".", function () { buy(it, node, true); }, "Yes, get it!"); return; }
         if (!coinSpend(cost)) return;
         if (it.f) { if (avatar.hd.o.indexOf(it.id) < 0) avatar.hd.o.push(it.id); if (it.slot === "look") avatar.hd.b = it.id; else avatar.hd.w[it.slot] = it.id; }
@@ -11371,6 +11539,7 @@
         if (it.swatch) pic = el("span", { class: "shp-swatch", style: "background:" + it.swatch });
         else if (it.f) pic = el("span", { class: "shp-hdthumb" }, [el("img", { src: HD_DIR + "thumbs/" + it.f + ".webp", alt: "", decoding: "async", draggable: "false" })]);
         else if (it.slot) { const a = { owned: [it.id], wear: {}, color: avatar.color, style: "buddy" }; a.wear[it.slot] = it.id; pic = avPieceNode(a, it.slot, it.id, 88); }
+        else if (it.id === "s.jester") { const pv = avPreview(it); pv.wear = {}; pv.owned = avatar.owned.concat([it.id]); if (!have) pv.sj = sjLook(); pic = avNode(pv, 86); }
         else { const pv = avPreview(it); pv.wear = {}; pv.owned = avatar.owned.concat([it.id]); pic = avPieceNode(pv, "head", "look:" + it.id, 88); }
         const tag = on ? el("span", { class: "shp-st wear", text: hand ? "Holding" : "Wearing" })
           : have ? el("span", { class: "shp-st own", text: hand ? "\u2713 Hold" : "\u2713 Wear" })
@@ -11469,7 +11638,7 @@
       };
       const paintAll = function (bounce) {
         const y = window.scrollY;
-        paintTabs(); paintBody(); paintHero(bounce); paintTry();
+        paintTabs(); paintBody(); paintHero(bounce); paintSj(false); paintTry();
         window.scrollTo(0, y);
       };
       paintAll();
