@@ -3552,7 +3552,8 @@
     .pet-ttl { flex: 1; min-width: 0; font: 900 1.4rem/1.1 var(--ui-font); }
     .pet-eggs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
     .pet-egg { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 0; min-height: 148px; padding: 10px 8px 12px; border-radius: 18px; border: 3px solid #ffe58a; background: rgba(255,255,255,.1); color: #fff; font: 800 1.05rem/1.15 var(--ui-font); cursor: pointer; }
-    .pet-egg svg { width: 92px; height: auto; }
+    .pet-egg .pet-art { width: 92px; height: auto; display: block; position: relative; }
+    .pet-egg .pet-art img { display: block; width: 100%; height: auto; }
     .pet-egg small { font: 900 .95rem/1 var(--ui-font); }
     .pet-room { position: relative; z-index: 1; height: 300px; border-radius: 22px; overflow: hidden; isolation: isolate; background: radial-gradient(120% 70% at 50% 0%, rgba(255,255,255,.55), transparent 42%), linear-gradient(#8ec8ff 0%, #d7f0ff 28%, #ffe7c4 62%, #f3d2a4 78%); box-shadow: inset 0 0 50px rgba(80,40,90,.18), inset 0 -30px 40px rgba(90,40,10,.12); touch-action: none; }
     .pet-room::before { content: ""; position: absolute; left: 8%; top: -10%; width: 46%; height: 70%; background: linear-gradient(180deg, rgba(255,244,200,.55), transparent 80%); clip-path: polygon(38% 0, 62% 0, 100% 100%, 0 100%); pointer-events: none; z-index: 0; }
@@ -3573,11 +3574,13 @@
     .pet-toys i:nth-child(3) { width: 0; height: 0; left: 30%; bottom: 18px; border-left: 12px solid transparent; border-right: 12px solid transparent; border-bottom: 20px solid #7ee07a; }
     .pet-ball { position: absolute; z-index: 3; bottom: 18%; width: 28px; height: 28px; margin-left: -14px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #fff, #ff5a3c 60%, #c42020); box-shadow: 0 4px 0 rgba(0,0,0,.15); }
     .pet-fig { position: absolute; left: 50%; bottom: 10%; transform: translateX(-50%); border: 0; background: transparent; padding: 0; cursor: pointer; z-index: 3; touch-action: manipulation; }
-    .pet-fig svg { display: block; width: var(--pw, 168px); height: auto; filter: drop-shadow(0 8px 6px rgba(80,40,10,.25)); }
-    .pet-eye { transform-box: fill-box; transform-origin: center; animation: pet-blink 4.4s infinite; }
-    .pet-cheek { transform-box: fill-box; transform-origin: center; opacity: .82; transition: transform .15s ease, opacity .15s ease; }
-    .pet-fig.chomp .pet-cheek { opacity: 1; transform: scale(1.7); }
-    .pet-zzz { animation: pet-zzz 1.8s ease-in-out infinite; }
+    .pet-fig .pet-art { display: block; width: var(--pw, 168px); height: auto; position: relative; }
+    .pet-fig .pet-art img { display: block; width: 100%; height: auto; filter: drop-shadow(0 8px 6px rgba(80,40,10,.25)); transform-origin: 50% 80%; }
+    .pet-fig:not(.egg):not(.asleep) .pet-art img { animation: pet-squash 4.4s ease-in-out infinite; }
+    .pet-cracks { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+    .pet-zzz { position: absolute; right: 4%; top: 6%; font: 900 1.45rem/1 var(--ui-font); color: #6a7ca0; pointer-events: none; animation: pet-zzz 1.8s ease-in-out infinite; }
+    .pet-zzz span { display: inline-block; margin-left: 1px; font-size: .8em; color: #9ab0d0; transform: translate(6px, -12px); }
+    @keyframes pet-squash { 0%, 88%, 100% { transform: scale(1); } 92% { transform: scale(1.05, .92); } 96% { transform: scale(.98, 1.04); } }
     .pet-float { position: absolute; left: 46%; top: 42%; z-index: 4; font-size: 1.35rem; pointer-events: none; animation: pet-float .85s ease-out both; }
     @keyframes pet-blink { 0%, 90%, 100% { transform: scaleY(1); } 94%, 97% { transform: scaleY(.12); } }
     @keyframes pet-zzz { 0%, 100% { opacity: .35; } 50% { opacity: 1; } }
@@ -3615,10 +3618,12 @@
     .pet-pop b { position: relative; z-index: 1; padding: .4rem 1rem; border-radius: 999px; background: #ffd34e; color: #3a2400; font: 900 1.8rem/1 var(--ui-font); }
     .pet-spark { position: absolute; left: 50%; top: 42%; width: 12px; height: 12px; margin: -6px; border-radius: 3px; animation: ci-spark 1s ease-out both; }
     .pet-mini { display: inline-flex; width: 36px; height: 36px; flex: 0 0 auto; border-radius: 50%; background: #fff; overflow: hidden; align-items: center; justify-content: center; }
-    .pet-mini svg { width: 34px; height: 34px; }
+    .pet-mini .pet-art { width: 34px; height: 34px; display: block; position: relative; }
+    .pet-mini .pet-art img { width: 34px; height: 34px; object-fit: contain; display: block; }
+    .pet-mini .pet-cracks, .pet-mini .pet-zzz { display: none; }
     .shp-pet { border: 0; padding: 0; cursor: pointer; }
     @media (prefers-reduced-motion: reduce) {
-      .pet-boop, .pet-fig.wander, .pet-fig.hello, .pet-fig.chomp, .pet-fig.wiggle, .pet-fig.egg, .pet-spark, .pet-float, .pet-eye, .pet-zzz { animation: none; }
+      .pet-boop, .pet-fig.wander, .pet-fig.hello, .pet-fig.chomp, .pet-fig.wiggle, .pet-fig.egg, .pet-spark, .pet-float, .pet-eye, .pet-zzz, .pet-fig .pet-art img { animation: none; }
       .pet-spark { opacity: 0; }
     }
     @media (max-width: 719px) { .pet-room { height: 270px; } }
@@ -10955,236 +10960,48 @@
       const other = win === a ? b : a;
       return petClean({ kind: win.kind, sp: Math.max(a.sp, b.sp), joy: a.joyAt >= b.joyAt ? a.joy : b.joy, joyAt: Math.max(a.joyAt, b.joyAt), name: win.name || other.name, room: win.room.concat(other.room) });
     }
-    let petSeq = 0;
-    function petShine(id, a, b, c) { return '<radialGradient id="' + id + '" cx="32%" cy="24%" r="78%"><stop offset="0" stop-color="' + a + '"/><stop offset=".42" stop-color="' + b + '"/><stop offset="1" stop-color="' + c + '"/></radialGradient>'; }
-    function petForm(gid, cx, cy, rx, ry, ink) {
-      return '<ellipse cx="' + cx + '" cy="' + (cy + 6) + '" rx="' + (rx * 0.82) + '" ry="' + (ry * 0.28) + '" fill="#000" opacity=".16"/>'
-        + '<ellipse cx="' + (cx + rx * 0.08) + '" cy="' + (cy + ry * 0.12) + '" rx="' + (rx * 0.92) + '" ry="' + (ry * 0.86) + '" fill="#000" opacity=".12"/>'
-        + '<ellipse cx="' + cx + '" cy="' + cy + '" rx="' + rx + '" ry="' + ry + '" fill="url(#' + gid + ')" stroke="' + (ink || "#4a2a16") + '" stroke-width="2.6"/>'
-        + '<ellipse cx="' + (cx - rx * 0.32) + '" cy="' + (cy - ry * 0.42) + '" rx="' + (rx * 0.36) + '" ry="' + (ry * 0.2) + '" fill="#fff" opacity=".62"/>'
-        + '<path d="M' + (cx - rx * 0.55) + ' ' + (cy - ry * 0.15) + ' Q' + cx + ' ' + (cy - ry * 0.95) + ' ' + (cx + rx * 0.62) + ' ' + (cy - ry * 0.2) + '" fill="none" stroke="#fff" stroke-width="2.2" opacity=".45" stroke-linecap="round"/>';
+    const PET_STAGE_FILES = ["egg", "baby", "kid", "teen", "grown-up"];
+    const petImgCache = {};
+    function petImgSrc(kind, stage) {
+      const k = petKind(kind) ? kind : "pup";
+      const s = PET_STAGE_FILES[Math.max(0, Math.min(4, stage | 0))] || "egg";
+      return "assets/pets/" + k + "-" + s + ".webp";
     }
-    function petEyes(id, x, y, x2, r, sleepy) {
-      if (sleepy) return '<path d="M' + (x - r) + " " + y + " Q" + x + " " + (y + r * 0.75) + " " + (x + r) + " " + y + '" fill="none" stroke="#3a2418" stroke-width="3.2" stroke-linecap="round"/><path d="M' + (x2 - r) + " " + y + " Q" + x2 + " " + (y + r * 0.75) + " " + (x2 + r) + " " + y + '" fill="none" stroke="#3a2418" stroke-width="3.2" stroke-linecap="round"/>';
-      const g = id + "ey";
-      function one(cx) { return '<g class="pet-eye"><ellipse cx="' + cx + '" cy="' + y + '" rx="' + r + '" ry="' + (r * 1.22) + '" fill="#fff"/><circle cx="' + cx + '" cy="' + (y + 1) + '" r="' + (r * 0.62) + '" fill="url(#' + g + ')"/><circle cx="' + (cx - r * 0.28) + '" cy="' + (y - r * 0.34) + '" r="' + (r * 0.22) + '" fill="#fff"/><circle cx="' + (cx + r * 0.2) + '" cy="' + (y + r * 0.2) + '" r="' + (r * 0.08) + '" fill="#fff"/></g>'; }
-      return '<radialGradient id="' + g + '"><stop offset="0" stop-color="#fff"/><stop offset=".16" stop-color="#c8f0ff"/><stop offset=".45" stop-color="#2a3d88"/><stop offset="1" stop-color="#070b16"/></radialGradient>' + one(x) + one(x2);
+    function petPreloadSrc(src) {
+      if (!src || petImgCache[src]) return;
+      const im = new Image();
+      im.src = src;
+      petImgCache[src] = im;
     }
-    function petEggArt(kind, id, cracks) {
-      const tint = { pup: "#e8b56a", kit: "#ffc0d4", dra: "#8ee08a", tur: "#b6ef8a" }[kind] || "#ffe7c4";
-      const ink = "#6a3a18";
-      let crack = "";
-      ["M78 108 L96 126 L74 146", "M124 86 L108 112 L132 128", "M70 148 L96 164 L76 182", "M132 140 L112 162 L138 176"].forEach(function (d, i) {
-        if (i < cracks) crack += '<path d="' + d + '" fill="none" stroke="#5a3014" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><path d="' + d + '" fill="none" stroke="#fff6e4" stroke-width="1.4" stroke-linecap="round" opacity=".7"/>';
+    function petPreload(pet) {
+      if (!pet || !pet.kind) {
+        PETS.forEach(function (k) { petPreloadSrc(petImgSrc(k.id, 0)); });
+        return;
+      }
+      const stage = petStage(pet.sp || 0);
+      petPreloadSrc(petImgSrc(pet.kind, stage));
+      if (stage < 4) petPreloadSrc(petImgSrc(pet.kind, stage + 1));
+    }
+    function petCrackSVG(sp) {
+      const n = Math.min(4, Math.max(0, Math.floor(Number(sp) || 0)));
+      if (!n) return "";
+      const paths = ["M38 42 L50 52 L36 64", "M62 32 L54 44 L66 54", "M34 66 L50 74 L38 84", "M66 60 L54 72 L68 80"];
+      let s = '<svg class="pet-cracks" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" aria-hidden="true">';
+      paths.forEach(function (d, i) {
+        if (i < n) {
+          s += '<path d="' + d + '" fill="none" stroke="#5a3014" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>';
+          s += '<path d="' + d + '" fill="none" stroke="#fff6e4" stroke-width="1" stroke-linecap="round" opacity=".75"/>';
+        }
       });
-      const mark = {
-        pup: '<ellipse cx="82" cy="138" rx="12" ry="9" fill="#c4843c" opacity=".85"/><ellipse cx="118" cy="122" rx="9" ry="7" fill="#a86a28"/><circle cx="100" cy="156" r="6" fill="#e0a15a"/>',
-        kit: '<path d="M70 96 L84 62 L104 100 Z" fill="#ff9ec4" stroke="#c45a84" stroke-width="1.5"/><path d="M130 96 L116 62 L96 100 Z" fill="#ff9ec4" stroke="#c45a84" stroke-width="1.5"/>',
-        dra: '<path d="M128 108 Q164 78 148 140 Z" fill="#2f9e45" stroke="#146b32" stroke-width="1.6"/><ellipse cx="78" cy="140" rx="12" ry="8" fill="#3cbf58"/>',
-        tur: '<ellipse cx="100" cy="142" rx="26" ry="18" fill="#2f9e45" stroke="#146b32" stroke-width="2"/><ellipse cx="100" cy="136" rx="10" ry="6" fill="#d8ffb0"/><ellipse cx="84" cy="146" rx="7" ry="5" fill="#c6ef8a" stroke="#1f7a38" stroke-width="1"/>'
-      }[kind] || "";
-      return petShine(id + "s", "#fffef8", "#ffe0b8", tint)
-        + '<ellipse cx="100" cy="196" rx="40" ry="8" fill="#000" opacity=".18"/>'
-        + petForm(id + "s", 100, 132, 52, 62, ink)
-        + '<ellipse cx="78" cy="100" rx="16" ry="9" fill="#fff" opacity=".7"/>'
-        + mark + crack;
-    }
-    function petArt(kind, stage, sleepy, id) {
-      const eyes = function (x, y, x2, r) { return petEyes(id, x, y, x2, r, sleepy); };
-      const cheeks = function (x, y, x2) { return '<ellipse class="pet-cheek" cx="' + x + '" cy="' + y + '" rx="9" ry="5.5" fill="#ff7a9a"/><ellipse class="pet-cheek" cx="' + x2 + '" cy="' + y + '" rx="9" ry="5.5" fill="#ff7a9a"/>'; };
-      const leg = function (x, y, w, h, fill, ink) { return '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="' + (w / 2) + '" fill="' + fill + '" stroke="' + ink + '" stroke-width="1.6"/><rect x="' + (x + 2) + '" y="' + (y + 3) + '" width="' + (w * 0.35) + '" height="' + (h * 0.45) + '" rx="3" fill="#fff" opacity=".35"/>'; };
-      const furN = function (x, y, c) { return '<path d="M' + (x - 14) + " " + y + " q6 5 0 9 M" + x + " " + (y + 1) + " q7 5 0 10 M" + (x + 14) + " " + y + ' q6 5 0 9" fill="none" stroke="' + c + '" stroke-width="1.7" opacity=".5" stroke-linecap="round"/>'; };
-      if (kind === "pup") {
-        const fur = petShine(id + "f", "#fff8ea", "#f0c48a", "#a86828") + petShine(id + "h", "#fff8ea", "#f0c48a", "#a86828");
-        const ear = petShine(id + "e", "#f6d2a4", "#c4843c", "#6a3410");
-        const ink = "#5a3014";
-        if (stage <= 1) return fur + ear
-          + petForm(id + "f", 100, 188, 36, 22, ink)
-          + '<ellipse cx="64" cy="130" rx="16" ry="28" fill="url(#' + id + 'e)" stroke="' + ink + '" stroke-width="2"/><ellipse cx="136" cy="130" rx="16" ry="28" fill="url(#' + id + 'e)" stroke="' + ink + '" stroke-width="2"/>'
-          + '<ellipse cx="64" cy="134" rx="7" ry="15" fill="#ffc8be"/><ellipse cx="136" cy="134" rx="7" ry="15" fill="#ffc8be"/>'
-          + petForm(id + "h", 100, 140, 38, 36, ink)
-          + furN(100, 158, "#8a4e22")
-          + '<ellipse cx="100" cy="158" rx="16" ry="11" fill="#fff6e8" stroke="#e0c4a0" stroke-width="1"/>'
-          + eyes(84, 136, 116, 12) + cheeks(74, 152, 126)
-          + '<ellipse cx="100" cy="156" rx="6.5" ry="4.4" fill="#3a2010"/><ellipse cx="98" cy="155" rx="2" ry="1.2" fill="#fff" opacity=".7"/>';
-        if (stage === 2) return fur + ear
-          + '<ellipse cx="162" cy="168" rx="16" ry="10" fill="url(#' + id + 'e)" stroke="' + ink + '" stroke-width="1.6" transform="rotate(-28 162 168)"/>'
-          + petForm(id + "f", 100, 176, 48, 28, ink)
-          + '<ellipse cx="62" cy="116" rx="15" ry="28" fill="url(#' + id + 'e)" stroke="' + ink + '" stroke-width="2"/><ellipse cx="138" cy="116" rx="15" ry="28" fill="url(#' + id + 'e)" stroke="' + ink + '" stroke-width="2"/>'
-          + petForm(id + "h", 100, 128, 36, 34, ink)
-          + furN(100, 150, "#8a4e22")
-          + '<ellipse cx="74" cy="200" rx="14" ry="8" fill="#e8b56a" stroke="' + ink + '" stroke-width="1.4"/><ellipse cx="126" cy="200" rx="14" ry="8" fill="#e8b56a" stroke="' + ink + '" stroke-width="1.4"/>'
-          + '<ellipse cx="100" cy="148" rx="15" ry="10" fill="#fff6e8"/>'
-          + eyes(84, 124, 116, 11) + cheeks(76, 140, 124)
-          + '<ellipse cx="100" cy="146" rx="6" ry="4" fill="#3a2010"/><path d="M88 156 q12 10 24 0" fill="none" stroke="#3a2010" stroke-width="2.4" stroke-linecap="round"/>';
-        if (stage === 3) return fur + ear
-          + '<path d="M148 146 Q188 112 170 180 Q150 168 144 154 Z" fill="url(#' + id + 'f)" stroke="' + ink + '" stroke-width="2"/>'
-          + petForm(id + "f", 118, 162, 48, 30, ink)
-          + leg(78, 176, 16, 30, "#e8b56a", ink) + leg(108, 178, 16, 28, "#e8b56a", ink) + leg(138, 174, 16, 28, "#c4843c", ink)
-          + '<ellipse cx="46" cy="108" rx="14" ry="26" fill="url(#' + id + 'e)" stroke="' + ink + '" stroke-width="1.8"/>'
-          + petForm(id + "h", 62, 126, 30, 28, ink)
-          + '<ellipse cx="38" cy="140" rx="16" ry="11" fill="#fff6e8" stroke="#e0c4a0" stroke-width="1"/>'
-          + '<rect x="34" y="130" width="32" height="11" rx="5" fill="#e23b4a" stroke="#8a1a24" stroke-width="1.2"/>'
-          + eyes(50, 122, 74, 10) + '<ellipse cx="34" cy="140" rx="5.5" ry="4" fill="#3a2010"/>';
-        return fur + ear
-          + '<path d="M146 128 Q198 70 176 172 Q154 176 144 146 Z" fill="url(#' + id + 'f)" stroke="' + ink + '" stroke-width="2.2"/><ellipse cx="170" cy="112" rx="11" ry="16" fill="#fff6e4" opacity=".75"/>'
-          + petForm(id + "f", 116, 156, 52, 34, ink)
-          + '<ellipse cx="108" cy="166" rx="28" ry="16" fill="#fff6e4" opacity=".7"/>'
-          + furN(112, 150, "#8a4e22")
-          + leg(72, 174, 18, 32, "#e8b56a", ink) + leg(102, 176, 18, 30, "#e8b56a", ink) + leg(138, 172, 18, 30, "#c4843c", ink)
-          + '<ellipse cx="34" cy="98" rx="15" ry="28" fill="url(#' + id + 'e)" stroke="' + ink + '" stroke-width="2"/><ellipse cx="34" cy="106" rx="7" ry="14" fill="#ffc8be"/>'
-          + petForm(id + "h", 58, 118, 32, 30, ink)
-          + '<ellipse cx="32" cy="136" rx="18" ry="12" fill="#fff6e8" stroke="#e0c4a0" stroke-width="1"/>'
-          + '<rect x="26" y="124" width="36" height="12" rx="6" fill="#e23b4a" stroke="#8a1a24" stroke-width="1.3"/>'
-          + '<circle cx="54" cy="130" r="6" fill="#ffd34e" stroke="#c48a10" stroke-width="1.5"/><circle cx="54" cy="130" r="2.2" fill="#fff6c0"/>'
-          + eyes(46, 112, 72, 11) + cheeks(40, 128, 78)
-          + '<ellipse cx="28" cy="134" rx="6.5" ry="4.4" fill="#3a2010"/><ellipse cx="26" cy="133" rx="2" ry="1" fill="#fff" opacity=".6"/>'
-          + '<path d="M22 142 q10 14 6 18 q-8 -4 -14 0" fill="#ff5a6a" stroke="#c42840" stroke-width="1"/>';
-      }
-      if (kind === "kit") {
-        const fur = petShine(id + "f", "#fff6ea", "#ffb86a", "#d06818") + petShine(id + "h", "#fff6ea", "#ffb86a", "#d06818");
-        const pink = "#ffd0e4", ink = "#8a3c10";
-        const stripes = function (x, y) { return '<path d="M' + (x - 16) + " " + y + " q8 6 0 12 M" + x + " " + (y + 2) + " q10 6 0 12 M" + (x + 16) + " " + y + ' q8 6 0 12" fill="none" stroke="#c45a10" stroke-width="2.2" stroke-linecap="round" opacity=".7"/>'; };
-        const ears = function (x, y, s) {
-          return '<path d="M' + (x - 22 * s) + " " + (y + 8) + " L" + (x - 12 * s) + " " + (y - 36 * s) + " L" + (x + 2) + " " + (y + 4) + ' Z" fill="url(#' + id + 'f)" stroke="' + ink + '" stroke-width="1.8"/>'
-            + '<path d="M' + (x + 22 * s) + " " + (y + 8) + " L" + (x + 12 * s) + " " + (y - 36 * s) + " L" + (x - 2) + " " + (y + 4) + ' Z" fill="url(#' + id + 'f)" stroke="' + ink + '" stroke-width="1.8"/>'
-            + '<path d="M' + (x - 16 * s) + " " + (y + 2) + " L" + (x - 10 * s) + " " + (y - 18 * s) + " L" + (x - 2) + " " + y + ' Z" fill="' + pink + '"/>'
-            + '<path d="M' + (x + 16 * s) + " " + (y + 2) + " L" + (x + 10 * s) + " " + (y - 18 * s) + " L" + (x + 2) + " " + y + ' Z" fill="' + pink + '"/>';
-        };
-        if (stage <= 1) return fur
-          + petForm(id + "f", 100, 190, 34, 20, ink)
-          + ears(100, 128, 1)
-          + petForm(id + "h", 100, 146, 36, 34, ink)
-          + eyes(84, 142, 116, 12) + cheeks(74, 158, 126)
-          + '<path d="M92 160 L100 168 L108 160" fill="#e23b4a"/><path d="M100 168 v7" stroke="' + ink + '" stroke-width="1.6"/>';
-        if (stage === 2) return fur
-          + '<path d="M146 170 Q180 198 162 142" stroke="#f0a050" stroke-width="14" fill="none" stroke-linecap="round"/><path d="M150 166 Q176 188 164 148" stroke="' + pink + '" stroke-width="4" fill="none" stroke-linecap="round"/>'
-          + petForm(id + "f", 100, 178, 46, 26, ink) + stripes(100, 168)
-          + ears(100, 118, 1)
-          + petForm(id + "h", 100, 132, 34, 32, ink)
-          + '<ellipse cx="74" cy="200" rx="13" ry="8" fill="#f0a050" stroke="' + ink + '" stroke-width="1.3"/><ellipse cx="126" cy="200" rx="13" ry="8" fill="#f0a050" stroke="' + ink + '" stroke-width="1.3"/>'
-          + eyes(86, 128, 116, 11) + cheeks(76, 144, 124)
-          + '<ellipse cx="100" cy="146" rx="5.5" ry="3.6" fill="#e23b4a"/><path d="M68 136 H48 M132 136 H152 M70 144 H52 M130 144 H148" stroke="#3a2418" stroke-width="1.6" stroke-linecap="round"/>';
-        if (stage === 3) return fur
-          + '<path d="M150 136 Q192 96 164 178" stroke="#f0a050" stroke-width="13" fill="none" stroke-linecap="round"/><path d="M156 132 Q186 104 166 168" stroke="' + pink + '" stroke-width="3.5" fill="none" stroke-linecap="round"/>'
-          + petForm(id + "f", 112, 164, 48, 28, ink) + stripes(112, 156)
-          + leg(86, 178, 14, 26, "#f0a050", ink) + leg(120, 178, 14, 26, "#f0a050", ink)
-          + ears(62, 112, 0.9)
-          + petForm(id + "h", 62, 126, 28, 26, ink)
-          + '<circle cx="46" cy="142" r="5.5" fill="#ffd34e" stroke="#c48a10" stroke-width="1"/>'
-          + eyes(50, 122, 74, 10) + '<ellipse cx="44" cy="140" rx="4.5" ry="3" fill="#e23b4a"/><path d="M34 128 H16 M36 136 H14" stroke="#3a2418" stroke-width="1.6" stroke-linecap="round"/>';
-        return fur
-          + '<path d="M150 124 Q204 62 170 178" stroke="#f0a050" stroke-width="16" fill="none" stroke-linecap="round"/><path d="M158 116 Q190 78 174 150" stroke="' + pink + '" stroke-width="4" fill="none" stroke-linecap="round"/>'
-          + petForm(id + "f", 114, 160, 52, 32, ink) + stripes(114, 150)
-          + leg(84, 176, 16, 30, "#f0a050", ink) + leg(122, 176, 16, 30, "#f0a050", ink)
-          + ears(56, 108, 1.05)
-          + petForm(id + "h", 56, 122, 30, 28, ink)
-          + '<circle cx="40" cy="140" r="6.5" fill="#ffd34e" stroke="#c48a10" stroke-width="1.3"/><circle cx="40" cy="140" r="2.4" fill="#fff6c0"/>'
-          + eyes(44, 116, 70, 11) + cheeks(36, 132, 74)
-          + '<ellipse cx="38" cy="136" rx="5.2" ry="3.4" fill="#e23b4a"/>'
-          + '<path d="M28 122 H8 M30 130 H6 M32 138 H10 M78 126 H98" stroke="#3a2418" stroke-width="1.7" stroke-linecap="round"/>';
-      }
-      if (kind === "dra") {
-        const sc = petShine(id + "f", "#f4ffe8", "#5dce78", "#146b32") + petShine(id + "h", "#f4ffe8", "#5dce78", "#146b32");
-        const wing = petShine(id + "w", "#fbffe8", "#9aeea0", "#0e5a28");
-        const belly = "#eaffd4", ink = "#0e5a28";
-        const scales = function (x, y) { return '<path d="M' + (x - 18) + " " + y + " q8 6 16 0 M" + (x - 8) + " " + (y + 12) + " q8 6 16 0 M" + (x - 22) + " " + (y + 12) + ' q8 6 16 0" fill="none" stroke="#0e5a28" stroke-width="1.8" stroke-linecap="round" opacity=".65"/>'; };
-        const wingP = function (d) { return '<path d="' + d + '" fill="url(#' + id + 'w)" stroke="' + ink + '" stroke-width="1.8"/><path d="' + d + '" fill="none" stroke="#146b32" stroke-width="1.4" opacity=".7"/>'; };
-        if (stage <= 1) return sc
-          + petForm(id + "f", 100, 182, 42, 26, ink)
-          + '<ellipse cx="100" cy="188" rx="22" ry="12" fill="' + belly + '"/>'
-          + '<path d="M70 150 Q42 136 58 178 Z" fill="#2f9e45" stroke="' + ink + '" stroke-width="1.6"/><path d="M130 150 Q158 136 142 178 Z" fill="#2f9e45" stroke="' + ink + '" stroke-width="1.6"/>'
-          + petForm(id + "h", 100, 138, 36, 34, ink)
-          + '<ellipse cx="100" cy="156" rx="16" ry="11" fill="' + belly + '" stroke="#b6e090" stroke-width="1"/>'
-          + eyes(84, 134, 116, 12) + cheeks(74, 150, 126);
-        if (stage === 2) return sc + wing
-          + '<path d="M150 174 Q182 198 166 146 Z" fill="url(#' + id + 'f)" stroke="' + ink + '" stroke-width="1.8"/>'
-          + petForm(id + "f", 112, 174, 44, 28, ink) + scales(108, 166)
-          + wingP("M80 148 C46 120 30 150 50 178 C64 164 76 166 84 154 Z")
-          + wingP("M108 144 C132 114 156 134 140 168 C124 156 110 158 104 148 Z")
-          + petForm(id + "h", 70, 136, 28, 26, ink)
-          + '<path d="M54 116 L62 96 L76 118 Z" fill="#ffd34e" stroke="#c48a10" stroke-width="1"/><path d="M86 114 L94 94 L74 116 Z" fill="#ffd34e" stroke="#c48a10" stroke-width="1"/>'
-          + '<ellipse cx="70" cy="152" rx="12" ry="8" fill="' + belly + '"/>'
-          + eyes(58, 132, 82, 10);
-        if (stage === 3) return sc + wing
-          + '<path d="M156 164 Q196 146 178 108 Q160 136 148 156 Z" fill="url(#' + id + 'f)" stroke="' + ink + '" stroke-width="1.8"/>'
-          + petForm(id + "f", 116, 168, 48, 32, ink) + scales(112, 158)
-          + wingP("M96 146 C52 86 16 116 28 164 C42 190 80 176 98 156 Z")
-          + wingP("M126 136 C164 78 196 112 180 164 C166 188 138 174 126 152 Z")
-          + leg(92, 186, 14, 22, "#3cbf58", ink) + leg(126, 186, 14, 22, "#3cbf58", ink)
-          + petForm(id + "h", 62, 130, 28, 26, ink)
-          + '<path d="M44 110 L48 78 L66 112 Z" fill="#ffd34e" stroke="#c48a10" stroke-width="1.2"/><path d="M80 108 L90 74 L66 110 Z" fill="#e8b020" stroke="#a87810" stroke-width="1.2"/>'
-          + '<ellipse cx="48" cy="146" rx="12" ry="8" fill="' + belly + '"/>'
-          + eyes(50, 126, 74, 10);
-        return sc + wing + petShine(id + "fr", "#fff6b0", "#ff9a1f", "#e23b4a")
-          + '<path d="M158 150 Q202 124 186 90 Q162 122 148 146 Z" fill="url(#' + id + 'f)" stroke="' + ink + '" stroke-width="1.8"/>'
-          + petForm(id + "f", 118, 164, 50, 34, ink)
-          + '<ellipse cx="112" cy="174" rx="24" ry="16" fill="' + belly + '" opacity=".9"/>' + scales(112, 156)
-          + wingP("M100 140 C48 64 8 100 22 158 C36 196 82 180 102 154 Z")
-          + wingP("M132 128 C176 52 206 96 190 160 C176 198 142 176 132 148 Z")
-          + leg(90, 186, 16, 24, "#3cbf58", ink) + leg(128, 186, 16, 24, "#2f9e45", ink)
-          + petForm(id + "h", 58, 126, 30, 28, ink)
-          + '<path d="M38 106 L40 68 L62 108 Z" fill="#ffd34e" stroke="#c48a10" stroke-width="1.3"/><path d="M76 102 L88 62 L68 106 Z" fill="#e8b020" stroke="#a87810" stroke-width="1.3"/>'
-          + '<ellipse cx="42" cy="144" rx="13" ry="9" fill="' + belly + '" stroke="#c6e8a0" stroke-width="1"/>'
-          + '<path d="M30 136 C8 124 0 100 14 86 C10 112 6 128 28 140 C14 146 20 158 36 150 Z" fill="url(#' + id + 'fr)" stroke="#e07020" stroke-width="1"/>'
-          + '<path d="M24 118 C14 104 16 92 26 84" fill="none" stroke="#fff6b0" stroke-width="2.4" stroke-linecap="round"/>'
-          + eyes(46, 120, 72, 11);
-      }
-      const sh = petShine(id + "f", "#f2ffe4", "#3cbf58", "#0e5a28") + petShine(id + "h", "#f6ffe6", "#c6ef8a", "#3e7a30");
-      const skin = id + "h", ink = "#145c28";
-      const scutes = function (cx, cy, s) {
-        function one(x, y, rx, ry, fill) { return '<ellipse cx="' + x + '" cy="' + y + '" rx="' + rx + '" ry="' + ry + '" fill="' + fill + '" stroke="#145c28" stroke-width="1.7"/><ellipse cx="' + (x - rx * 0.25) + '" cy="' + (y - ry * 0.3) + '" rx="' + (rx * 0.35) + '" ry="' + (ry * 0.22) + '" fill="#fff" opacity=".45"/>'; }
-        return one(cx, cy - s, s * 0.72, s * 0.42, "#e8ffc8") + one(cx - s * 0.9, cy, s * 0.6, s * 0.38, "#d0f0a0") + one(cx + s * 0.9, cy, s * 0.6, s * 0.38, "#d0f0a0") + one(cx, cy + s * 0.75, s * 0.55, s * 0.34, "#b6e090");
-      };
-      if (stage <= 1) return sh
-        + '<ellipse cx="96" cy="196" rx="36" ry="8" fill="#000" opacity=".15"/>'
-        + petForm(id + "f", 96, 168, 48, 36, ink)
-        + '<ellipse cx="96" cy="174" rx="22" ry="16" fill="#e8ffd0" stroke="#8ec878" stroke-width="1"/>'
-        + '<path d="M140 156 Q158 150 162 140" fill="none" stroke="#8ee08a" stroke-width="12" stroke-linecap="round"/>'
-        + '<circle cx="164" cy="136" r="16" fill="url(#' + skin + ')" stroke="' + ink + '" stroke-width="2"/>'
-        + eyes(156, 134, 172, 6);
-      if (stage === 2) return sh
-        + petForm(id + "f", 92, 168, 52, 38, ink) + scutes(92, 164, 16)
-        + '<path d="M140 156 Q160 146 166 126" fill="none" stroke="#8ee08a" stroke-width="12" stroke-linecap="round"/>'
-        + '<circle cx="170" cy="118" r="16" fill="url(#' + skin + ')" stroke="' + ink + '" stroke-width="2"/>'
-        + '<ellipse cx="48" cy="198" rx="15" ry="8" fill="#7ee07a" stroke="' + ink + '" stroke-width="1.3"/><ellipse cx="126" cy="200" rx="15" ry="8" fill="#7ee07a" stroke="' + ink + '" stroke-width="1.3"/>'
-        + eyes(162, 116, 178, 6);
-      if (stage === 3) return sh
-        + '<path d="M38 176 Q18 194 34 206" fill="none" stroke="#2f9e45" stroke-width="8" stroke-linecap="round"/>'
-        + petForm(id + "f", 96, 162, 56, 42, ink) + scutes(96, 158, 18)
-        + '<path d="M146 148 Q172 130 176 106" fill="none" stroke="#8ee08a" stroke-width="13" stroke-linecap="round"/>'
-        + '<circle cx="180" cy="100" r="17" fill="url(#' + skin + ')" stroke="' + ink + '" stroke-width="2"/>'
-        + '<ellipse cx="40" cy="198" rx="16" ry="9" fill="#7ee07a" stroke="' + ink + '" stroke-width="1.3"/><ellipse cx="78" cy="206" rx="16" ry="9" fill="#7ee07a" stroke="' + ink + '" stroke-width="1.3"/><ellipse cx="128" cy="204" rx="16" ry="9" fill="#7ee07a" stroke="' + ink + '" stroke-width="1.3"/>'
-        + eyes(172, 98, 188, 7) + '<path d="M166 110 q8 6 14 0" fill="none" stroke="#3a2418" stroke-width="1.8" stroke-linecap="round"/>';
-      return sh
-        + '<path d="M34 166 Q10 188 28 208" fill="none" stroke="#2f9e45" stroke-width="9" stroke-linecap="round"/>'
-        + petForm(id + "f", 90, 160, 60, 46, ink) + scutes(90, 154, 20)
-        + '<path d="M142 150 Q176 124 182 96" fill="none" stroke="#8ee08a" stroke-width="14" stroke-linecap="round"/>'
-        + '<circle cx="186" cy="90" r="18" fill="url(#' + skin + ')" stroke="' + ink + '" stroke-width="2.2"/>'
-        + '<ellipse cx="200" cy="92" rx="8" ry="5" fill="#6ed468"/>'
-        + '<ellipse cx="34" cy="202" rx="17" ry="9" fill="#7ee07a" stroke="' + ink + '" stroke-width="1.4"/><ellipse cx="72" cy="210" rx="17" ry="9" fill="#7ee07a" stroke="' + ink + '" stroke-width="1.4"/><ellipse cx="118" cy="208" rx="17" ry="9" fill="#7ee07a" stroke="' + ink + '" stroke-width="1.4"/><ellipse cx="152" cy="198" rx="14" ry="8" fill="#7ee07a" stroke="' + ink + '" stroke-width="1.3"/>'
-        + eyes(178, 86, 194, 7) + '<path d="M170 100 q10 8 16 0" fill="none" stroke="#3a2418" stroke-width="2" stroke-linecap="round"/>';
-    }
-    function petHoist(raw) {
-      const grads = [];
-      let body = "", i = 0;
-      while (i < raw.length) {
-        const a = raw.indexOf("<radialGradient", i);
-        if (a < 0) { body += raw.slice(i); break; }
-        body += raw.slice(i, a);
-        const b = raw.indexOf("</radialGradient>", a);
-        grads.push(raw.slice(a, b + 17));
-        i = b + 17;
-      }
-      return "<defs>" + grads.join("") + "</defs>" + body;
+      return s + "</svg>";
     }
     function petSVG(pet, size) {
       const sp = pet.sp || 0, stage = petStage(sp), sleepy = (pet.joy || 0) < 35;
-      const id = "pg" + (++petSeq);
-      const raw = stage === 0 ? petEggArt(pet.kind || "pup", id, Math.min(4, sp)) : petArt(pet.kind || "pup", stage, sleepy, id);
-      const z = sleepy ? '<g class="pet-zzz"><text x="156" y="78" font-size="22" font-family="Arial,sans-serif" font-weight="700" fill="#6a7ca0">z</text><text x="172" y="60" font-size="14" font-family="Arial,sans-serif" font-weight="700" fill="#9ab0d0">z</text></g>' : "";
-      const h = Math.round(size * 230 / 200);
-      return '<svg class="pet-svg" viewBox="0 0 200 230" width="' + size + '" height="' + h + '" aria-hidden="true">' + petHoist(raw) + z + "</svg>";
+      const src = petImgSrc(pet.kind || "pup", stage);
+      petPreloadSrc(src);
+      const z = (sleepy && stage > 0) ? '<span class="pet-zzz" aria-hidden="true">z<span>z</span></span>' : "";
+      const cracks = stage === 0 ? petCrackSVG(sp) : "";
+      return '<span class="pet-art" style="width:' + size + 'px"><img src="' + src + '" alt="" width="' + size + '" draggable="false">' + cracks + z + "</span>";
     }
     const NS_COLORS = [
       { id: "red", name: "Red", hex: "#ff5a6a", cost: 2 }, { id: "blue", name: "Blue", hex: "#8ec5ff", cost: 2 },
@@ -12513,6 +12330,7 @@
       ]));
       const pet = avatar.pet;
       const showEggs = !pet.kind || petPicking;
+      if (showEggs) petPreload(null); else petPreload(pet);
       if (showEggs) {
         card.appendChild(el("p", { class: "pet-stage", text: "Pick an egg. Every egg is free." }));
         const grid = el("div", { class: "pet-eggs" });
