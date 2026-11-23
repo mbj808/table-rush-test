@@ -4023,6 +4023,43 @@
     .home-fc-row > .home-h2h { background: linear-gradient(135deg, #6fb6ff 0%, #5a6bff 50%, #8a3ae8 100%); box-shadow: 0 4px 0 #34207e, 0 0 16px rgba(110, 120, 255, 0.45), inset 0 1px 0 rgba(255,255,255,0.45); }
     .home-fc-row > .home-pet { background: linear-gradient(135deg, #ffe27a 0%, #ff9a3c 55%, #ef5d8a 100%); color: #3a1800; box-shadow: 0 4px 0 #a33a28, 0 0 16px rgba(255, 150, 60, 0.45), inset 0 1px 0 rgba(255,255,255,0.55); }
     .home-fc-row > .home-pet .hb-label { text-shadow: none; }
+    .home-fc-row > .home-hw { background: linear-gradient(135deg, #fff6c8 0%, #7ec8ff 48%, #3d6dff 100%); color: #102048; box-shadow: 0 4px 0 #1a4e9a, 0 0 16px rgba(80, 160, 255, .45), inset 0 1px 0 rgba(255,255,255,.65); }
+    .home-fc-row > .home-hw .hb-label { text-shadow: none; }
+    body[data-page="hand"] header h1, body[data-page="hand"] .page-head { display: none; }
+    .hw-card { max-width: 40rem; margin: 0 auto; color: #fff; display: flex; flex-direction: column; gap: 12px; padding-bottom: 2rem; }
+    .hw-bar { position: relative; z-index: 6; display: flex; align-items: center; gap: .5rem; min-height: 56px; }
+    .hw-back { position: relative; z-index: 7; flex: none; min-height: 48px; padding: 0 14px; border-radius: 14px; border: 0; background: rgba(255,255,255,.16); color: #fff; font: 900 1.15rem/1 var(--ui-font); cursor: pointer; touch-action: manipulation; }
+    .hw-ttl { flex: 1; min-width: 0; font: 900 1.35rem/1.1 var(--ui-font); }
+    .hw-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .hw-tabs button { min-height: 52px; border-radius: 16px; border: 3px solid rgba(255,255,255,.35); background: rgba(255,255,255,.1); color: #fff; font: 900 1.15rem/1 var(--ui-font); cursor: pointer; touch-action: manipulation; }
+    .hw-tabs button.on { background: #ffd34e; color: #3a2400; border-color: #fff3c2; }
+    .hw-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+    @media (min-width: 720px) { .hw-grid { grid-template-columns: repeat(7, minmax(0, 1fr)); } }
+    .hw-tile { position: relative; min-height: 64px; border-radius: 16px; border: 3px solid rgba(255,255,255,.4); background: rgba(255,255,255,.12); color: #fff; font: 900 1.8rem/1 var(--ui-font); cursor: pointer; touch-action: manipulation; }
+    .hw-tile .star { position: absolute; top: 2px; right: 6px; font-size: .95rem; }
+    .hw-stage { position: relative; border-radius: 22px; background: #fffef8; overflow: hidden; touch-action: none; }
+    .hw-svg { display: block; width: 100%; height: auto; touch-action: none; }
+    .hw-ink { fill: none; stroke: #3a6cff; stroke-width: 14; stroke-linecap: round; stroke-linejoin: round; }
+    .hw-ink.bad { animation: hw-fade .55s ease forwards; }
+    @keyframes hw-fade { to { opacity: 0; } }
+    .hw-arr { fill: #1f8a3a; }
+    .hw-arr.dim { fill: #c5cdd8; }
+    .hw-demo[hidden] { display: none; }
+    .hw-dot { transform-box: fill-box; transform-origin: center; }
+    .hw-dot.pulse { animation: hw-pulse .8s ease-in-out infinite; }
+    @keyframes hw-pulse { 50% { transform: scale(1.35); } }
+    .hw-demo { fill: #3cbf58; stroke: #fff; stroke-width: 3; }
+    .hw-hint { margin: 0; min-height: 1.4em; text-align: center; font: 800 1.05rem/1.2 var(--ui-font); color: #ffe58a; }
+    .hw-tools { display: flex; flex-wrap: wrap; gap: 8px; }
+    .hw-tools button, .hw-done button { flex: 1 1 7rem; min-height: 52px; border-radius: 16px; border: 0; background: #ffe58a; color: #3a2400; font: 900 1.05rem/1 var(--ui-font); cursor: pointer; touch-action: manipulation; }
+    .hw-done { position: absolute; inset: 0; z-index: 5; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; background: rgba(20, 16, 48, .55); text-align: center; padding: 16px; }
+    .hw-done b { font: 900 2rem/1.1 var(--ui-font); color: #fff; }
+    .hw-done .row { display: flex; flex-wrap: wrap; gap: 8px; width: 100%; }
+    .hw-spark { position: absolute; width: 12px; height: 12px; border-radius: 3px; animation: ci-spark .9s ease-out both; }
+    @media (prefers-reduced-motion: reduce) {
+      .hw-ink.bad, .hw-dot.pulse, .hw-spark { animation: none; }
+      .hw-spark { opacity: 0; }
+    }
     .home-fc-row > button::before { background: linear-gradient(180deg, rgba(255,255,255,0.3), rgba(255,255,255,0)); }
     .home-fc-row .menu-lb-ico { background: rgba(255,255,255,0.35); box-shadow: inset 0 1px 0 rgba(255,255,255,0.6); }
     .home-stack .menu-tile { box-shadow: 0 4px 0 rgba(0,0,0,0.4), 0 0 18px var(--tile-glow, rgba(95,242,255,0.55)); }
@@ -9368,6 +9405,7 @@
       if (page === "signin") { stack.appendChild(siCard()); app.appendChild(stack); return; }
       if (page === "leaders") { stack.appendChild(leaderboardCard()); app.appendChild(stack); return; }
       if (page === "pet") { stack.appendChild(petCard()); app.appendChild(stack); return; }
+      if (page === "hand") { stack.appendChild(hwCard()); app.appendChild(stack); return; }
       const opsCard = operationCard();
       if (page === "games" && learnList.length) stack.appendChild(learnCard());
       stack.appendChild(opsCard);
@@ -11101,6 +11139,7 @@
         })(),
         ns: nsClean(a.ns),
         snd: sndClean(a.snd),
+        hw: hwClean(a.hw),
         updated: Number(a.updated) || 0 };
     }
     let avatar = (function () { try { return avClean(JSON.parse(localStorage.getItem(AV_KEY) || "null")); } catch (e) { return avClean(null); } })();
@@ -11190,7 +11229,8 @@
           sc: Object.assign({}, base.sc || {}, { o: ((avatar.sc && avatar.sc.o) || []).concat((remote.sc && remote.sc.o) || []) }),
           ci: ciMerge(avatar.ci, remote.ci, localNewer),
           ns: nsMerge(avatar.ns, remote.ns, localNewer),
-          snd: sndMerge(avatar.snd, remote.snd, localNewer) }, petAllMerge(avatar.pets, remote.pets, avatar.pet, remote.pet, localNewer)));
+          snd: sndMerge(avatar.snd, remote.snd, localNewer),
+          hw: hwMerge(avatar.hw, remote.hw) }, petAllMerge(avatar.pets, remote.pets, avatar.pet, remote.pet, localNewer)));
         avatar.updated = upd;
         try { localStorage.setItem(AV_KEY, JSON.stringify(avatar)); } catch (e) {}
         if (JSON.stringify(Object.assign({}, remote, { updated: 0 })) !== JSON.stringify(Object.assign({}, avatar, { updated: 0 }))) avSetPending(true);
@@ -12160,8 +12200,8 @@
       paintAll();
       return card;
     }
-    const PAGES = ["menu", "beats", "backgrounds", "games", "minigames", "leaders", "closet", "scene", "bricks", "h2h", "sayit", "grammar", "signin", "pet"];
-    const PAGE_TITLES = { beats: "Beats", backgrounds: "Backgrounds", games: "Fact Challenge", minigames: "Mini Games", leaders: "Leaders", closet: "Avatar", scene: "My Scene", bricks: "Brick by Brick", h2h: "Head to Head", sayit: "Say It", grammar: "Grammar", signin: "Your class", pet: "My Pet" };
+    const PAGES = ["menu", "beats", "backgrounds", "games", "minigames", "leaders", "closet", "scene", "bricks", "h2h", "sayit", "grammar", "signin", "pet", "hand"];
+    const PAGE_TITLES = { beats: "Beats", backgrounds: "Backgrounds", games: "Fact Challenge", minigames: "Mini Games", leaders: "Leaders", closet: "Avatar", scene: "My Scene", bricks: "Brick by Brick", h2h: "Head to Head", sayit: "Say It", grammar: "Grammar", signin: "Your class", pet: "My Pet", hand: "Handwriting" };
     let menuSmooth = false;
     function currentPage() {
       const h = (location.hash || "").replace(/^#/, "");
@@ -12527,6 +12567,329 @@
       if (SIM_ON) card.appendChild(simBar());
       return card;
     }
+    function hwClean(raw) {
+      const src = typeof raw === "string" ? raw : (raw && raw.d) || "";
+      let d = "";
+      String(src).split("").forEach(function (ch) { if (/^[A-Za-z]$/.test(ch) && d.indexOf(ch) < 0) d += ch; });
+      return { d: d };
+    }
+    function hwMerge(a, b) { return hwClean(hwClean(a).d + hwClean(b).d); }
+    function hwLine(x1, y1, x2, y2, n) {
+      const o = [];
+      n = n || 12;
+      for (let i = 0; i <= n; i++) o.push([Math.round((x1 + (x2 - x1) * i / n) * 10) / 10, Math.round((y1 + (y2 - y1) * i / n) * 10) / 10]);
+      return o;
+    }
+    function hwArc(cx, cy, rx, ry, a0, sweep, n) {
+      const o = [];
+      n = n || 22;
+      for (let i = 0; i <= n; i++) {
+        const a = (a0 + sweep * i / n) * Math.PI / 180;
+        o.push([Math.round((cx + Math.cos(a) * rx) * 10) / 10, Math.round((cy + Math.sin(a) * ry) * 10) / 10]);
+      }
+      return o;
+    }
+    function hwQuad(x0, y0, x1, y1, x2, y2, n) {
+      const o = [];
+      n = n || 14;
+      for (let i = 0; i <= n; i++) {
+        const t = i / n, u = 1 - t;
+        o.push([Math.round((u * u * x0 + 2 * u * t * x1 + t * t * x2) * 10) / 10, Math.round((u * u * y0 + 2 * u * t * y1 + t * t * y2) * 10) / 10]);
+      }
+      return o;
+    }
+    function hwJoin(parts) {
+      const o = [];
+      parts.forEach(function (p) { p.forEach(function (pt) { if (!o.length || Math.abs(o[o.length - 1][0] - pt[0]) > 0.2 || Math.abs(o[o.length - 1][1] - pt[1]) > 0.2) o.push(pt); }); });
+      return o;
+    }
+    let hwCache = null;
+    function hwFont() {
+      if (hwCache) return hwCache;
+      const T = 52, MID = 156, B = 252, DESC = 306;
+      const L = 64, R = 176, C = 120;
+      const l = 96, r = 168;
+      const ln = hwLine, arc = hwArc, q = hwQuad, jn = hwJoin;
+      const rx = (r - l) / 2 * 0.96, ry = (B - MID) / 2 * 0.9;
+      const acx = (l + r) / 2, acy = (MID + B) / 2;
+      function bowl() { return arc(acx, acy, rx, ry, -60, -360, 26); }
+      function sCurve(top, mid, base, left, right) {
+        return jn([q(right - 6, top + 14, left - 8, top + 4, (left + right) / 2, mid, 14), q((left + right) / 2, mid, right + 10, base - 6, left + 10, base - 12, 14)]);
+      }
+      const aCirc = bowl(), a0 = aCirc[0];
+      const o = {};
+      const yCross = T + (B - T) * 0.55;
+      o.A = [ln(C, T + 4, L, B, 16), ln(C, T + 4, R, B, 16), ln(C + (L - C) * 0.55, yCross, C + (R - C) * 0.55, yCross, 8)];
+      o.B = [ln(L, T, L, B, 16), q(L, T, R + 8, T + 6, L, MID, 16), q(L, MID, R + 14, (MID + B) / 2 + 8, L, B, 16)];
+      o.C = [arc(C, (T + B) / 2, (R - L) / 2 * 0.86, (B - T) / 2 * 0.9, -40, -280, 24)];
+      o.D = [ln(L, T, L, B, 16), q(L, T, R + 24, (T + B) / 2, L, B, 20)];
+      o.E = [ln(L, T, L, B, 16), ln(L, T, R, T, 8), ln(L, MID, R - 18, MID, 8), ln(L, B, R, B, 8)];
+      o.F = [ln(L, T, L, B, 16), ln(L, T, R, T, 8), ln(L, MID, R - 22, MID, 8)];
+      o.G = [arc(C, (T + B) / 2, (R - L) / 2 * 0.86, (B - T) / 2 * 0.9, -40, -300, 24), ln(C + 6, MID + 8, R - 4, MID + 8, 8)];
+      o.H = [ln(L, T, L, B, 16), ln(R, T, R, B, 16), ln(L, MID, R, MID, 10)];
+      o.I = [ln(C, T, C, B, 16), ln(C - 28, T, C + 28, T, 8), ln(C - 28, B, C + 28, B, 8)];
+      o.J = [jn([ln(C + 16, T + 8, C + 16, B - 28, 12), q(C + 16, B - 28, C + 16, B + 10, L + 10, B - 6, 10)]), ln(C - 16, T, C + 36, T, 8)];
+      o.K = [ln(L, T, L, B, 16), ln(R, T + 8, L + 2, MID + 6, 12), ln(L + 2, MID + 6, R, B, 12)];
+      o.L = [ln(L, T, L, B, 16), ln(L, B, R, B, 10)];
+      o.M = [ln(L, T, L, B, 14), ln(L, T, C, B, 14), ln(C, B, R, T, 14), ln(R, T, R, B, 14)];
+      o.N = [ln(L, T, L, B, 14), ln(L, T, R, B, 16), ln(R, T, R, B, 14)];
+      o.O = [arc(C, (T + B) / 2, (R - L) / 2 * 0.86, (B - T) / 2 * 0.92, -60, -360, 30)];
+      o.P = [ln(L, T, L, B, 16), q(L, T, R + 6, T + 8, L, MID + 4, 16)];
+      o.Q = [arc(C, (T + B) / 2, (R - L) / 2 * 0.86, (B - T) / 2 * 0.92, -60, -360, 30), ln(C + 16, B - 46, R + 6, B + 6, 8)];
+      o.R = [ln(L, T, L, B, 16), q(L, T, R + 4, T + 6, L, MID, 14), ln(L + 8, MID - 4, R, B, 12)];
+      o.S = [sCurve(T, MID, B, L, R)];
+      o.T = [ln(C, T, C, B, 16), ln(L, T, R, T, 10)];
+      o.U = [jn([ln(L, T, L, B - 28, 12), q(L, B - 28, C, B + 16, R, B - 28, 12), ln(R, B - 28, R, T, 12)])];
+      o.V = [jn([ln(L, T, C, B, 14), ln(C, B, R, T, 14)])];
+      o.W = [jn([ln(L, T, L + 28, B, 12), ln(L + 28, B, C, T + 36, 12), ln(C, T + 36, R - 28, B, 12), ln(R - 28, B, R, T, 12)])];
+      o.X = [ln(L, T, R, B, 16), ln(R, T, L, B, 16)];
+      o.Y = [ln(L, T, C, MID, 12), jn([ln(R, T, C, MID, 12), ln(C, MID, C, B, 12)])];
+      o.Z = [ln(L, T, R, T, 10), ln(R, T, L, B, 16), ln(L, B, R, B, 10)];
+      o.a = [aCirc, ln(a0[0], a0[1], a0[0], B, 10)];
+      o.b = [ln(l, T, l, B, 18), arc(l + rx, acy, rx, ry, 180, 360, 26)];
+      o.c = [arc(acx, acy, rx, ry, -40, -270, 22)];
+      o.d = [bowlCopy(aCirc), ln(acx + rx, T, acx + rx, B, 16)];
+      o.e = [jn([ln(acx + rx * 0.85, acy, acx - rx * 0.15, acy, 8), arc(acx, acy, rx, ry, 170, -300, 22)])];
+      o.f = [jn([q(l + 40, T + 2, l + 42, T + 28, l, T + 40, 10), ln(l, T + 40, l, DESC - 4, 14)]), ln(l - 22, MID, l + 32, MID, 8)];
+      o.g = [bowlCopy(aCirc), jn([ln(a0[0], a0[1], a0[0], DESC - 16, 12), q(a0[0], DESC - 16, a0[0] + 4, DESC + 8, a0[0] - 36, DESC - 4, 8)])];
+      o.h = [ln(l, T, l, B, 18), q(l, MID, r + 8, MID - 10, r - 4, B, 16)];
+      o.i = [ln((l + r) / 2, MID, (l + r) / 2, B, 12), arc((l + r) / 2, MID - 22, 7, 7, -60, -360, 10)];
+      o.j = [jn([ln(acx, MID, acx, DESC - 18, 14), q(acx, DESC - 18, acx, DESC + 8, acx - 34, DESC - 2, 8)]), arc(acx, MID - 22, 7, 7, -60, -360, 10)];
+      o.k = [ln(l, T, l, B, 18), ln(r - 4, MID + 4, l + 2, (MID + B) / 2, 10), ln(l + 2, (MID + B) / 2, r, B, 10)];
+      o.l = [ln(l + 6, T, l + 6, B, 18)];
+      o.m = [ln(l, MID, l, B, 12), q(l, MID, l + 30, MID - 16, l + 36, B, 12), q(l + 36, MID, l + 66, MID - 16, r, B, 12)];
+      o.n = [ln(l, MID, l, B, 12), q(l, MID, r + 6, MID - 14, r - 2, B, 14)];
+      o.o = [arc(acx, acy, rx, ry, -60, -360, 26)];
+      o.p = [ln(l, MID, l, DESC, 16), arc(l + rx, acy, rx, ry, 180, 360, 24)];
+      o.q = [bowlCopy(aCirc), jn([ln(a0[0], Math.min(a0[1], MID), a0[0], DESC, 14), ln(a0[0], DESC, a0[0] + 18, DESC - 14, 6)])];
+      o.r = [ln(l, MID, l, B, 12), q(l, MID + 4, l + 36, MID - 18, r - 8, MID + 18, 10)];
+      o.s = [sCurve(MID, (MID + B) / 2, B, l + 6, r - 4)];
+      o.t = [ln(l + 8, T + 18, l + 8, B, 16), ln(l - 16, MID, l + 36, MID, 8)];
+      o.u = [jn([ln(l, MID, l, B - 20, 10), q(l, B - 20, acx, B + 14, r, B - 20, 10), ln(r, B - 20, r, MID, 10)]), ln(r, MID, r, B, 10)];
+      o.v = [jn([ln(l, MID, acx, B, 12), ln(acx, B, r, MID, 12)])];
+      o.w = [jn([ln(l, MID, l + 18, B, 10), ln(l + 18, B, acx, MID + 18, 10), ln(acx, MID + 18, r - 18, B, 10), ln(r - 18, B, r, MID, 10)])];
+      o.x = [ln(l, MID, r, B, 14), ln(r, MID, l, B, 14)];
+      o.y = [ln(l, MID, acx, B, 12), jn([ln(r, MID, acx, B, 10), ln(acx, B, acx, DESC - 14, 10), q(acx, DESC - 14, acx + 4, DESC + 8, acx - 32, DESC - 2, 8)])];
+      o.z = [ln(l, MID, r, MID, 8), ln(r, MID, l, B, 14), ln(l, B, r, B, 8)];
+      function bowlCopy(pts) { return pts.map(function (p) { return [p[0], p[1]]; }); }
+      o.a = [bowlCopy(aCirc), ln(a0[0], a0[1], a0[0], B, 10)];
+      o.d = [bowlCopy(aCirc), ln(acx + rx * 0.92, T, acx + rx * 0.92, B, 16)];
+      o.g = [bowlCopy(aCirc), jn([ln(a0[0], a0[1], a0[0], DESC - 18, 12), q(a0[0], DESC - 18, a0[0], DESC + 10, a0[0] - 38, DESC - 2, 8)])];
+      o.q = [bowlCopy(aCirc), jn([ln(a0[0], a0[1], a0[0], DESC, 14), ln(a0[0], DESC, a0[0] + 20, DESC - 16, 6)])];
+      hwCache = o;
+      return o;
+    }
+
+
+    let hwCase = "up", hwCh = "", hwStep = 0, hwInk = [], hwDown = false, hwHint = "", hwRaf = 0, hwBad = false;
+    function hwDist(a, b) { const dx = a[0] - b[0], dy = a[1] - b[1]; return Math.sqrt(dx * dx + dy * dy); }
+    function hwPath(pts) { return pts.length ? "M" + pts.map(function (p) { return p[0] + " " + p[1]; }).join(" L") : ""; }
+    function hwProject(pt, stroke) {
+      let best = 1e9, total = 0, alongBest = 0, acc = 0;
+      for (let i = 1; i < stroke.length; i++) total += hwDist(stroke[i - 1], stroke[i]);
+      for (let i = 1; i < stroke.length; i++) {
+        const ax = stroke[i - 1], bx = stroke[i], L = hwDist(ax, bx) || 0.001;
+        const vx = bx[0] - ax[0], vy = bx[1] - ax[1];
+        let u = ((pt[0] - ax[0]) * vx + (pt[1] - ax[1]) * vy) / (L * L);
+        u = Math.max(0, Math.min(1, u));
+        const d = hwDist(pt, [ax[0] + vx * u, ax[1] + vy * u]);
+        const along = acc + L * u;
+        if (d < best) { best = d; alongBest = along; }
+        acc += L;
+      }
+      return { d: best, t: total ? alongBest / total : 0 };
+    }
+    function hwGood(ink, stroke) {
+      if (!ink || ink.length < 6) return false;
+      if (hwDist(ink[0], stroke[0]) > 42) return false;
+      let close = 0, back = 0, prev = 0, maxT = 0;
+      ink.forEach(function (p, i) {
+        const pr = hwProject(p, stroke);
+        if (pr.d < 30) close++;
+        if (i && pr.t + 0.12 < prev) back++;
+        if (pr.t > prev - 0.02) prev = Math.max(prev, pr.t);
+        if (pr.t > maxT) maxT = pr.t;
+      });
+      return close / ink.length >= 0.68 && back < ink.length * 0.3 && maxT >= 0.75;
+    }
+    function hwArrows(stroke) {
+      const out = [];
+      let acc = 0, last = -999;
+      for (let i = 1; i < stroke.length; i++) {
+        const L = hwDist(stroke[i - 1], stroke[i]);
+        acc += L;
+        if (acc > 26 && acc - last > 36) {
+          out.push({ x: stroke[i][0], y: stroke[i][1], ang: Math.atan2(stroke[i][1] - stroke[i - 1][1], stroke[i][0] - stroke[i - 1][0]) });
+          last = acc;
+        }
+      }
+      return out;
+    }
+    function hwArrow(x, y, ang, cls) {
+      const c = Math.cos(ang), s = Math.sin(ang);
+      const p = function (dx, dy) { return (x + dx * c - dy * s).toFixed(1) + "," + (y + dx * s + dy * c).toFixed(1); };
+      return '<polygon class="' + cls + '" points="' + p(11, 0) + " " + p(-8, 6.5) + " " + p(-8, -6.5) + '"/>';
+    }
+    function hwReduce() { return !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches); }
+    function hwMap(ev, svg) {
+      const r = svg.getBoundingClientRect();
+      return [(ev.clientX - r.left) / r.width * 240, (ev.clientY - r.top) / r.height * 320];
+    }
+    function hwLetters(upper) {
+      const font = hwFont();
+      const s = upper ? "ABCDEFGHIJKLMNOPQRSTUVWXYZ" : "abcdefghijklmnopqrstuvwxyz";
+      return s.split("").filter(function (ch) { return font[ch]; });
+    }
+    function hwNext(ch) {
+      const upper = ch === ch.toUpperCase();
+      const list = hwLetters(upper);
+      const i = list.indexOf(ch);
+      return list[(i + 1) % list.length];
+    }
+    function hwOpen(ch) {
+      if (hwRaf) cancelAnimationFrame(hwRaf);
+      hwRaf = 0;
+      hwCh = ch; hwStep = 0; hwInk = []; hwDown = false; hwHint = ""; hwBad = false;
+      render();
+    }
+    function hwMark(ch) {
+      const d = (avatar.hw && avatar.hw.d) || "";
+      if (d.indexOf(ch) >= 0) return;
+      avatar.hw = hwClean(d + ch);
+      avatar.made = true;
+      avSaveSoon();
+    }
+    function hwCard() {
+      const card = el("div", { class: "card hw-card" });
+      const back = el("button", { type: "button", class: "hw-back", text: "\u2039 Back", onClick: function (ev) {
+        if (ev) ev.stopPropagation();
+        if (hwRaf) cancelAnimationFrame(hwRaf);
+        hwRaf = 0;
+        if (hwCh) { hwCh = ""; hwInk = []; render(); }
+        else goPage("menu");
+      } });
+      card.appendChild(el("div", { class: "hw-bar" }, [back, el("span", { class: "hw-ttl", text: hwCh ? "Trace " + hwCh : "Handwriting" })]));
+      if (!hwCh) {
+        card.appendChild(el("div", { class: "hw-tabs" }, ["up", "low"].map(function (k) {
+          return el("button", { type: "button", class: k === hwCase ? "on" : "", text: k === "up" ? "Uppercase" : "Lowercase", onClick: function () { hwCase = k; render(); } });
+        })));
+        const grid = el("div", { class: "hw-grid" });
+        const done = (avatar.hw && avatar.hw.d) || "";
+        hwLetters(hwCase === "up").forEach(function (ch) {
+          const b = el("button", { type: "button", class: "hw-tile", "aria-label": ch + (done.indexOf(ch) >= 0 ? ", finished" : ""), onClick: function () { hwOpen(ch); } });
+          b.appendChild(document.createTextNode(ch));
+          if (done.indexOf(ch) >= 0) b.appendChild(el("span", { class: "star", text: "\u2B50", "aria-hidden": "true" }));
+          grid.appendChild(b);
+        });
+        card.appendChild(grid);
+        card.appendChild(el("p", { class: "hw-hint", text: "Pick a letter. Trace each stroke from the green dot." }));
+        return card;
+      }
+      const strokes = hwFont()[hwCh] || [];
+      const doneAll = hwStep >= strokes.length;
+      const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      svg.setAttribute("class", "hw-svg");
+      svg.setAttribute("viewBox", "0 0 240 320");
+      svg.setAttribute("aria-label", "Trace the letter " + hwCh);
+      let body = '<line x1="18" y1="52" x2="222" y2="52" stroke="#c5d0dc" stroke-width="2"/>'
+        + '<line x1="18" y1="156" x2="222" y2="156" stroke="#d5deea" stroke-width="2" stroke-dasharray="7 7"/>'
+        + '<line x1="18" y1="252" x2="222" y2="252" stroke="#8aa0b4" stroke-width="3"/>'
+        + '<line x1="18" y1="306" x2="222" y2="306" stroke="#e4ebf2" stroke-width="2"/>';
+      strokes.forEach(function (st, i) {
+        const d = hwPath(st);
+        if (i < hwStep) body += '<path d="' + d + '" fill="none" stroke="#3cbf58" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>';
+        else body += '<path d="' + d + '" fill="none" stroke="' + (i === hwStep ? "#cfd6e2" : "#e6ebf2") + '" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>';
+      });
+      strokes.forEach(function (st, i) {
+        if (i < hwStep) return;
+        const faded = i !== hwStep;
+        hwArrows(st).forEach(function (a) { body += hwArrow(a.x, a.y, a.ang, faded ? "hw-arr dim" : "hw-arr"); });
+        if (!faded) body += '<circle class="hw-dot' + (hwBad ? " pulse" : "") + '" cx="' + st[0][0] + '" cy="' + st[0][1] + '" r="13" fill="#3cbf58" stroke="#fff" stroke-width="3"/>'
+          + '<text x="' + st[0][0] + '" y="' + (st[0][1] + 5) + '" text-anchor="middle" font-size="14" font-weight="700" fill="#143018" font-family="sans-serif">' + (i + 1) + "</text>";
+        else body += '<circle cx="' + st[0][0] + '" cy="' + st[0][1] + '" r="8" fill="#d5dbe6"/>';
+      });
+      body += '<path class="hw-ink' + (hwBad ? " bad" : "") + '" d="' + hwPath(hwInk) + '"/>';
+      body += '<circle class="hw-demo" cx="0" cy="0" r="9" hidden=""/>';
+      svg.innerHTML = body;
+      const stage = el("div", { class: "hw-stage" });
+      stage.appendChild(svg);
+      function endStroke() {
+        if (!hwDown) return;
+        hwDown = false;
+        const st = strokes[hwStep];
+        if (st && hwGood(hwInk, st)) {
+          hwStep += 1; hwInk = []; hwBad = false; hwHint = hwStep >= strokes.length ? "" : "Nice! Next stroke.";
+          if (hwStep >= strokes.length) { hwMark(hwCh); try { playTone(true); } catch (e) {} }
+          render();
+        } else {
+          hwBad = true; hwHint = "Try again. Start on the green dot.";
+          const ink = svg.querySelector(".hw-ink");
+          if (ink) ink.classList.add("bad");
+          const dot = svg.querySelector(".hw-dot");
+          if (dot && !hwReduce()) dot.classList.add("pulse");
+          const hint = card.querySelector(".hw-hint");
+          if (hint) hint.textContent = hwHint;
+          setTimeout(function () { hwInk = []; hwBad = false; const n = document.querySelector(".hw-svg .hw-ink"); if (n) { n.setAttribute("d", ""); n.classList.remove("bad"); } }, 560);
+        }
+      }
+      svg.addEventListener("pointerdown", function (ev) {
+        if (doneAll || ev.button > 0) return;
+        hwDown = true; hwInk = [hwMap(ev, svg)]; hwBad = false;
+        const ink = svg.querySelector(".hw-ink");
+        if (ink) { ink.classList.remove("bad"); ink.setAttribute("d", hwPath(hwInk)); }
+        ev.preventDefault();
+      });
+      svg.addEventListener("pointermove", function (ev) {
+        if (!hwDown) return;
+        hwInk.push(hwMap(ev, svg));
+        const ink = svg.querySelector(".hw-ink");
+        if (ink) ink.setAttribute("d", hwPath(hwInk));
+        ev.preventDefault();
+      });
+      svg.addEventListener("pointerup", endStroke);
+      svg.addEventListener("pointercancel", endStroke);
+      svg.addEventListener("pointerleave", function () { if (hwDown) endStroke(); });
+      stage.appendChild(svg);
+      if (doneAll) {
+        const ov = el("div", { class: "hw-done" });
+        ov.appendChild(el("b", { text: "\u2B50 " + hwCh + " \u2B50" }));
+        if (!hwReduce()) ["-70px,-40px,#ffe14a", "74px,-28px,#7ee07a", "-40px,36px,#7ec8ff", "60px,40px,#ff7ab8"].forEach(function (s, i) {
+          const xy = s.split(","), bit = el("i", { class: "hw-spark" });
+          bit.style.left = "50%"; bit.style.top = "42%";
+          bit.style.setProperty("--x", xy[0]); bit.style.setProperty("--y", xy[1]); bit.style.background = xy[2]; bit.style.animationDelay = (i * 40) + "ms";
+          ov.appendChild(bit);
+        });
+        const row = el("div", { class: "row" });
+        row.appendChild(el("button", { type: "button", text: "Next letter", onClick: function () { hwOpen(hwNext(hwCh)); } }));
+        row.appendChild(el("button", { type: "button", text: "Again", onClick: function () { hwOpen(hwCh); } }));
+        row.appendChild(el("button", { type: "button", text: "Back", onClick: function () { hwCh = ""; render(); } }));
+        ov.appendChild(row);
+        stage.appendChild(ov);
+      }
+      card.appendChild(stage);
+      card.appendChild(el("p", { class: "hw-hint", text: doneAll ? "You traced the whole letter!" : (hwHint || "Start at the green dot. Follow the arrows.") }));
+      if (!doneAll) card.appendChild(el("div", { class: "hw-tools" }, [
+        el("button", { type: "button", text: "Show me", onClick: function () { hwShowMe(strokes[hwStep], svg); } })
+      ]));
+      return card;
+    }
+    function hwShowMe(stroke, svg) {
+      if (!stroke) return;
+      if (hwReduce()) { hwHint = "Start at the green dot and follow the arrows."; const h = document.querySelector(".hw-hint"); if (h) h.textContent = hwHint; return; }
+      if (hwRaf) cancelAnimationFrame(hwRaf);
+      const dot = svg.querySelector(".hw-demo");
+      if (dot) dot.removeAttribute("hidden");
+      const t0 = performance.now(), dur = 1300;
+      function frame(now) {
+        const u = Math.min(1, (now - t0) / dur);
+        const i = Math.min(stroke.length - 1, Math.round(u * (stroke.length - 1)));
+        if (dot) { dot.setAttribute("cx", stroke[i][0]); dot.setAttribute("cy", stroke[i][1]); }
+        if (u < 1 && document.body.dataset.page === "hand") hwRaf = requestAnimationFrame(frame);
+        else if (dot) dot.setAttribute("hidden", "");
+      }
+      hwRaf = requestAnimationFrame(frame);
+    }
+
     function menuPage() {
       const sec = el("section", { class: "menu-page home-stack", id: "menu-page", "aria-label": "Menu" });
       // 1. Boom box
@@ -12576,6 +12939,11 @@
       fcRow.appendChild(el("button", { type: "button", class: "menu-lb menu-closet", "aria-label": "Avatar", onClick: function () { goPage("closet"); } }, [
         avHas() ? avNode(avatar, 40, "menu-av") : el("span", { class: "menu-lb-ico", "aria-hidden": "true", text: "\uD83D\uDC55" }),
         el("span", { class: "hb-label", text: "Avatar" }),
+        el("span", { class: "hb-go", "aria-hidden": "true", text: "\u203A" })
+      ]));
+      fcRow.appendChild(el("button", { type: "button", class: "menu-lb home-hw", "aria-label": "Handwriting", onClick: function () { hwCh = ""; goPage("hand"); } }, [
+        el("span", { class: "menu-lb-ico", "aria-hidden": "true", text: "\u270D\uFE0F" }),
+        el("span", { class: "hb-label", text: "Handwriting" }),
         el("span", { class: "hb-go", "aria-hidden": "true", text: "\u203A" })
       ]));
       fcRow.appendChild(el("button", { type: "button", class: "menu-lb home-pet", "aria-label": "My Pet", onClick: function () { goPage("pet"); } }, [
