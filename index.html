@@ -3551,6 +3551,7 @@
     .pet-back { position: relative; z-index: 7; flex: none; min-height: 48px; padding: 0 14px; border-radius: 14px; border: 0; background: rgba(255,255,255,.16); color: #fff; font: 900 1.15rem/1 var(--ui-font); cursor: pointer; touch-action: manipulation; }
     .pet-ttl { flex: 1; min-width: 0; font: 900 1.4rem/1.1 var(--ui-font); }
     .pet-eggs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    @media (min-width: 720px) { .pet-eggs { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
     .pet-egg { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 0; min-height: 148px; padding: 10px 8px 12px; border-radius: 18px; border: 3px solid #ffe58a; background: rgba(255,255,255,.1); color: #fff; font: 800 1.05rem/1.15 var(--ui-font); cursor: pointer; }
     .pet-egg .pet-art { width: 92px; height: auto; display: block; position: relative; }
     .pet-egg .pet-art img { display: block; width: 100%; height: auto; }
@@ -10954,7 +10955,8 @@
       return '<svg class="ci-svg" viewBox="0 0 360 270" role="img" aria-label="' + scene.name + '">' + body + (scene.ink || "") + "</svg>";
     }
     // My Pet. Food and treats spend coins toward the next stage ($5 each). Toys and room decor do not. Old growth points are mapped onto these stages.
-    const PETS = [{ id: "pup", name: "Puppy" }, { id: "kit", name: "Kitten" }, { id: "dra", name: "Dragon" }, { id: "tur", name: "Turtle" }];
+    const PETS = [{ id: "pup", name: "Puppy" }, { id: "kit", name: "Kitten" }, { id: "dra", name: "Dragon" }, { id: "tur", name: "Turtle" }, { id: "bun", name: "Bunny" }, { id: "uni", name: "Unicorn" }, { id: "pan", name: "Panda" }, { id: "pen", name: "Penguin" }];
+    const PET_EGG_COST = 5;
     const PET_STAGES = [{ at: 0, name: "Egg" }, { at: 5, name: "Baby" }, { at: 10, name: "Kid" }, { at: 15, name: "Teen" }, { at: 20, name: "Grown-up" }];
     const PET_ROOM = [["rug", "Rug", 2], ["bed", "Bed", 3], ["toys", "Toys", 5]];
     const PET_BAD_HARD = ["fuck", "shit", "bitch", "nigger", "nigga", "faggot", "retard", "porn", "whore", "slut", "cunt"];
@@ -12269,12 +12271,12 @@
       if (petPopTimer || Date.now() >= petPopUntil) return;
       petPopTimer = setTimeout(function () { petPopTimer = 0; if (currentPage() === "pet" && state.phase === "setup") render(); }, petPopUntil - Date.now() + 40);
     }
-    function petChoose(kind) {
+    function petEggCost() { return (avatar.pets && avatar.pets.length) ? PET_EGG_COST : 0; }
+    function petGive(kind) {
       const info = petKind(kind);
       if (!info) return;
       petRemember();
-      const owned = (avatar.pets || []).filter(function (p) { return p.kind === kind; })[0];
-      if (owned) { petSwitch(kind); return; }
+      if ((avatar.pets || []).some(function (p) { return p.kind === kind; })) { petSwitch(kind); return; }
       avatar.pet = petClean({ kind: kind, sp: 0, joy: 80, joyAt: Date.now() });
       petRemember();
       avatar.made = true;
@@ -12283,6 +12285,21 @@
       petSound("chirp");
       say("You picked a " + info.name.toLowerCase() + " egg!");
       render();
+    }
+    function petChoose(kind) {
+      const info = petKind(kind);
+      if (!info) return;
+      petRemember();
+      const owned = (avatar.pets || []).filter(function (p) { return p.kind === kind; })[0];
+      if (owned) { petSwitch(kind); return; }
+      const cost = petEggCost();
+      if (!cost) { petGive(kind); return; }
+      if (coinGet() < cost) { say("You need $" + cost + " for a new egg. You have $" + coinGet() + "."); return; }
+      avConfirm("Get the " + info.name + " egg for $" + cost + "?", "You have $" + coinGet() + ".", function () {
+        if (coinGet() < cost) { say("You need $" + cost + " for a new egg. You have $" + coinGet() + "."); return; }
+        if (!coinSpend(cost)) return;
+        petGive(kind);
+      }, "Yes, get it!");
     }
     function petSwitch(kind) {
       const info = petKind(kind);
@@ -12453,16 +12470,17 @@
       } else petPreload(pet);
       if (showEggs) {
         const have = avatar.pets || [];
-        card.appendChild(el("p", { class: "pet-stage", text: have.length ? "Tap a pet to play with it, or pick a new egg. Every new egg is free." : "Pick an egg. Every egg is free." }));
+        const eggCost = have.length ? PET_EGG_COST : 0;
+        card.appendChild(el("p", { class: "pet-stage", text: have.length ? "Tap a pet to play with it, or get another egg for $" + PET_EGG_COST + "." : "Pick an egg. Your first egg is free." }));
         const grid = el("div", { class: "pet-eggs" });
         PETS.forEach(function (k) {
           const owned = have.filter(function (p) { return p.kind === k.id; })[0];
           const now = !!(owned && pet.kind === k.id);
-          const label = owned ? ((owned.name || k.name) + (now ? ", in the room" : ", " + PET_STAGES[petStage(owned.sp)].name)) : k.name + " egg, free";
+          const label = owned ? ((owned.name || k.name) + (now ? ", in the room" : ", " + PET_STAGES[petStage(owned.sp)].name)) : k.name + " egg" + (eggCost ? ", $" + eggCost : ", free");
           const btn = el("button", { type: "button", class: "pet-egg" + (owned ? " mine" : "") + (now ? " now" : ""), "aria-label": label, onClick: function () { if (owned) petSwitch(k.id); else petChoose(k.id); } });
           btn.innerHTML = petSVG(owned || { kind: k.id, sp: 0, joy: 80 }, 92);
           btn.appendChild(el("span", { text: owned && owned.name ? owned.name : k.name }));
-          btn.appendChild(el("small", { text: now ? "In the room" : owned ? PET_STAGES[petStage(owned.sp)].name : "Free" }));
+          btn.appendChild(el("small", { text: now ? "In the room" : owned ? PET_STAGES[petStage(owned.sp)].name : (eggCost ? "$" + eggCost : "Free") }));
           grid.appendChild(btn);
         });
         card.appendChild(grid);
