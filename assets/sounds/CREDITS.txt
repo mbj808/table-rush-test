@@ -1,0 +1,21 @@
+Animal answer sounds for the Animals sound pack.
+Each clip is a real recording, trimmed under one second, normalized, and saved as a small MP3.
+All three sources are Creative Commons Zero (CC0 1.0). No attribution is required.
+
+bark.mp3
+  A single bark from a cockapoo puppy.
+  Source: "Cockapoo puppy barking and making strange noises." by dtmendes
+  https://freesound.org/people/dtmendes/sounds/591137/
+  License: CC0 1.0 https://creativecommons.org/publicdomain/zero/1.0/
+
+meow.mp3
+  A meow from a 3-week-old kitten, recorded with a Marantz PMD 660.
+  Source: "Kitten miaowing.wav" by barkenov
+  https://freesound.org/people/barkenov/sounds/440697/
+  License: CC0 1.0 https://creativecommons.org/publicdomain/zero/1.0/
+
+quack.mp3
+  One quack from a duck at the seashore in eastern Sweden.
+  Source: "Duck_quack_1_Sweden.wav" by calodas
+  https://freesound.org/people/calodas/sounds/188376/
+  License: CC0 1.0 https://creativecommons.org/publicdomain/zero/1.0/

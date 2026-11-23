@@ -8105,9 +8105,7 @@
       } else if (pack === "animals") {
         const which = animalIndex == null ? (sndAnimal % 3) : animalIndex;
         if (ok && animalIndex == null) sndAnimal++;
-        if (which === 0) { sndNoise(now, 0.06, 0.18 * g, 540); sndTone(200, "sine", now, 0.08, 0.16 * g); sndNoise(now + 0.1, 0.07, 0.14 * g, 420); }
-        else if (which === 1) sndTone(ok ? 780 : 480, "sine", now, 0.26, 0.16 * g, ok ? 320 : 220);
-        else { sndTone(ok ? 560 : 320, "triangle", now, 0.08, 0.16 * g); sndTone(ok ? 480 : 260, "triangle", now + 0.1, 0.08, 0.12 * g); }
+        sndAnimalAt(which, ok, now);
       } else if (pack === "coin") {
         sndTone(ok ? 988 : 392, "square", now, 0.09, 0.08 * g);
         if (ok) sndTone(1319, "square", now + 0.09, 0.16, 0.08);
@@ -8124,10 +8122,61 @@
       if (!ac) { say("This browser can't play sounds."); return; }
       try {
         if (pack === "animals") {
+          sndAnimalFetch();
+          sndAnimalDecode();
           const t = ac.currentTime + 0.01;
-          [0, 1, 2].forEach(function (i) { sndPlay("animals", true, t + i * 0.42, i); });
+          [0, 1, 2].forEach(function (i) { sndPlay("animals", true, t + i * 0.85, i); });
         } else sndPlay(pack || "", true);
       } catch (e) {}
+    }
+    // Real puppy bark, kitten meow, and duck quack. See assets/sounds/CREDITS.txt.
+    const SND_ANIMAL_URLS = ["assets/sounds/bark.mp3", "assets/sounds/meow.mp3", "assets/sounds/quack.mp3"];
+    let sndAnimalRaw = [null, null, null];
+    let sndAnimalBuf = [null, null, null];
+    let sndAnimalFetching = false;
+    function sndAnimalFetch() {
+      if (sndAnimalFetching) return;
+      sndAnimalFetching = true;
+      SND_ANIMAL_URLS.forEach(function (url, i) {
+        fetch(url).then(function (r) {
+          if (!r.ok) throw new Error("sound");
+          return r.arrayBuffer();
+        }).then(function (ab) {
+          sndAnimalRaw[i] = ab;
+          sndAnimalDecode();
+        }).catch(function () {});
+      });
+    }
+    function sndAnimalDecode() {
+      const ac = audioCtx;
+      if (!ac) return;
+      sndAnimalRaw.forEach(function (ab, i) {
+        if (!ab || sndAnimalBuf[i] || sndAnimalBuf[i] === "wait") return;
+        sndAnimalBuf[i] = "wait";
+        let copy = ab;
+        try { copy = ab.slice(0); } catch (e) {}
+        ac.decodeAudioData(copy).then(function (buf) { sndAnimalBuf[i] = buf; }).catch(function () { sndAnimalBuf[i] = null; });
+      });
+    }
+    function sndAnimalAt(which, ok, when) {
+      const buf = sndAnimalBuf[which];
+      if (!buf || buf === "wait" || !audioCtx) return;
+      const src = audioCtx.createBufferSource();
+      src.buffer = buf;
+      const gain = audioCtx.createGain();
+      // A miss is the same recording, quieter and a little duller.
+      gain.gain.setValueAtTime(ok ? 0.9 : 0.28, when);
+      if (ok) src.connect(gain);
+      else {
+        const filter = audioCtx.createBiquadFilter();
+        filter.type = "lowpass";
+        filter.frequency.setValueAtTime(1400, when);
+        src.playbackRate.setValueAtTime(0.94, when);
+        src.connect(filter);
+        filter.connect(gain);
+      }
+      gain.connect(audioCtx.destination);
+      src.start(when);
     }
     function playTone(ok) {
       if (state.muted) return;
@@ -8136,6 +8185,7 @@
         if (pack) sndPlay(pack, !!ok); else sndDefault(!!ok);
       });
     }
+    sndAnimalFetch();
     const HOME_MUSIC_VOLUME = 0.55;
     // Broad first-gesture unlock: scroll/touch/wheel count, not only taps.
     const HOME_UNLOCK_EVENTS = ["pointerdown", "touchstart", "mousedown", "keydown", "click", "wheel"];
@@ -8145,7 +8195,15 @@
     // only the one track being played is downloaded. A play() before any tap rejects like an autoplay block.
     var userGestured = false;
     ["pointerdown", "touchstart", "touchend", "mousedown", "keydown", "click"].forEach(function (type) {
-      document.addEventListener(type, function (e) { if (e.isTrusted !== false) userGestured = true; }, true);
+      document.addEventListener(type, function (e) {
+        if (e.isTrusted !== false) userGestured = true;
+        // The clips are already downloaded. The first tap builds the shared context and decodes them,
+        // so a later Hear it or answer can start the recording in that same turn.
+        if (sndAnimalFetching && sndAnimalBuf.some(function (b) { return !b || b === "wait"; })) {
+          if (!audioCtx) sndUnlockNow();
+          sndAnimalDecode();
+        }
+      }, true);
     });
     function lazyAudio(url) {
       const a = new Audio();
@@ -9070,6 +9128,7 @@
       if (typeof scApplyLive === "function") scApplyLive();
     }
     function render() {
+      try { if (avatar && avatar.snd && avatar.snd.on === "animals") sndAnimalFetch(); } catch (e) {}
       cleanMathTables();
       bb3Leave();
       applyUnlockedBackground();
@@ -12089,6 +12148,7 @@
         avatar.made = true; avSaveSoon(); say("You got " + item.name + "!"); paintAll(false);
       }
       function sndPanel() {
+        sndAnimalFetch();
         const box = el("div", { class: "snd-box" });
         box.appendChild(el("p", { class: "ns-h", text: "Answer sounds" }));
         box.appendChild(el("p", { class: "ci-hint", text: "Changes the sound when you get a fact right. A wrong answer is a softer version. Only you hear it." }));
