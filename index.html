@@ -3545,6 +3545,42 @@
     body[data-page="leaders"] .lb-tab { font-family: var(--ui-font); font-weight: 700; min-height: 2.7rem; }
     /* ===== Avatar page redesign ===== */
     body[data-page="closet"] header h1, body[data-page="closet"] .page-head { display: none; }
+    body[data-page="pet"] header h1, body[data-page="pet"] .page-head { display: none; }
+    .pet-card { max-width: 40rem; margin: 0 auto; color: #fff; display: flex; flex-direction: column; gap: 12px; padding-bottom: 2rem; }
+    .pet-bar { display: flex; align-items: center; gap: .5rem; min-height: 56px; }
+    .pet-back { flex: none; min-height: 48px; padding: 0 14px; border-radius: 14px; border: 0; background: rgba(255,255,255,.16); color: #fff; font: 900 1.15rem/1 var(--ui-font); cursor: pointer; }
+    .pet-ttl { flex: 1; min-width: 0; font: 900 1.4rem/1.1 var(--ui-font); }
+    .pet-eggs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    .pet-egg { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 0; min-height: 148px; padding: 10px 8px 12px; border-radius: 18px; border: 3px solid #ffe58a; background: rgba(255,255,255,.1); color: #fff; font: 800 1.05rem/1.15 var(--ui-font); cursor: pointer; }
+    .pet-egg svg { width: 92px; height: auto; }
+    .pet-egg small { font: 900 .95rem/1 var(--ui-font); }
+    .pet-view { position: relative; display: grid; place-items: end center; min-height: 230px; border-radius: 22px; background: radial-gradient(60% 70% at 50% 100%, rgba(255,240,180,.35), transparent 70%), rgba(255,255,255,.08); overflow: hidden; }
+    .pet-fig { border: 0; background: transparent; padding: 8px 8px 0; cursor: pointer; }
+    .pet-fig svg { display: block; width: var(--pw, 160px); height: auto; }
+    .pet-boop { animation: pet-boop .45s ease; }
+    @keyframes pet-boop { 0% { transform: translateY(0) scale(1, 1); } 35% { transform: translateY(-16px) scale(1.05, .92); } 70% { transform: translateY(0) scale(.98, 1.05); } 100% { transform: none; } }
+    .pet-name { margin: 0; text-align: center; font: 900 1.6rem/1.1 var(--ui-font); }
+    .pet-stage { margin: 0; text-align: center; font: 800 1.05rem/1.2 var(--ui-font); color: #ffe58a; }
+    .pet-barline { height: 18px; border-radius: 999px; background: rgba(0,0,0,.35); overflow: hidden; border: 2px solid rgba(255,255,255,.35); }
+    .pet-barline span { display: block; height: 100%; width: 0; border-radius: inherit; background: linear-gradient(90deg, #7ee07a, #ffe14a); }
+    .pet-heart span { background: linear-gradient(90deg, #ff7ab8, #e23b4a); }
+    .pet-acts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+    .pet-act { min-height: 64px; padding: 8px 6px; border-radius: 16px; border: 3px solid #fff3c2; background: linear-gradient(#fff6d0, #ffc24a); color: #3a2400; font: 900 1rem/1.15 var(--ui-font); cursor: pointer; }
+    .pet-act small { display: block; font-size: .95rem; }
+    .pet-rename, .pet-swap { align-self: center; min-height: 48px; padding: 0 16px; border-radius: 999px; border: 2px solid rgba(255,255,255,.5); background: transparent; color: #fff; font: 800 1rem/1 var(--ui-font); cursor: pointer; }
+    .pet-namebox { display: flex; flex-wrap: wrap; gap: 8px; }
+    .pet-namebox input { flex: 1 1 10rem; min-width: 0; min-height: 52px; border-radius: 14px; border: 3px solid #ffe58a; padding: 0 12px; font: 800 1.15rem/1 var(--ui-font); color: #1a120c; }
+    .pet-namebox button { flex: 0 0 auto; min-height: 52px; padding: 0 16px; border-radius: 14px; border: 0; background: #7ee07a; color: #143018; font: 900 1.05rem/1 var(--ui-font); cursor: pointer; }
+    .pet-pop { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; }
+    .pet-pop b { position: relative; z-index: 1; padding: .4rem 1rem; border-radius: 999px; background: #ffd34e; color: #3a2400; font: 900 1.8rem/1 var(--ui-font); }
+    .pet-spark { position: absolute; left: 50%; top: 42%; width: 12px; height: 12px; margin: -6px; border-radius: 3px; animation: ci-spark 1s ease-out both; }
+    .pet-mini { display: inline-flex; width: 36px; height: 36px; flex: 0 0 auto; border-radius: 50%; background: #fff; overflow: hidden; align-items: center; justify-content: center; }
+    .pet-mini svg { width: 34px; height: 34px; }
+    .shp-pet { border: 0; padding: 0; cursor: pointer; }
+    @media (prefers-reduced-motion: reduce) {
+      .pet-boop { animation: none; }
+      .pet-spark { animation: none; opacity: 0; }
+    }
     body[data-page="scene"] header h1, body[data-page="scene"] .page-head { display: none; }
     .closet-card { max-width: 34rem; gap: 0; padding-top: 0; color: #fff; }
     .av-top { position: sticky; top: 0; z-index: 20; display: flex; flex-direction: column; gap: 0.55rem; padding: 0.6rem 0.2rem 0.7rem;
@@ -3896,6 +3932,8 @@
     .home-fc-row > .home-lb { background: linear-gradient(135deg, #fff1a8 0%, #ffcf3f 50%, #ff9f1c 100%); box-shadow: 0 4px 0 #a8620a, 0 0 16px rgba(255, 200, 60, 0.45), inset 0 1px 0 rgba(255,255,255,0.6); }
     .home-fc-row > .home-bb { background: linear-gradient(135deg, #ffb36b 0%, #ff5a4a 50%, #e0245e 100%); box-shadow: 0 4px 0 #8a1a3a, 0 0 16px rgba(255, 90, 80, 0.45), inset 0 1px 0 rgba(255,255,255,0.45); }
     .home-fc-row > .home-h2h { background: linear-gradient(135deg, #6fb6ff 0%, #5a6bff 50%, #8a3ae8 100%); box-shadow: 0 4px 0 #34207e, 0 0 16px rgba(110, 120, 255, 0.45), inset 0 1px 0 rgba(255,255,255,0.45); }
+    .home-fc-row > .home-pet { background: linear-gradient(135deg, #ffe27a 0%, #ff9a3c 55%, #ef5d8a 100%); color: #3a1800; box-shadow: 0 4px 0 #a33a28, 0 0 16px rgba(255, 150, 60, 0.45), inset 0 1px 0 rgba(255,255,255,0.55); }
+    .home-fc-row > .home-pet .hb-label { text-shadow: none; }
     .home-fc-row > button::before { background: linear-gradient(180deg, rgba(255,255,255,0.3), rgba(255,255,255,0)); }
     .home-fc-row .menu-lb-ico { background: rgba(255,255,255,0.35); box-shadow: inset 0 1px 0 rgba(255,255,255,0.6); }
     .home-stack .menu-tile { box-shadow: 0 4px 0 rgba(0,0,0,0.4), 0 0 18px var(--tile-glow, rgba(95,242,255,0.55)); }
@@ -9148,6 +9186,7 @@
       if (page === "grammar") { stack.appendChild(grCard()); app.appendChild(stack); return; }
       if (page === "signin") { stack.appendChild(siCard()); app.appendChild(stack); return; }
       if (page === "leaders") { stack.appendChild(leaderboardCard()); app.appendChild(stack); return; }
+      if (page === "pet") { stack.appendChild(petCard()); app.appendChild(stack); return; }
       const opsCard = operationCard();
       if (page === "games" && learnList.length) stack.appendChild(learnCard());
       stack.appendChild(opsCard);
@@ -10007,7 +10046,7 @@
       if (!LEADERBOARD_URL) return null;
       const me = lbMe();
       if (me) return el("div", { class: "si-bar" }, [
-        el("span", { class: "si-hi" }, [(function () { const a = classArt(me.cls || "A", ""); a.setAttribute("aria-hidden", "true"); return a; })(), document.createTextNode("Hi, " + me.name + "!"), el("span", { class: "si-cls-tag", text: lbClassName(me.cls || "A") })]),
+        el("span", { class: "si-hi" }, [(function () { const a = classArt(me.cls || "A", ""); a.setAttribute("aria-hidden", "true"); return a; })(), petMini(), document.createTextNode("Hi, " + me.name + "!"), el("span", { class: "si-cls-tag", text: lbClassName(me.cls || "A") })]),
         el("button", { type: "button", class: "si-out", text: "Not you?", onClick: siAskOut })
       ]);
       return el("div", { class: "si-bar" }, [
@@ -10032,7 +10071,7 @@
         ]));
       } else {
         card.appendChild(el("p", { class: "lb-me" }, [
-          document.createTextNode("You are "), el("strong", { text: me.name }), document.createTextNode(" "),
+          petMini(), document.createTextNode("You are "), el("strong", { text: me.name }), document.createTextNode(" "),
           el("button", { type: "button", class: "lb-change", text: "Not you?", onClick: siAskOut })
         ]));
       }
@@ -10671,6 +10710,90 @@
       });
       return '<svg class="ci-svg" viewBox="0 0 360 270" role="img" aria-label="' + scene.name + '">' + body + (scene.ink || "") + "</svg>";
     }
+    // My Pet. Growth comes only from coins spent here (food and treats), never from practice.
+    const PET_KINDS = [["pup", "Puppy", 0], ["kit", "Kitten", 5], ["dra", "Dragon", 5], ["tur", "Turtle", 5]];
+    const PET_STAGES = [{ at: 0, name: "Egg" }, { at: 5, name: "Baby" }, { at: 20, name: "Kid" }, { at: 50, name: "Teen" }, { at: 100, name: "Grown-up" }];
+    const PET_BAD_HARD = ["fuck", "shit", "bitch", "nigger", "nigga", "faggot", "retard", "porn", "whore", "slut", "cunt"];
+    const PET_BAD_SOFT = ["damn", "hell", "crap", "ass", "piss", "poop", "butt", "sex", "kill"];
+    function petBad(name) {
+      const raw = String(name || "").toLowerCase().replace(/[^a-z]/g, "");
+      const words = String(name || "").toLowerCase().split(/[^a-z]+/);
+      if (PET_BAD_HARD.some(function (w) { return raw.indexOf(w) >= 0; })) return true;
+      return words.some(function (w) { return PET_BAD_SOFT.indexOf(w) >= 0; });
+    }
+    function petKind(id) { return PET_KINDS.find(function (k) { return k[0] === id; }) || null; }
+    function petStage(g) { let i = 0; PET_STAGES.forEach(function (s, n) { if (g >= s.at) i = n; }); return i; }
+    function petClean(p) {
+      p = p && typeof p === "object" ? p : {};
+      const kind = petKind(p.kind) ? p.kind : "";
+      let g = Math.max(0, Math.min(100, Math.floor(Number(p.g) || 0)));
+      let joy = Math.max(0, Math.min(100, Math.floor(p.joy == null || p.joy === "" ? 80 : Number(p.joy) || 0)));
+      let joyAt = Math.max(0, Math.floor(Number(p.joyAt) || 0));
+      const now = Date.now();
+      if (!joyAt) joyAt = now;
+      else {
+        const drop = Math.floor((Math.max(0, now - joyAt) / 86400000) * 25);
+        if (drop) { joy = Math.max(0, joy - drop); joyAt = joyAt + Math.floor(drop * 86400000 / 25); }
+      }
+      let name = String(p.name || "").replace(/\s+/g, " ").trim().slice(0, 12);
+      if (petBad(name)) name = "";
+      const paid = [];
+      (Array.isArray(p.paid) ? p.paid : []).forEach(function (id) { if (id !== "pup" && petKind(id) && paid.indexOf(id) < 0) paid.push(id); });
+      return { kind: kind, g: g, joy: joy, joyAt: joyAt, name: name, paid: paid };
+    }
+    function petMerge(a, b) {
+      a = petClean(a); b = petClean(b);
+      if (!a.kind) return b;
+      if (!b.kind) return a;
+      const win = a.g > b.g || (a.g === b.g && a.joyAt >= b.joyAt) ? a : b;
+      const other = win === a ? b : a;
+      return petClean({ kind: win.kind, g: Math.max(a.g, b.g), joy: a.joyAt >= b.joyAt ? a.joy : b.joy, joyAt: Math.max(a.joyAt, b.joyAt), name: win.name || other.name, paid: win.paid.concat(other.paid) });
+    }
+    function petEye(x, y, sleepy) {
+      return sleepy ? '<path d="M' + (x - 4) + ' ' + y + ' q4 3.5 8 0" fill="none" stroke="#1a120c" stroke-width="2.4" stroke-linecap="round"/>' : '<circle cx="' + x + '" cy="' + y + '" r="2.5" fill="#1a120c"/>';
+    }
+    function petEgg(kind) {
+      const spot = {
+        pup: '<ellipse cx="48" cy="80" rx="8" ry="6" fill="#e0a15a" stroke="#1a120c" stroke-width="3"/><ellipse cx="70" cy="72" rx="6" ry="5" fill="#c4843c" stroke="#1a120c" stroke-width="3"/><circle cx="58" cy="94" r="4" fill="#e0a15a" stroke="#1a120c" stroke-width="3"/>',
+        kit: '<path d="M42 52 L50 36 L58 52 Z" fill="#f0a050" stroke="#1a120c" stroke-width="3"/><path d="M62 52 L70 36 L78 52 Z" fill="#f0a050" stroke="#1a120c" stroke-width="3"/>',
+        dra: '<ellipse cx="48" cy="76" rx="7" ry="5" fill="#3cbf58" stroke="#1a120c" stroke-width="3"/><ellipse cx="72" cy="86" rx="7" ry="5" fill="#67d86a" stroke="#1a120c" stroke-width="3"/><path d="M78 58 Q96 46 88 72 Z" fill="#3cbf58" stroke="#1a120c" stroke-width="3"/>',
+        tur: '<ellipse cx="60" cy="80" rx="16" ry="12" fill="#3cbf58" stroke="#1a120c" stroke-width="3"/><path d="M52 72 H68 M60 64 V90" stroke="#1f7a38" stroke-width="2" fill="none"/>'
+      }[kind] || "";
+      return '<ellipse cx="60" cy="78" rx="32" ry="40" fill="#fff8e8" stroke="#1a120c" stroke-width="4"/>' + spot;
+    }
+    function petBody(kind, stage, sleepy) {
+      const e = function (x, y) { return petEye(x, y, sleepy); };
+      if (kind === "pup") {
+        if (stage <= 1) return '<ellipse cx="60" cy="104" rx="20" ry="12" fill="#e8b56a" stroke="#1a120c" stroke-width="3.5"/><circle cx="60" cy="76" r="20" fill="#f0c48a" stroke="#1a120c" stroke-width="3.5"/><ellipse cx="42" cy="64" rx="8" ry="14" fill="#c4843c" stroke="#1a120c" stroke-width="3.5"/><ellipse cx="78" cy="64" rx="8" ry="14" fill="#c4843c" stroke="#1a120c" stroke-width="3.5"/>' + e(52, 74) + e(68, 74) + '<ellipse cx="60" cy="82" rx="4" ry="3" fill="#5a3418"/>';
+        if (stage === 2) return '<ellipse cx="86" cy="96" rx="10" ry="6" fill="#e8b56a" stroke="#1a120c" stroke-width="3.5"/><ellipse cx="60" cy="100" rx="28" ry="16" fill="#e8b56a" stroke="#1a120c" stroke-width="3.5"/><circle cx="60" cy="68" r="22" fill="#f0c48a" stroke="#1a120c" stroke-width="3.5"/><ellipse cx="40" cy="54" rx="9" ry="16" fill="#c4843c" stroke="#1a120c" stroke-width="3.5"/><ellipse cx="80" cy="54" rx="9" ry="16" fill="#c4843c" stroke="#1a120c" stroke-width="3.5"/><ellipse cx="46" cy="114" rx="8" ry="5" fill="#e8b56a" stroke="#1a120c" stroke-width="3"/><ellipse cx="74" cy="114" rx="8" ry="5" fill="#e8b56a" stroke="#1a120c" stroke-width="3"/>' + e(52, 66) + e(70, 66) + '<ellipse cx="60" cy="76" rx="5" ry="3.5" fill="#5a3418"/><path d="M52 84 q8 6 16 0" fill="none" stroke="#1a120c" stroke-width="2" stroke-linecap="round"/>';
+        if (stage === 3) return '<path d="M88 86 Q108 74 98 100" fill="none" stroke="#e8b56a" stroke-width="8" stroke-linecap="round"/><ellipse cx="64" cy="90" rx="30" ry="18" fill="#e8b56a" stroke="#1a120c" stroke-width="3.5"/><circle cx="34" cy="68" r="18" fill="#f0c48a" stroke="#1a120c" stroke-width="3.5"/><ellipse cx="20" cy="54" rx="8" ry="14" fill="#c4843c" stroke="#1a120c" stroke-width="3.5"/><rect x="42" y="100" width="9" height="18" rx="4" fill="#e8b56a" stroke="#1a120c" stroke-width="3"/><rect x="60" y="100" width="9" height="18" rx="4" fill="#e8b56a" stroke="#1a120c" stroke-width="3"/><rect x="78" y="98" width="9" height="16" rx="4" fill="#c4843c" stroke="#1a120c" stroke-width="3"/>' + e(28, 66) + e(40, 66) + '<ellipse cx="32" cy="76" rx="4" ry="3" fill="#5a3418"/>';
+        return '<path d="M96 74 Q118 56 104 98" fill="none" stroke="#e8b56a" stroke-width="10" stroke-linecap="round"/><ellipse cx="66" cy="86" rx="34" ry="22" fill="#e8b56a" stroke="#1a120c" stroke-width="3.5"/><circle cx="32" cy="60" r="20" fill="#f0c48a" stroke="#1a120c" stroke-width="3.5"/><ellipse cx="16" cy="44" rx="9" ry="16" fill="#c4843c" stroke="#1a120c" stroke-width="3.5"/><ellipse cx="42" cy="42" rx="8" ry="14" fill="#c4843c" stroke="#1a120c" stroke-width="3.5"/><rect x="38" y="100" width="11" height="20" rx="4" fill="#e8b56a" stroke="#1a120c" stroke-width="3"/><rect x="58" y="100" width="11" height="20" rx="4" fill="#e8b56a" stroke="#1a120c" stroke-width="3"/><rect x="80" y="98" width="11" height="18" rx="4" fill="#c4843c" stroke="#1a120c" stroke-width="3"/><rect x="22" y="68" width="24" height="8" rx="3" fill="#e23b4a" stroke="#1a120c" stroke-width="2.5"/>' + e(26, 58) + e(38, 58) + '<ellipse cx="28" cy="68" rx="4" ry="3" fill="#5a3418"/><path d="M24 74 q6 8 4 12 q-2 -4 -6 -2" fill="#e23b4a"/>';
+      }
+      if (kind === "kit") {
+        if (stage <= 1) return '<ellipse cx="60" cy="104" rx="18" ry="11" fill="#f0a050" stroke="#1a120c" stroke-width="3.5"/><circle cx="60" cy="74" r="20" fill="#ffb86a" stroke="#1a120c" stroke-width="3.5"/><path d="M42 64 L46 42 L58 60 Z" fill="#ffb86a" stroke="#1a120c" stroke-width="3.5"/><path d="M78 64 L74 42 L62 60 Z" fill="#ffb86a" stroke="#1a120c" stroke-width="3.5"/>' + e(52, 74) + e(68, 74) + '<path d="M56 82 L60 86 L64 82" fill="none" stroke="#1a120c" stroke-width="2"/>';
+        if (stage === 2) return '<path d="M84 100 Q104 110 96 88" fill="none" stroke="#f0a050" stroke-width="7" stroke-linecap="round"/><ellipse cx="60" cy="100" rx="26" ry="16" fill="#f0a050" stroke="#1a120c" stroke-width="3.5"/><circle cx="60" cy="66" r="22" fill="#ffb86a" stroke="#1a120c" stroke-width="3.5"/><path d="M40 56 L46 32 L60 54 Z" fill="#ffb86a" stroke="#1a120c" stroke-width="3.5"/><path d="M80 56 L74 32 L60 54 Z" fill="#ffb86a" stroke="#1a120c" stroke-width="3.5"/>' + e(52, 66) + e(70, 66) + '<ellipse cx="60" cy="76" rx="4" ry="3" fill="#e23b4a"/><path d="M48 80 H40 M72 80 H80" stroke="#1a120c" stroke-width="1.6"/>';
+        if (stage === 3) return '<path d="M90 84 Q114 70 100 108" fill="none" stroke="#f0a050" stroke-width="8" stroke-linecap="round"/><ellipse cx="64" cy="92" rx="30" ry="18" fill="#f0a050" stroke="#1a120c" stroke-width="3.5"/><circle cx="34" cy="66" r="18" fill="#ffb86a" stroke="#1a120c" stroke-width="3.5"/><path d="M22 54 L28 32 L42 52 Z" fill="#ffb86a" stroke="#1a120c" stroke-width="3.5"/><path d="M48 52 L42 30 L28 50 Z" fill="#ffb86a" stroke="#1a120c" stroke-width="3.5"/><rect x="44" y="102" width="8" height="16" rx="4" fill="#f0a050" stroke="#1a120c" stroke-width="3"/><rect x="70" y="102" width="8" height="16" rx="4" fill="#f0a050" stroke="#1a120c" stroke-width="3"/>' + e(28, 64) + e(40, 64);
+        return '<path d="M98 70 Q120 48 106 100" fill="none" stroke="#f0a050" stroke-width="10" stroke-linecap="round"/><ellipse cx="66" cy="88" rx="34" ry="20" fill="#f0a050" stroke="#1a120c" stroke-width="3.5"/><circle cx="30" cy="60" r="20" fill="#ffb86a" stroke="#1a120c" stroke-width="3.5"/><path d="M16 48 L22 22 L38 46 Z" fill="#ffb86a" stroke="#1a120c" stroke-width="3.5"/><path d="M46 46 L40 20 L22 44 Z" fill="#ffb86a" stroke="#1a120c" stroke-width="3.5"/><rect x="40" y="100" width="10" height="18" rx="4" fill="#f0a050" stroke="#1a120c" stroke-width="3"/><rect x="72" y="100" width="10" height="18" rx="4" fill="#f0a050" stroke="#1a120c" stroke-width="3"/>' + e(24, 58) + e(38, 58) + '<path d="M18 66 H8 M42 68 H52" stroke="#1a120c" stroke-width="1.8"/>';
+      }
+      if (kind === "dra") {
+        if (stage <= 1) return '<ellipse cx="60" cy="102" rx="20" ry="14" fill="#3cbf58" stroke="#1a120c" stroke-width="3.5"/><circle cx="60" cy="74" r="18" fill="#67d86a" stroke="#1a120c" stroke-width="3.5"/><path d="M40 78 Q24 70 36 96 Z" fill="#2f9e45" stroke="#1a120c" stroke-width="3"/><path d="M80 78 Q96 70 84 96 Z" fill="#2f9e45" stroke="#1a120c" stroke-width="3"/>' + e(53, 72) + e(67, 72);
+        if (stage === 2) return '<path d="M86 100 Q100 112 92 88" fill="#3cbf58" stroke="#1a120c" stroke-width="3"/><ellipse cx="60" cy="100" rx="26" ry="16" fill="#3cbf58" stroke="#1a120c" stroke-width="3.5"/><circle cx="60" cy="66" r="20" fill="#67d86a" stroke="#1a120c" stroke-width="3.5"/><path d="M44 60 L48 44 L56 58 Z" fill="#e0a43a" stroke="#1a120c" stroke-width="3"/><path d="M76 60 L72 44 L64 58 Z" fill="#e0a43a" stroke="#1a120c" stroke-width="3"/><path d="M36 74 Q14 60 30 100 Z" fill="#2f9e45" stroke="#1a120c" stroke-width="3.5"/><path d="M84 74 Q106 60 90 100 Z" fill="#2f9e45" stroke="#1a120c" stroke-width="3.5"/>' + e(52, 66) + e(68, 66);
+        if (stage === 3) return '<path d="M92 88 Q112 100 100 72" fill="#3cbf58" stroke="#1a120c" stroke-width="3"/><ellipse cx="64" cy="92" rx="30" ry="18" fill="#3cbf58" stroke="#1a120c" stroke-width="3.5"/><circle cx="36" cy="64" r="18" fill="#67d86a" stroke="#1a120c" stroke-width="3.5"/><path d="M28 50 L32 32 L42 50 Z" fill="#e0a43a" stroke="#1a120c" stroke-width="3"/><path d="M48 50 L44 30 L34 48 Z" fill="#e0a43a" stroke="#1a120c" stroke-width="3"/><path d="M30 70 Q4 48 22 108 Z" fill="#2f9e45" stroke="#1a120c" stroke-width="3.5"/><path d="M86 72 Q114 46 100 112 Z" fill="#2f9e45" stroke="#1a120c" stroke-width="3.5"/>' + e(30, 62) + e(42, 62);
+        return '<path d="M100 80 Q118 98 104 64" fill="#3cbf58" stroke="#1a120c" stroke-width="3"/><ellipse cx="64" cy="88" rx="32" ry="22" fill="#3cbf58" stroke="#1a120c" stroke-width="3.5"/><circle cx="32" cy="58" r="20" fill="#67d86a" stroke="#1a120c" stroke-width="3.5"/><path d="M22 42 L26 20 L40 42 Z" fill="#e0a43a" stroke="#1a120c" stroke-width="3"/><path d="M46 40 L40 18 L28 40 Z" fill="#e0a43a" stroke="#1a120c" stroke-width="3"/><path d="M28 64 Q0 36 16 112 Z" fill="#2f9e45" stroke="#1a120c" stroke-width="3.5"/><path d="M90 62 Q120 28 108 116 Z" fill="#2f9e45" stroke="#1a120c" stroke-width="3.5"/>' + e(26, 56) + e(40, 56) + '<path d="M24 66 q6 4 4 8" fill="none" stroke="#e23b4a" stroke-width="2"/>';
+      }
+      if (stage <= 1) return '<ellipse cx="60" cy="96" rx="26" ry="18" fill="#3cbf58" stroke="#1a120c" stroke-width="3.5"/><circle cx="86" cy="86" r="10" fill="#b6ef8a" stroke="#1a120c" stroke-width="3"/>' + e(84, 84) + e(92, 86);
+      if (stage === 2) return '<ellipse cx="58" cy="96" rx="30" ry="20" fill="#2f9e45" stroke="#1a120c" stroke-width="3.5"/><ellipse cx="58" cy="96" rx="16" ry="12" fill="#b6ef8a" stroke="#1f7a38" stroke-width="2"/><circle cx="96" cy="84" r="11" fill="#b6ef8a" stroke="#1a120c" stroke-width="3"/><ellipse cx="36" cy="112" rx="8" ry="5" fill="#67d86a" stroke="#1a120c" stroke-width="3"/><ellipse cx="78" cy="112" rx="8" ry="5" fill="#67d86a" stroke="#1a120c" stroke-width="3"/>' + e(94, 82) + e(102, 84);
+      if (stage === 3) return '<ellipse cx="58" cy="92" rx="34" ry="24" fill="#2f9e45" stroke="#1a120c" stroke-width="3.5"/><path d="M44 80 H72 M58 70 V108" stroke="#1f7a38" stroke-width="3"/><circle cx="100" cy="74" r="12" fill="#b6ef8a" stroke="#1a120c" stroke-width="3"/><rect x="100" y="70" width="16" height="6" rx="3" fill="#67d86a" stroke="#1a120c" stroke-width="2.5"/><ellipse cx="32" cy="112" rx="9" ry="5" fill="#67d86a" stroke="#1a120c" stroke-width="3"/><ellipse cx="80" cy="114" rx="9" ry="5" fill="#67d86a" stroke="#1a120c" stroke-width="3"/>' + e(98, 72) + e(106, 74);
+      return '<ellipse cx="56" cy="88" rx="38" ry="28" fill="#2f9e45" stroke="#1a120c" stroke-width="3.5"/><path d="M40 76 H74 M56 62 V112" stroke="#145c28" stroke-width="3.5"/><circle cx="104" cy="64" r="14" fill="#b6ef8a" stroke="#1a120c" stroke-width="3.5"/><rect x="108" y="58" width="18" height="7" rx="3" fill="#67d86a" stroke="#1a120c" stroke-width="2.5"/><ellipse cx="28" cy="114" rx="10" ry="6" fill="#67d86a" stroke="#1a120c" stroke-width="3"/><ellipse cx="78" cy="116" rx="10" ry="6" fill="#67d86a" stroke="#1a120c" stroke-width="3"/><path d="M24 96 Q12 104 20 112" fill="none" stroke="#2f9e45" stroke-width="6" stroke-linecap="round"/>' + e(100, 62) + e(110, 64);
+    }
+    function petSVG(pet, size) {
+      const stage = petStage(pet.g || 0);
+      const sleepy = (pet.joy || 0) < 35;
+      const inner = stage === 0 ? petEgg(pet.kind || "pup") : petBody(pet.kind || "pup", stage, sleepy);
+      const z = sleepy ? '<text x="90" y="28" font-size="18" font-family="Arial,sans-serif" font-weight="700" fill="#5a6a88">z</text>' : "";
+      const h = Math.round(size * 130 / 120);
+      return '<svg class="pet-svg" viewBox="0 0 120 130" width="' + size + '" height="' + h + '" aria-hidden="true">' + inner + z + "</svg>";
+    }
     function avClean(a) {
       a = a && typeof a === "object" ? a : {};
       const ok = function (list, v, d) { return list.some(function (x) { return x[0] === v; }) ? v : d; };
@@ -10691,6 +10814,7 @@
         hd: hdClean(a.hd, Array.isArray(a.pk) && a.pk.indexOf("hd") >= 0),
         sc: scClean(a.sc),
         ci: ciClean(a.ci),
+        pet: petClean(a.pet),
         updated: Number(a.updated) || 0 };
     }
     let avatar = (function () { try { return avClean(JSON.parse(localStorage.getItem(AV_KEY) || "null")); } catch (e) { return avClean(null); } })();
@@ -10778,7 +10902,8 @@
         avatar = avClean(Object.assign({}, base, { owned: owned, made: avatar.made || remote.made, pk: (avatar.pk || []).concat(remote.pk || []),
           hd: Object.assign({}, base.hd, { o: (avatar.hd.o || []).concat(remote.hd.o || []) }),
           sc: Object.assign({}, base.sc || {}, { o: ((avatar.sc && avatar.sc.o) || []).concat((remote.sc && remote.sc.o) || []) }),
-          ci: ciMerge(avatar.ci, remote.ci, localNewer) }));
+          ci: ciMerge(avatar.ci, remote.ci, localNewer),
+          pet: petMerge(avatar.pet, remote.pet) }));
         avatar.updated = upd;
         try { localStorage.setItem(AV_KEY, JSON.stringify(avatar)); } catch (e) {}
         if (JSON.stringify(Object.assign({}, remote, { updated: 0 })) !== JSON.stringify(Object.assign({}, avatar, { updated: 0 }))) avSetPending(true);
@@ -11342,8 +11467,8 @@
         el("button", { type: "button", text: "Set $0", onClick: function () { add(0); } }),
         el("button", { type: "button", class: "sim-reset", text: "Reset purchases", onClick: function () {
           const me = LEADERBOARD_URL ? lbMe() : null;
-          avConfirm("Reset purchases?", "Removes every bought piece, opened pack, and Color It picture" + (me ? " for " + me.name + " (also on the TEST sheet)" : " on this device") + ". Coins stay.", function () {
-            avatar.owned = []; avatar.pk = []; avatar.wear = {}; avatar.ci = { o: [], c: {} }; avatar = avClean(avatar); avatar.made = true;
+          avConfirm("Reset purchases?", "Removes every bought piece, opened pack, Color It picture, and My Pet" + (me ? " for " + me.name + " (also on the TEST sheet)" : " on this device") + ". Coins stay.", function () {
+            avatar.owned = []; avatar.pk = []; avatar.wear = {}; avatar.ci = { o: [], c: {} }; avatar.pet = null; avatar = avClean(avatar); avatar.made = true;
             avSave(); say("Purchases reset."); redo();
           }, "Yes, reset");
         } })
@@ -11398,6 +11523,12 @@
       card.appendChild(el("div", { class: "shp-bar" }, [
         el("button", { type: "button", class: "shp-back", "aria-label": "Back", text: "\u2039", onClick: function () { goPage("menu"); } }),
         el("span", { class: "shp-ttl", text: "Avatar Shop" }),
+        (function () {
+          if (!avatar.pet || !avatar.pet.kind) return null;
+          const b = el("button", { type: "button", class: "pet-mini shp-pet", "aria-label": (avatar.pet.name || "My Pet"), onClick: function () { goPage("pet"); } });
+          b.innerHTML = petSVG(avatar.pet, 36);
+          return b;
+        })(),
         el("button", { type: "button", class: "shp-more", "aria-label": "More", text: "\u22EF", onClick: function () { if (menu.hasAttribute("hidden")) menu.removeAttribute("hidden"); else menu.setAttribute("hidden", ""); } }),
         coins, menu]));
       setTimeout(function () { avShowStatus(avStatus); }, 0);
@@ -11663,8 +11794,8 @@
       paintAll();
       return card;
     }
-    const PAGES = ["menu", "beats", "backgrounds", "games", "minigames", "leaders", "closet", "scene", "bricks", "h2h", "sayit", "grammar", "signin"];
-    const PAGE_TITLES = { beats: "Beats", backgrounds: "Backgrounds", games: "Fact Challenge", minigames: "Mini Games", leaders: "Leaders", closet: "Avatar", scene: "My Scene", bricks: "Brick by Brick", h2h: "Head to Head", sayit: "Say It", grammar: "Grammar", signin: "Your class" };
+    const PAGES = ["menu", "beats", "backgrounds", "games", "minigames", "leaders", "closet", "scene", "bricks", "h2h", "sayit", "grammar", "signin", "pet"];
+    const PAGE_TITLES = { beats: "Beats", backgrounds: "Backgrounds", games: "Fact Challenge", minigames: "Mini Games", leaders: "Leaders", closet: "Avatar", scene: "My Scene", bricks: "Brick by Brick", h2h: "Head to Head", sayit: "Say It", grammar: "Grammar", signin: "Your class", pet: "My Pet" };
     let menuSmooth = false;
     function currentPage() {
       const h = (location.hash || "").replace(/^#/, "");
@@ -11703,6 +11834,161 @@
       h2.appendChild(logoTitle(PAGE_TITLES[page] || "", "pt-" + page));
       head.appendChild(h2);
       return head;
+    }
+    let petPicking = false, petNaming = false, petPopUntil = 0, petPopTimer = 0, petPopName = "";
+    function petIcon(px) {
+      const s = el("span", { class: "menu-lb-ico pet-mini", "aria-hidden": "true" });
+      s.innerHTML = petSVG(avatar.pet, px || 36);
+      return s;
+    }
+    function petMini() {
+      if (!avatar.pet || !avatar.pet.kind) return null;
+      const s = el("span", { class: "pet-mini", "aria-hidden": "true" });
+      s.innerHTML = petSVG(avatar.pet, 36);
+      return s;
+    }
+    function petArmPop() {
+      if (petPopTimer || Date.now() >= petPopUntil) return;
+      petPopTimer = setTimeout(function () { petPopTimer = 0; if (currentPage() === "pet" && state.phase === "setup") render(); }, petPopUntil - Date.now() + 40);
+    }
+    function petChoose(kind) {
+      const info = petKind(kind);
+      if (!info) return;
+      if (avatar.pet.kind === kind) { petPicking = false; render(); return; }
+      const free = kind === "pup" || avatar.pet.paid.indexOf(kind) >= 0;
+      const go = function () {
+        if (!free) {
+          if (!coinSpend(info[2])) return;
+          if (avatar.pet.paid.indexOf(kind) < 0) avatar.pet.paid.push(kind);
+        }
+        avatar.pet.kind = kind;
+        avatar.made = true;
+        petPicking = false;
+        avSaveSoon();
+        say("You picked a " + info[1].toLowerCase() + " egg!");
+        render();
+      };
+      if (free) { go(); return; }
+      if (coinGet() < info[2]) { say("You need $" + info[2] + " for the " + info[1].toLowerCase() + " egg. You have $" + coinGet() + "."); return; }
+      avConfirm("Get the " + info[1].toLowerCase() + " egg for $" + info[2] + "?", "You have $" + coinGet() + ".", go, "Yes, get it!");
+    }
+    function petSaveName(raw) {
+      const name = String(raw || "").replace(/\s+/g, " ").trim().slice(0, 12);
+      if (!name || !/[a-z]/i.test(name)) { say("Type a name for your pet."); return; }
+      if (petBad(name)) { say("Pick a kinder name for class."); return; }
+      avatar.pet.name = name;
+      avatar.made = true;
+      petNaming = false;
+      avSaveSoon();
+      say("Hi, " + name + "!");
+      render();
+    }
+    function petCare(type) {
+      const spec = { food: [1, 1, 15, "food"], treat: [3, 4, 30, "a treat"], toy: [2, 0, 22, "a toy"] }[type];
+      if (!spec || !avatar.pet.kind) return;
+      if (coinGet() < spec[0]) { say("You need $" + spec[0] + " for " + spec[3] + ". You have $" + coinGet() + "."); return; }
+      const before = petStage(avatar.pet.g);
+      if (!coinSpend(spec[0])) return;
+      avatar.pet.g = Math.min(100, avatar.pet.g + spec[1]);
+      avatar.pet.joy = Math.min(100, avatar.pet.joy + spec[2]);
+      avatar.pet.joyAt = Date.now();
+      const after = petStage(avatar.pet.g);
+      avatar.made = true;
+      avSaveSoon();
+      if (after > before) {
+        petPopName = PET_STAGES[after].name;
+        petPopUntil = Date.now() + 1500;
+        if (!avatar.pet.name) petNaming = true;
+        say((avatar.pet.name ? avatar.pet.name + " is a " : "Your pet is a ") + petPopName + "!");
+      } else say(spec[1] ? "Yum!" : "Wee!");
+      render();
+    }
+    function petCard() {
+      let storedJoy = null;
+      try { const raw = JSON.parse(localStorage.getItem(AV_KEY) || "null"); storedJoy = raw && raw.pet ? raw.pet.joy : null; } catch (e) {}
+      avatar.pet = petClean(avatar.pet);
+      if (avatar.pet.kind && storedJoy != null && storedJoy !== avatar.pet.joy) avSaveSoon();
+      const card = el("div", { class: "card pet-card" });
+      const coins = el("p", { class: "coin-bank shp-coins", "data-short": "1", role: "status", "aria-label": coinGet() + " coins" }, [el("span", { class: "coin-ico", "aria-hidden": "true", text: "$" }), el("span", { text: String(coinGet()) })]);
+      card.appendChild(el("div", { class: "pet-bar" }, [
+        el("button", { type: "button", class: "pet-back", text: "\u2039 Back", onClick: function () { goPage("menu"); } }),
+        el("span", { class: "pet-ttl", text: "My Pet" }),
+        coins
+      ]));
+      const pet = avatar.pet;
+      const showEggs = !pet.kind || petPicking;
+      if (showEggs) {
+        card.appendChild(el("p", { class: "pet-stage", text: "Pick an egg. The puppy is free." }));
+        const grid = el("div", { class: "pet-eggs" });
+        PET_KINDS.forEach(function (k) {
+          const owned = k[0] === "pup" || pet.paid.indexOf(k[0]) >= 0;
+          const price = owned ? "Free" : "$" + k[2];
+          const btn = el("button", { type: "button", class: "pet-egg", "aria-label": k[1] + " egg, " + price, onClick: function () { petChoose(k[0]); } });
+          btn.innerHTML = petSVG({ kind: k[0], g: 0, joy: 80 }, 92);
+          btn.appendChild(el("span", { text: k[1] }));
+          btn.appendChild(el("small", { text: price }));
+          grid.appendChild(btn);
+        });
+        card.appendChild(grid);
+        if (pet.kind) card.appendChild(el("button", { type: "button", class: "pet-rename", text: "Back to my egg", onClick: function () { petPicking = false; render(); } }));
+      } else {
+        const stage = petStage(pet.g);
+        const next = PET_STAGES[stage + 1];
+        const cur = PET_STAGES[stage];
+        const span = next ? next.at - cur.at : 1;
+        const pct = next ? Math.max(0, Math.min(100, Math.round((pet.g - cur.at) / span * 100))) : 100;
+        const sleepy = pet.joy < 35;
+        const widths = [140, 160, 190, 220, 250];
+        card.appendChild(el("p", { class: "pet-name", text: pet.name || (stage === 0 ? "A mystery egg" : "Name me!") }));
+        card.appendChild(el("p", { class: "pet-stage", text: cur.name + (sleepy ? " \u00B7 sleepy" : "") }));
+        const view = el("div", { class: "pet-view" });
+        const fig = el("button", { type: "button", class: "pet-fig", "aria-label": (pet.name || cur.name) + ", tap to play", onClick: function () {
+          fig.classList.remove("pet-boop"); void fig.offsetWidth; fig.classList.add("pet-boop");
+          say(sleepy ? (pet.name || "Your pet") + " is sleepy." : (pet.name || "Your pet") + "!");
+        } });
+        fig.style.setProperty("--pw", widths[stage] + "px");
+        fig.innerHTML = petSVG(pet, widths[stage]);
+        view.appendChild(fig);
+        if (Date.now() < petPopUntil) {
+          const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+          const pop = el("div", { class: "pet-pop", "aria-hidden": "true" });
+          pop.appendChild(el("b", { text: petPopName + "!" }));
+          if (!reduce) ["-64px,-40px,#ffe14a", "70px,-24px,#ff7ab8", "-36px,34px,#7ee07a", "60px,40px,#7ec8e8"].forEach(function (s, i) {
+            const xy = s.split(","), bit = el("i", { class: "pet-spark" });
+            bit.style.setProperty("--x", xy[0]); bit.style.setProperty("--y", xy[1]); bit.style.background = xy[2]; bit.style.animationDelay = (i * 40) + "ms";
+            pop.appendChild(bit);
+          });
+          view.appendChild(pop);
+          petArmPop();
+        }
+        card.appendChild(view);
+        card.appendChild(el("p", { class: "pet-stage", text: next ? pet.g + " of " + next.at + " to " + next.name : "Grown-up" }));
+        const bar = el("div", { class: "pet-barline", role: "progressbar", "aria-valuemin": "0", "aria-valuemax": "100", "aria-valuenow": String(pct), "aria-label": "Growth" });
+        bar.appendChild(el("span", { style: "width:" + pct + "%" }));
+        card.appendChild(bar);
+        card.appendChild(el("p", { class: "pet-stage", text: sleepy ? "Happiness is low. A toy or a treat helps." : "Happiness" }));
+        const heart = el("div", { class: "pet-barline pet-heart", role: "progressbar", "aria-valuemin": "0", "aria-valuemax": "100", "aria-valuenow": String(pet.joy), "aria-label": "Happiness " + pet.joy });
+        heart.appendChild(el("span", { style: "width:" + pet.joy + "%" }));
+        card.appendChild(heart);
+        card.appendChild(el("div", { class: "pet-acts" }, [
+          el("button", { type: "button", class: "pet-act", onClick: function () { petCare("food"); } }, [document.createTextNode("Food"), el("small", { text: "$1" })]),
+          el("button", { type: "button", class: "pet-act", onClick: function () { petCare("treat"); } }, [document.createTextNode("Treat"), el("small", { text: "$3" })]),
+          el("button", { type: "button", class: "pet-act", onClick: function () { petCare("toy"); } }, [document.createTextNode("Toy"), el("small", { text: "$2" })])
+        ]));
+        if (petNaming || (stage > 0 && !pet.name)) {
+          const box = el("div", { class: "pet-namebox" });
+          const input = el("input", { type: "text", maxlength: "12", "aria-label": "Pet name", placeholder: "Name your pet" });
+          input.value = pet.name || "";
+          box.appendChild(input);
+          box.appendChild(el("button", { type: "button", text: "Save name", onClick: function () { petSaveName(input.value); } }));
+          card.appendChild(box);
+        } else if (stage > 0) {
+          card.appendChild(el("button", { type: "button", class: "pet-rename", text: "Rename", onClick: function () { petNaming = true; render(); } }));
+        }
+        if (stage === 0) card.appendChild(el("button", { type: "button", class: "pet-swap", text: "Pick a different egg", onClick: function () { petPicking = true; render(); } }));
+      }
+      if (SIM_ON) card.appendChild(simBar());
+      return card;
     }
     function menuPage() {
       const sec = el("section", { class: "menu-page home-stack", id: "menu-page", "aria-label": "Menu" });
@@ -11753,6 +12039,11 @@
       fcRow.appendChild(el("button", { type: "button", class: "menu-lb menu-closet", "aria-label": "Avatar", onClick: function () { goPage("closet"); } }, [
         avHas() ? avNode(avatar, 40, "menu-av") : el("span", { class: "menu-lb-ico", "aria-hidden": "true", text: "\uD83D\uDC55" }),
         el("span", { class: "hb-label", text: "Avatar" }),
+        el("span", { class: "hb-go", "aria-hidden": "true", text: "\u203A" })
+      ]));
+      fcRow.appendChild(el("button", { type: "button", class: "menu-lb home-pet", "aria-label": "My Pet", onClick: function () { goPage("pet"); } }, [
+        avatar.pet && avatar.pet.kind ? petIcon(40) : el("span", { class: "menu-lb-ico", "aria-hidden": "true", text: "\uD83E\uDD5A" }),
+        el("span", { class: "hb-label", text: "My Pet" }),
         el("span", { class: "hb-go", "aria-hidden": "true", text: "\u203A" })
       ]));
       // 3. Leaderboard spans the full row under them
