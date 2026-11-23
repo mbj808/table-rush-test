@@ -7972,47 +7972,45 @@
     }
     function sndUnlockNow() {
       const ac = sndCtx();
-      if (!ac) return Promise.resolve();
-      // Must run inside the tap. iOS drops notes that were scheduled before resume() finishes,
-      // and a second AudioContext (the old pet sounds) stays silent.
+      if (!ac) return null;
+      // Call resume() in the same turn as the click or touchend. Desktop Safari and iOS
+      // both ignore notes that are started only inside resume().then().
+      try { ac.resume(); } catch (e) {}
       if (!sndUnlocked) {
         sndUnlocked = true;
         try {
-          const a = new Audio(SND_UNLOCK_WAV);
-          a.setAttribute("playsinline", "");
-          a.volume = 0.05;
-          const p = a.play();
-          if (p && p.catch) p.catch(function () {});
+          const buf = ac.createBuffer(1, 1, ac.sampleRate || 44100);
+          const src = ac.createBufferSource();
+          src.buffer = buf;
+          src.connect(ac.destination);
+          src.start(0);
         } catch (e) {}
       }
       try {
-        const o = ac.createOscillator(), g = ac.createGain();
-        g.gain.value = 0.0008;
-        o.frequency.value = 440;
-        o.connect(g); g.connect(ac.destination);
-        o.start(); o.stop((ac.currentTime || 0) + 0.03);
-      } catch (e) {}
-      try { return ac.resume() || Promise.resolve(); } catch (e2) { return Promise.resolve(); }
+        const a = new Audio(SND_UNLOCK_WAV);
+        a.setAttribute("playsinline", "");
+        a.volume = 0.01;
+        const p = a.play();
+        if (p && p.catch) p.catch(function () {});
+      } catch (e2) {}
+      return ac;
     }
     function sndAfterUnlock(fn) {
-      const ac = sndCtx();
+      const ac = sndUnlockNow();
       if (!ac) return;
-      const p = sndUnlockNow();
-      const go = function () { try { fn(); } catch (e) {} };
-      if (ac.state === "running") go();
-      else if (p && p.then) p.then(function () { go(); }).catch(go);
-      else go();
+      try { fn(); } catch (e) {}
     }
     function sndTone(freq, type, t, dur, peak, slide) {
       const o = audioCtx.createOscillator(), g = audioCtx.createGain();
       o.type = type || "sine";
-      o.frequency.setValueAtTime(Math.max(40, freq), t);
-      if (slide) o.frequency.exponentialRampToValueAtTime(Math.max(40, slide), t + Math.max(0.04, dur));
-      g.gain.setValueAtTime(0, t);
-      g.gain.linearRampToValueAtTime(peak, t + Math.min(0.03, dur * 0.35));
-      g.gain.linearRampToValueAtTime(0, t + dur);
+      const f0 = Math.max(40, freq);
+      o.frequency.setValueAtTime(f0, t);
+      if (slide > 0) { try { o.frequency.exponentialRampToValueAtTime(Math.max(40, slide), t + Math.max(0.05, dur)); } catch (e) {} }
+      // Start at full volume. A ramp that begins at 0 is silent on desktop Safari.
+      g.gain.setValueAtTime(Math.max(0.05, peak), t);
+      try { g.gain.linearRampToValueAtTime(0.0001, t + dur); } catch (e2) { g.gain.value = peak; }
       o.connect(g); g.connect(audioCtx.destination);
-      o.start(t); o.stop(t + dur + 0.02);
+      o.start(t); o.stop(t + dur + 0.03);
     }
     function sndNoise(t, dur, peak, freq) {
       const rate = audioCtx.sampleRate || 44100, n = Math.max(1, Math.floor(rate * dur));
@@ -8060,13 +8058,15 @@
       } else sndDefault(ok, now);
     }
     function sndHear(pack) {
-      if (state.muted) { say("Sounds are muted. Tap the music button to turn sound on."); return; }
-      sndAfterUnlock(function () {
+      // A preview is an explicit tap, so it plays even when game music is muted.
+      const ac = sndUnlockNow();
+      if (!ac) { say("This browser can't play sounds."); return; }
+      try {
         if (pack === "animals") {
-          const t = audioCtx.currentTime + 0.02;
+          const t = ac.currentTime + 0.01;
           [0, 1, 2].forEach(function (i) { sndPlay("animals", true, t + i * 0.42, i); });
         } else sndPlay(pack || "", true);
-      });
+      } catch (e) {}
     }
     function playTone(ok) {
       if (state.muted) return;
@@ -8782,6 +8782,7 @@
       }
       q.flash = { right: right, text: right ? "Right!" : q.fact.a + " \u00d7 " + q.fact.b + " = " + (q.fact.a * q.fact.b) };
       q.lockUntil = Date.now() + (right ? 250 : 900);
+      try { playTone(right); } catch (e) {}
       render();
       if (right) plusOne(".quiz-fact");
       clearTimeout(feedback);
@@ -11066,17 +11067,17 @@
       return '<span class="pet-art" style="width:' + size + 'px"><img src="' + src + '" alt="" width="' + size + '" draggable="false">' + cracks + z + "</span>";
     }
     const NS_COLORS = [
-      { id: "red", name: "Red", hex: "#ff5a6a", cost: 2 }, { id: "blue", name: "Blue", hex: "#8ec5ff", cost: 2 },
-      { id: "gold", name: "Gold", hex: "#ffe14a", cost: 2 }, { id: "purple", name: "Purple", hex: "#d2a6ff", cost: 2 },
-      { id: "green", name: "Green", hex: "#7dff9a", cost: 2 }, { id: "pink", name: "Pink", hex: "#ff9ec8", cost: 2 }
+      { id: "red", name: "Red", hex: "#ff5a6a", cost: 10 }, { id: "blue", name: "Blue", hex: "#8ec5ff", cost: 10 },
+      { id: "gold", name: "Gold", hex: "#ffe14a", cost: 10 }, { id: "purple", name: "Purple", hex: "#d2a6ff", cost: 10 },
+      { id: "green", name: "Green", hex: "#7dff9a", cost: 10 }, { id: "pink", name: "Pink", hex: "#ff9ec8", cost: 10 }
     ];
     const NS_FONTS = [
-      { id: "bubble", name: "Bubble", cost: 3 }, { id: "comic", name: "Comic", cost: 3 },
-      { id: "pixel", name: "Pixel", cost: 3 }, { id: "script", name: "Fancy script", cost: 3 }
+      { id: "bubble", name: "Bubble", cost: 10 }, { id: "comic", name: "Comic", cost: 10 },
+      { id: "pixel", name: "Pixel", cost: 10 }, { id: "script", name: "Fancy script", cost: 10 }
     ];
     const NS_EFFECTS = [
-      { id: "glow", name: "Glow", cost: 5 }, { id: "rainbow", name: "Rainbow shimmer", cost: 5 },
-      { id: "sparkles", name: "Sparkles", cost: 5 }, { id: "flames", name: "Flames", cost: 5 }
+      { id: "glow", name: "Glow", cost: 10 }, { id: "rainbow", name: "Rainbow shimmer", cost: 10 },
+      { id: "sparkles", name: "Sparkles", cost: 10 }, { id: "flames", name: "Flames", cost: 10 }
     ];
     const SND_PACKS = [
       { id: "drum", name: "Drum hit", cost: 3 }, { id: "laser", name: "Laser zap", cost: 3 },
@@ -12009,9 +12010,9 @@
         prev.appendChild(sample);
         box.appendChild(prev);
         box.appendChild(el("p", { class: "ci-hint", text: "This is how your name looks on the leaderboard and when you are signed in. One color, one font, and one effect." }));
-        box.appendChild(nsGroup("Colors \u00B7 $2", "c", NS_COLORS));
-        box.appendChild(nsGroup("Fonts \u00B7 $3", "f", NS_FONTS));
-        box.appendChild(nsGroup("Effects \u00B7 $5", "e", NS_EFFECTS));
+        box.appendChild(nsGroup("Colors \u00B7 $10", "c", NS_COLORS));
+        box.appendChild(nsGroup("Fonts \u00B7 $10", "f", NS_FONTS));
+        box.appendChild(nsGroup("Effects \u00B7 $10", "e", NS_EFFECTS));
         return box;
       }
       function sndBuy(id) {
@@ -12035,7 +12036,18 @@
           const card = el("div", { class: "snd-card" + (on ? " on" : "") });
           card.appendChild(el("b", { text: item.name }));
           if (item.id === "animals") card.appendChild(el("small", { text: "Bark, meow, quack" }));
-          card.appendChild(el("button", { type: "button", class: "snd-hear", text: "Hear it", "aria-label": "Hear " + item.name, onClick: function () { sndHear(item.id); } }));
+          const hearBtn = el("button", { type: "button", class: "snd-hear", text: "Hear it", "aria-label": "Hear " + item.name });
+          let heardAt = 0;
+          function fireHear(ev) {
+            if (ev && ev.type === "touchend") ev.preventDefault();
+            const n = Date.now();
+            if (n - heardAt < 350) return;
+            heardAt = n;
+            sndHear(item.id);
+          }
+          hearBtn.addEventListener("touchend", fireHear);
+          hearBtn.addEventListener("click", fireHear);
+          card.appendChild(hearBtn);
           card.appendChild(el("button", { type: "button", class: "snd-get", "aria-label": item.name + (on ? ", on" : have ? ", yours" : ", $" + item.cost), text: on ? "On" : have ? "Use" : "$" + item.cost, onClick: function () { sndBuy(item.id); } }));
           grid.appendChild(card);
         });
