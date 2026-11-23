@@ -3693,9 +3693,9 @@
     .shp-buy { flex: none; display: inline-flex; align-items: center; gap: .35rem; white-space: nowrap; min-height: 46px; padding: .25rem .9rem .25rem .3rem; border-radius: 999px; border: 3px solid #8a5200; background: linear-gradient(#fff3a0, #ffc21a); color: #3a2400; font: 900 1.1rem/1 var(--ui-font); box-shadow: 0 3px 0 #6b3d00; cursor: pointer; }
     .shp-buy .coin-ico { width: 1.8rem; height: 1.8rem; font-size: 1.15rem; border-width: 2px; }
     .shp-buy.poor, .shp-st.price.poor { filter: grayscale(1); opacity: .6; }
-    .shp-tabs { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; padding: 0 0 8px; }
-    .shp-tab span { display: block; max-width: 100%; }
-    .shp-tab { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; min-width: 0; min-height: 64px; padding: 6px 2px; border-radius: 16px; border: 0; background: rgba(255,255,255,.09); color: #e2d8ff; font: 800 .8rem/1.05 var(--ui-font); text-align: center; cursor: pointer; }
+    .shp-tabs { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; padding: 0 0 8px; }
+    .shp-tab span { display: block; max-width: 100%; overflow-wrap: break-word; }
+    .shp-tab { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; min-width: 0; min-height: 62px; padding: 4px 1px; border-radius: 16px; border: 0; background: rgba(255,255,255,.09); color: #e2d8ff; font: 800 .68rem/1.05 var(--ui-font); text-align: center; cursor: pointer; }
     .shp-tab i { font-style: normal; font-size: 1.6rem; line-height: 1; }
     .shp-tab.on { background: #ffd34e; color: #3a2400; box-shadow: 0 3px 0 #a87412; }
     .shp-tab.pk { background: linear-gradient(#ff7ab8, #b47cff); color: #fff; }
@@ -3759,6 +3759,47 @@
     @media (prefers-reduced-motion: reduce) {
       .ci-spark { animation: none; opacity: 0; }
       .ci-fin b { box-shadow: none; }
+    }
+    .ns-f-bubble { font-family: "Arial Rounded MT Bold", "Trebuchet MS", "Segoe UI", sans-serif; font-weight: 900; letter-spacing: .04em; }
+    .ns-f-comic { font-family: "Chalkboard SE", "Comic Sans MS", "Marker Felt", cursive; font-weight: 700; }
+    .ns-f-pixel { font-family: "Courier New", Courier, monospace; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+    .ns-f-script { font-family: "Snell Roundhand", "Bradley Hand", "Segoe Script", "Brush Script MT", "Apple Chancery", cursive; font-weight: 700; font-style: italic; }
+    .ns-e-glow { animation: ns-glow 1.8s ease-in-out infinite; }
+    .ns-e-rainbow { background: linear-gradient(90deg, #ff5a5a, #ffd34e, #7ee07a, #4fd1e8, #b47cff, #ff5a5a); background-size: 220% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent; animation: ns-rainbow 3.2s linear infinite; }
+    .ns-e-sparkles { animation: ns-spark 1.4s ease-in-out infinite; }
+    .ns-e-flames { animation: ns-flame .8s ease-in-out infinite; }
+    @keyframes ns-glow { 0%, 100% { text-shadow: 0 0 4px currentColor; } 50% { text-shadow: 0 0 8px currentColor, 0 0 16px currentColor; } }
+    @keyframes ns-rainbow { to { background-position: 220% 0; } }
+    @keyframes ns-spark { 0%, 100% { text-shadow: 7px -5px 0 #fff, -6px 3px 0 transparent; } 50% { text-shadow: -5px -6px 0 #ffe14a, 6px 4px 0 #fff; } }
+    @keyframes ns-flame { 0%, 100% { text-shadow: 0 2px 0 #ffd34e, 0 6px 8px #e23b4a; } 50% { text-shadow: 0 -1px 0 #fff6b0, 0 9px 12px #ff6a00; } }
+    .ns-box, .snd-box { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+    .ns-preview { min-height: 92px; display: grid; place-items: center; padding: 14px 12px; border-radius: 18px; background: linear-gradient(#2a1460, #120824); border: 3px solid #ffe58a; overflow: hidden; }
+    .ns-preview .ns-name { font-size: 2rem; line-height: 1.2; max-width: 100%; overflow-wrap: anywhere; text-align: center; }
+    .ns-sec { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+    .ns-h { margin: 0; font: 900 1rem/1 var(--ui-font); color: #ffe58a; }
+    .ns-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; min-width: 0; }
+    .snd-grid { display: flex; flex-wrap: wrap; gap: 8px; min-width: 0; }
+    .ns-chip { flex: 1 1 6.2rem; min-width: 0; min-height: 56px; padding: 6px; border-radius: 16px; border: 3px solid rgba(255,255,255,.35); background: rgba(255,255,255,.1); color: #fff; font: 800 .95rem/1.15 var(--ui-font); cursor: pointer; }
+    .ns-chip.on { border-color: #7ee07a; background: #143018; }
+    .ns-chip small { display: block; font: 800 .8rem/1.1 var(--ui-font); opacity: .9; }
+    .ns-dot { display: inline-block; width: 22px; height: 22px; margin-right: 6px; border-radius: 50%; border: 2px solid #fff; vertical-align: middle; }
+    .ns-sample { display: inline-block; font: 900 1.15rem/1 var(--ui-font); margin-right: 4px; }
+    .ns-sample.ns-e-glow { color: #ffe14a; }
+    .ns-sample.ns-e-flames { color: #ffb020; }
+    .ns-sample.ns-e-sparkles { color: #fff; }
+    .snd-card { flex: 1 1 9rem; min-width: 0; display: flex; flex-direction: column; gap: 6px; padding: 10px; border-radius: 16px; border: 3px solid rgba(255,255,255,.3); background: rgba(255,255,255,.08); color: #fff; }
+    .snd-card.on { border-color: #7ee07a; }
+    .snd-card b { font: 900 1rem/1.2 var(--ui-font); }
+    .snd-card small { font: 700 .8rem/1.2 var(--ui-font); opacity: .85; }
+    .snd-hear, .snd-get { min-height: 44px; border-radius: 12px; border: 0; font: 800 .95rem/1 var(--ui-font); cursor: pointer; }
+    .snd-hear { background: rgba(255,255,255,.16); color: #fff; }
+    .snd-get { background: linear-gradient(#ffe066, #ffc21a); color: #3a2400; }
+    .snd-card.on .snd-get { background: #7ee07a; }
+    @media (prefers-reduced-motion: reduce) {
+      .ns-e-glow, .ns-e-rainbow, .ns-e-sparkles, .ns-e-flames { animation: none; }
+      .ns-e-glow { text-shadow: 0 0 8px currentColor; }
+      .ns-e-sparkles { text-shadow: 6px -4px 0 #ffe14a; }
+      .ns-e-flames { text-shadow: 0 4px 8px #e23b4a; }
     }
     .shp-chip { align-self: flex-start; min-height: 42px; padding: 0 1rem; border-radius: 999px; border: 0; background: rgba(255,255,255,.14); color: #fff; font: 800 1rem/1 var(--ui-font); }
     .shp-packs { display: grid; gap: 12px; }
@@ -7873,28 +7914,80 @@
     }
 
     function say(text) { document.getElementById("live").textContent = text; }
+    let sndAnimal = 0;
+    function sndReady() {
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      if (!Ctx) return false;
+      audioCtx = audioCtx || new Ctx();
+      audioCtx.resume().catch(function () {});
+      return true;
+    }
+    function sndTone(freq, type, t, dur, peak, slide) {
+      const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+      o.type = type || "sine";
+      o.frequency.setValueAtTime(Math.max(40, freq), t);
+      if (slide) o.frequency.exponentialRampToValueAtTime(Math.max(40, slide), t + dur);
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(peak, t + Math.min(0.02, dur * 0.25));
+      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      o.connect(g); g.connect(audioCtx.destination);
+      o.start(t); o.stop(t + dur + 0.02);
+    }
+    function sndNoise(t, dur, peak, freq) {
+      const rate = audioCtx.sampleRate, n = Math.max(1, Math.floor(rate * dur));
+      const buf = audioCtx.createBuffer(1, n, rate), data = buf.getChannelData(0);
+      for (let i = 0; i < n; i++) data[i] = Math.random() * 2 - 1;
+      const src = audioCtx.createBufferSource();
+      src.buffer = buf;
+      const f = audioCtx.createBiquadFilter();
+      f.type = "bandpass"; f.frequency.value = freq || 700; f.Q.value = 0.7;
+      const g = audioCtx.createGain();
+      g.gain.setValueAtTime(peak, t);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      src.connect(f); f.connect(g); g.connect(audioCtx.destination);
+      src.start(t); src.stop(t + dur + 0.01);
+    }
+    function sndDefault(ok) {
+      const now = audioCtx.currentTime;
+      (ok ? [523, 784] : [196]).forEach(function (freq, i) { sndTone(freq, ok ? "sine" : "triangle", now + i * 0.07, 0.16, 0.05); });
+    }
+    function sndPlay(pack, ok) {
+      const now = audioCtx.currentTime, g = ok ? 1 : 0.42;
+      if (pack === "drum") {
+        sndTone(ok ? 150 : 90, "sine", now, 0.12, 0.08 * g, ok ? 55 : 48);
+        sndNoise(now, 0.05, 0.055 * g, ok ? 200 : 110);
+      } else if (pack === "laser") {
+        sndTone(ok ? 920 : 380, "sawtooth", now, ok ? 0.15 : 0.1, 0.03 * g, ok ? 160 : 80);
+      } else if (pack === "animals") {
+        const which = sndAnimal % 3;
+        if (ok) sndAnimal++;
+        if (which === 0) { sndNoise(now, 0.05, 0.06 * g, 520); sndTone(210, "sine", now, 0.06, 0.045 * g); sndNoise(now + 0.08, 0.055, 0.05 * g, 400); }
+        else if (which === 1) sndTone(ok ? 740 : 460, "sine", now, 0.2, 0.04 * g, ok ? 340 : 230);
+        else { sndTone(ok ? 520 : 300, "triangle", now, 0.06, 0.045 * g); sndTone(ok ? 440 : 260, "triangle", now + 0.08, 0.055, 0.035 * g); }
+      } else if (pack === "coin") {
+        sndTone(ok ? 988 : 370, "square", now, 0.08, 0.028 * g);
+        if (ok) sndTone(1319, "square", now + 0.08, 0.12, 0.028);
+      } else if (pack === "magic") {
+        (ok ? [523, 659, 784, 1046] : [349, 440]).forEach(function (f, i) { sndTone(f, "sine", now + i * 0.07, 0.26, 0.035 * g); });
+      } else if (pack === "uke") {
+        sndNoise(now, 0.02, 0.025 * g, 1400);
+        (ok ? [262, 330, 392] : [196]).forEach(function (f) { sndTone(f, "triangle", now, 0.2, 0.032 * g); sndTone(f * 2, "sine", now, 0.1, 0.012 * g); });
+      } else sndDefault(ok);
+    }
+    function sndHear(pack) {
+      if (state.muted) { say("Sounds are muted. Unmute to hear them."); return; }
+      try {
+        if (!sndReady()) return;
+        if (pack === "animals") { sndAnimal = 0; [0, 1, 2].forEach(function (i) { setTimeout(function () { if (!state.muted) { try { sndPlay("animals", true); } catch (e) {} } }, i * 340); }); return; }
+        if (pack) sndPlay(pack, true); else sndDefault(true);
+      } catch (e) {}
+    }
     function playTone(ok) {
       if (state.muted) return;
       try {
-        const Ctx = window.AudioContext || window.webkitAudioContext;
-        if (!Ctx) return;
-        audioCtx = audioCtx || new Ctx();
-        audioCtx.resume().catch(function () {});
-        const now = audioCtx.currentTime;
-        (ok ? [523, 784] : [196]).forEach(function (freq, i) {
-          const osc = audioCtx.createOscillator();
-          const gain = audioCtx.createGain();
-          osc.type = ok ? "sine" : "triangle";
-          osc.frequency.value = freq;
-          const start = now + i * 0.07;
-          gain.gain.setValueAtTime(0.0001, start);
-          gain.gain.exponentialRampToValueAtTime(0.05, start + 0.02);
-          gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.16);
-          osc.connect(gain);
-          gain.connect(audioCtx.destination);
-          osc.start(start);
-          osc.stop(start + 0.18);
-        });
+        if (!sndReady()) return;
+        const pack = (typeof avatar !== "undefined" && avatar && avatar.snd && avatar.snd.on) || "";
+        if (pack) sndPlay(pack, !!ok); else sndDefault(!!ok);
       } catch (_) {}
     }
     const HOME_MUSIC_VOLUME = 0.55;
@@ -9917,15 +10010,30 @@
       if (h === undefined) { try { h = avatarSVG(a, { size: 30 }); } catch (e) { h = ""; } if (lbAvCache.size > 300) lbAvCache.clear(); lbAvCache.set(k, h); }
       return h;
     }
+    function nsLook(ns) {
+      ns = nsClean(ns);
+      const col = NS_COLORS.find(function (c) { return c.id === ns.c; });
+      return { cls: "ns-name" + (ns.f ? " ns-f-" + ns.f : "") + (ns.e ? " ns-e-" + ns.e : ""), color: col && ns.e !== "rainbow" ? col.hex : "" };
+    }
+    function nsNameHTML(name, ns) {
+      const look = nsLook(ns);
+      return '<span class="' + look.cls + '"' + (look.color ? ' style="color:' + look.color + '"' : "") + ">" + lbEsc(name) + "</span>";
+    }
+    function nsPaint(node, ns) {
+      const look = nsLook(ns);
+      node.className = look.cls;
+      node.style.color = look.color;
+    }
     function lbRowsInto(list, items, me) {
       const medals = ["\uD83E\uDD47", "\uD83E\uDD48", "\uD83E\uDD49"], avs = (lb.board && lb.board.avatars) || {}, my = me ? String(me.name).toLowerCase() : null;
       let html = "";
       items.forEach(function (it, i) {
         const mine = my !== null && String(it.name).toLowerCase() === my;
+        const src = mine ? avatar : avs[it.name];
         const cls = "lb-row" + (mine ? " me" : "") + (i < 3 ? " top" + (i + 1) : "") + (lbChanged(it.key, it.val) ? " lb-bump" : "");
         html += '<li class="' + cls + '" data-n="' + lbEsc(it.key) + '"><span class="lb-rank">' + (i < 3 ? medals[i] : String(i + 1)) +
           '</span><span class="lb-name"><span class="av lb-av">' + lbAvHTML(mine ? avatar : avs[it.name] || { color: "#c9c9d6" }) +
-          '</span><span>' + lbEsc(it.name) + '</span></span><span class="lb-streak">' + lbEsc(it.val) + '</span></li>';
+          "</span>" + nsNameHTML(it.name, src && src.ns) + '</span><span class="lb-streak">' + lbEsc(it.val) + "</span></li>";
       });
       if (html) list.insertAdjacentHTML("beforeend", html);
     }
@@ -10084,10 +10192,15 @@
     function siBar() {
       if (!LEADERBOARD_URL) return null;
       const me = lbMe();
-      if (me) return el("div", { class: "si-bar" }, [
-        el("span", { class: "si-hi" }, [(function () { const a = classArt(me.cls || "A", ""); a.setAttribute("aria-hidden", "true"); return a; })(), petMini(), document.createTextNode("Hi, " + me.name + "!"), el("span", { class: "si-cls-tag", text: lbClassName(me.cls || "A") })]),
+      if (me) {
+        const hiName = el("span");
+        nsPaint(hiName, avatar.ns);
+        hiName.textContent = me.name;
+        return el("div", { class: "si-bar" }, [
+        el("span", { class: "si-hi" }, [(function () { const a = classArt(me.cls || "A", ""); a.setAttribute("aria-hidden", "true"); return a; })(), petMini(), document.createTextNode("Hi, "), hiName, document.createTextNode("!"), el("span", { class: "si-cls-tag", text: lbClassName(me.cls || "A") })]),
         el("button", { type: "button", class: "si-out", text: "Not you?", onClick: siAskOut })
       ]);
+      }
       return el("div", { class: "si-bar" }, [
         el("button", { type: "button", class: "si-in", onClick: siOpen }, [el("span", { class: "si-in-ico", "aria-hidden": "true", text: "\uD83D\uDC64" }), el("span", { text: "Sign in" }), el("span", { class: "si-in-sub", text: "save your points" })])
       ]);
@@ -10109,8 +10222,11 @@
           el("button", { type: "button", class: "lb-go", text: "\uD83D\uDC64 Sign in", onClick: siOpen })
         ]));
       } else {
+        const youName = el("strong");
+        nsPaint(youName, avatar.ns);
+        youName.textContent = me.name;
         card.appendChild(el("p", { class: "lb-me" }, [
-          petMini(), document.createTextNode("You are "), el("strong", { text: me.name }), document.createTextNode(" "),
+          petMini(), document.createTextNode("You are "), youName, document.createTextNode(" "),
           el("button", { type: "button", class: "lb-change", text: "Not you?", onClick: siAskOut })
         ]));
       }
@@ -10870,6 +10986,52 @@
       const h = Math.round(size * 230 / 200);
       return '<svg class="pet-svg" viewBox="0 0 200 230" width="' + size + '" height="' + h + '" aria-hidden="true">' + petHoist(raw) + z + "</svg>";
     }
+    const NS_COLORS = [
+      { id: "red", name: "Red", hex: "#ff5a6a", cost: 2 }, { id: "blue", name: "Blue", hex: "#8ec5ff", cost: 2 },
+      { id: "gold", name: "Gold", hex: "#ffe14a", cost: 2 }, { id: "purple", name: "Purple", hex: "#d2a6ff", cost: 2 },
+      { id: "green", name: "Green", hex: "#7dff9a", cost: 2 }, { id: "pink", name: "Pink", hex: "#ff9ec8", cost: 2 }
+    ];
+    const NS_FONTS = [
+      { id: "bubble", name: "Bubble", cost: 3 }, { id: "comic", name: "Comic", cost: 3 },
+      { id: "pixel", name: "Pixel", cost: 3 }, { id: "script", name: "Fancy script", cost: 3 }
+    ];
+    const NS_EFFECTS = [
+      { id: "glow", name: "Glow", cost: 5 }, { id: "rainbow", name: "Rainbow shimmer", cost: 5 },
+      { id: "sparkles", name: "Sparkles", cost: 5 }, { id: "flames", name: "Flames", cost: 5 }
+    ];
+    const SND_PACKS = [
+      { id: "drum", name: "Drum hit", cost: 3 }, { id: "laser", name: "Laser zap", cost: 3 },
+      { id: "animals", name: "Animals", cost: 3 }, { id: "coin", name: "Video-game coin", cost: 3 },
+      { id: "magic", name: "Magic chime", cost: 3 }, { id: "uke", name: "Ukulele strum", cost: 3 }
+    ];
+    function nsIds(list, arr) {
+      const out = [];
+      (Array.isArray(arr) ? arr : []).forEach(function (id) { if (list.some(function (x) { return x.id === id; }) && out.indexOf(id) < 0) out.push(id); });
+      return out;
+    }
+    function nsClean(raw) {
+      raw = raw && typeof raw === "object" ? raw : {};
+      const oc = nsIds(NS_COLORS, raw.oc), of = nsIds(NS_FONTS, raw.of), oe = nsIds(NS_EFFECTS, raw.oe);
+      return { oc: oc, of: of, oe: oe, c: oc.indexOf(raw.c) >= 0 ? raw.c : "", f: of.indexOf(raw.f) >= 0 ? raw.f : "", e: oe.indexOf(raw.e) >= 0 ? raw.e : "" };
+    }
+    function nsMerge(a, b, localWins) {
+      a = nsClean(a); b = nsClean(b);
+      const add = function (x, y) { const o = x.slice(); y.forEach(function (id) { if (o.indexOf(id) < 0) o.push(id); }); return o; };
+      const win = localWins ? a : b;
+      return nsClean({ oc: add(a.oc, b.oc), of: add(a.of, b.of), oe: add(a.oe, b.oe), c: win.c, f: win.f, e: win.e });
+    }
+    function sndClean(raw) {
+      raw = raw && typeof raw === "object" ? raw : {};
+      const o = nsIds(SND_PACKS, raw.o);
+      return { o: o, on: o.indexOf(raw.on) >= 0 ? raw.on : "" };
+    }
+    function sndMerge(a, b, localWins) {
+      a = sndClean(a); b = sndClean(b);
+      const o = a.o.slice();
+      b.o.forEach(function (id) { if (o.indexOf(id) < 0) o.push(id); });
+      const win = localWins ? a : b;
+      return sndClean({ o: o, on: win.on });
+    }
     function avClean(a) {
       a = a && typeof a === "object" ? a : {};
       const ok = function (list, v, d) { return list.some(function (x) { return x[0] === v; }) ? v : d; };
@@ -10891,6 +11053,8 @@
         sc: scClean(a.sc),
         ci: ciClean(a.ci),
         pet: petClean(a.pet),
+        ns: nsClean(a.ns),
+        snd: sndClean(a.snd),
         updated: Number(a.updated) || 0 };
     }
     let avatar = (function () { try { return avClean(JSON.parse(localStorage.getItem(AV_KEY) || "null")); } catch (e) { return avClean(null); } })();
@@ -10979,7 +11143,9 @@
           hd: Object.assign({}, base.hd, { o: (avatar.hd.o || []).concat(remote.hd.o || []) }),
           sc: Object.assign({}, base.sc || {}, { o: ((avatar.sc && avatar.sc.o) || []).concat((remote.sc && remote.sc.o) || []) }),
           ci: ciMerge(avatar.ci, remote.ci, localNewer),
-          pet: petMerge(avatar.pet, remote.pet) }));
+          pet: petMerge(avatar.pet, remote.pet),
+          ns: nsMerge(avatar.ns, remote.ns, localNewer),
+          snd: sndMerge(avatar.snd, remote.snd, localNewer) }));
         avatar.updated = upd;
         try { localStorage.setItem(AV_KEY, JSON.stringify(avatar)); } catch (e) {}
         if (JSON.stringify(Object.assign({}, remote, { updated: 0 })) !== JSON.stringify(Object.assign({}, avatar, { updated: 0 }))) avSetPending(true);
@@ -11543,8 +11709,8 @@
         el("button", { type: "button", text: "Set $0", onClick: function () { add(0); } }),
         el("button", { type: "button", class: "sim-reset", text: "Reset purchases", onClick: function () {
           const me = LEADERBOARD_URL ? lbMe() : null;
-          avConfirm("Reset purchases?", "Removes every bought piece, opened pack, Color It picture, and My Pet" + (me ? " for " + me.name + " (also on the TEST sheet)" : " on this device") + ". Coins stay.", function () {
-            avatar.owned = []; avatar.pk = []; avatar.wear = {}; avatar.ci = { o: [], c: {} }; avatar.pet = null; avatar = avClean(avatar); avatar.made = true;
+          avConfirm("Reset purchases?", "Removes every bought piece, opened pack, Color It picture, My Pet, name style, and sound pack" + (me ? " for " + me.name + " (also on the TEST sheet)" : " on this device") + ". Coins stay.", function () {
+            avatar.owned = []; avatar.pk = []; avatar.wear = {}; avatar.ci = { o: [], c: {} }; avatar.pet = null; avatar.ns = null; avatar.snd = null; avatar = avClean(avatar); avatar.made = true;
             avSave(); say("Purchases reset."); redo();
           }, "Yes, reset");
         } })
@@ -11562,7 +11728,8 @@
     // ---- Avatar Shop page: stage + 8 tabs + Shop / My Closet. Buying updates in place (no page jump). ----
     let shopTab = "hat", shopMode = "shop", shopTry = "", shopPack = "", shopBought = [];
     const SHOP_TABS = [["pack", "\u2B50", "Packs"], ["hat", "\uD83C\uDFA9", "Hats"], ["shirt", "\uD83D\uDC55", "Shirts"], ["glasses", "\uD83D\uDD76\uFE0F", "Glasses"],
-      ["shoes", "\uD83D\uDC5F", "Shoes"], ["pet", "\uD83D\uDC36", "Pets"], ["look", "\uD83C\uDFA8", "Looks"], ["hand", "\u270B", "Hand items"], ["color", "\uD83D\uDD8D", "Color It"]];
+      ["shoes", "\uD83D\uDC5F", "Shoes"], ["pet", "\uD83D\uDC36", "Pets"], ["look", "\uD83C\uDFA8", "Looks"], ["hand", "\u270B", "Hand items"], ["color", "\uD83D\uDD8D", "Color It"],
+      ["names", "\u2728", "Name styles"], ["sounds", "\uD83D\uDD0A", "Sound packs"]];
     const SHOP_PACK_BG = { hw: "#ff8a1f,#5b2a8a", bh: "#1fb5a8,#ff8a3d", sp: "#22308a,#6f8cff", sw: "#3550c8,#e8414f", tg: "#a0522d,#f2a65a",
       wz: "#5a1020,#c9a24a", bb: "#e8414f,#ffb703", ft: "#ff7ab8,#6f8cff", jg: "#2f7d3a,#9ccc3a" };
     function shopFind(id) { return avItem(id) || avLook(id); }
@@ -11715,13 +11882,89 @@
         }
         return box;
       }
+      function nsBuy(group, id) {
+        const list = group === "c" ? NS_COLORS : group === "f" ? NS_FONTS : NS_EFFECTS;
+        const ownedKey = group === "c" ? "oc" : group === "f" ? "of" : "oe";
+        if (!id) { avatar.ns[group] = ""; avatar.made = true; avSaveSoon(); say("Regular " + (group === "c" ? "color" : group === "f" ? "letters" : "effect") + "."); paintAll(false); return; }
+        const item = list.find(function (x) { return x.id === id; });
+        if (!item) return;
+        if (avatar.ns[ownedKey].indexOf(id) >= 0) { avatar.ns[group] = id; avatar.made = true; avSaveSoon(); say(item.name + " is on!"); paintAll(false); return; }
+        if (coinGet() < item.cost) { say("You need $" + item.cost + " for " + item.name + ". You have $" + coinGet() + "."); return; }
+        if (!coinSpend(item.cost)) return;
+        avatar.ns[ownedKey].push(id);
+        avatar.ns[group] = id;
+        avatar.made = true; avSaveSoon(); say("You got " + item.name + "!"); paintAll(false);
+      }
+      function nsGroup(title, group, items) {
+        const box = el("div", { class: "ns-sec" });
+        box.appendChild(el("p", { class: "ns-h", text: title }));
+        const row = el("div", { class: "ns-row" });
+        const noneOn = !avatar.ns[group];
+        row.appendChild(el("button", { type: "button", class: "ns-chip" + (noneOn ? " on" : ""), "aria-pressed": String(noneOn), text: "None", onClick: function () { nsBuy(group, ""); } }));
+        const ownedKey = group === "c" ? "oc" : group === "f" ? "of" : "oe";
+        items.forEach(function (item) {
+          const have = avatar.ns[ownedKey].indexOf(item.id) >= 0, on = avatar.ns[group] === item.id;
+          const btn = el("button", { type: "button", class: "ns-chip" + (on ? " on" : "") + (group === "f" ? " ns-f-" + item.id : ""), "aria-pressed": String(on), "aria-label": item.name + (on ? ", on" : have ? ", yours" : ", $" + item.cost), onClick: function () { nsBuy(group, item.id); } });
+          if (group === "c") btn.appendChild(el("i", { class: "ns-dot", style: "background:" + item.hex, "aria-hidden": "true" }));
+          if (group === "e") btn.appendChild(el("b", { class: "ns-sample ns-e-" + item.id, text: "Aa", "aria-hidden": "true" }));
+          btn.appendChild(el("span", { text: item.name }));
+          btn.appendChild(el("small", { text: on ? "On" : have ? "Use" : "$" + item.cost }));
+          row.appendChild(btn);
+        });
+        box.appendChild(row);
+        return box;
+      }
+      function nsPanel() {
+        const box = el("div", { class: "ns-box" });
+        const who = (LEADERBOARD_URL && lbMe()) ? lbMe().name : "Your Name";
+        const prev = el("div", { class: "ns-preview" });
+        const sample = el("span");
+        nsPaint(sample, avatar.ns);
+        sample.textContent = who;
+        prev.appendChild(sample);
+        box.appendChild(prev);
+        box.appendChild(el("p", { class: "ci-hint", text: "This is how your name looks on the leaderboard and when you are signed in. One color, one font, and one effect." }));
+        box.appendChild(nsGroup("Colors \u00B7 $2", "c", NS_COLORS));
+        box.appendChild(nsGroup("Fonts \u00B7 $3", "f", NS_FONTS));
+        box.appendChild(nsGroup("Effects \u00B7 $5", "e", NS_EFFECTS));
+        return box;
+      }
+      function sndBuy(id) {
+        if (!id) { avatar.snd.on = ""; avatar.made = true; avSaveSoon(); say("Default sound is on."); paintAll(false); return; }
+        const item = SND_PACKS.find(function (x) { return x.id === id; });
+        if (!item) return;
+        if (avatar.snd.o.indexOf(id) >= 0) { avatar.snd.on = id; avatar.made = true; avSaveSoon(); say(item.name + " is on!"); paintAll(false); return; }
+        if (coinGet() < item.cost) { say("You need $" + item.cost + " for " + item.name + ". You have $" + coinGet() + "."); return; }
+        if (!coinSpend(item.cost)) return;
+        avatar.snd.o.push(id);
+        avatar.snd.on = id;
+        avatar.made = true; avSaveSoon(); say("You got " + item.name + "!"); paintAll(false);
+      }
+      function sndPanel() {
+        const box = el("div", { class: "snd-box" });
+        box.appendChild(el("p", { class: "ns-h", text: "Answer sounds" }));
+        box.appendChild(el("p", { class: "ci-hint", text: "Changes the sound when you get a fact right. A wrong answer is a softer version. Only you hear it." }));
+        const grid = el("div", { class: "snd-grid" });
+        [{ id: "", name: "Default" }].concat(SND_PACKS).forEach(function (item) {
+          const on = (avatar.snd.on || "") === item.id, have = !item.id || avatar.snd.o.indexOf(item.id) >= 0;
+          const card = el("div", { class: "snd-card" + (on ? " on" : "") });
+          card.appendChild(el("b", { text: item.name }));
+          if (item.id === "animals") card.appendChild(el("small", { text: "Bark, meow, quack" }));
+          card.appendChild(el("button", { type: "button", class: "snd-hear", text: "Hear it", "aria-label": "Hear " + item.name, onClick: function () { sndHear(item.id); } }));
+          card.appendChild(el("button", { type: "button", class: "snd-get", "aria-label": item.name + (on ? ", on" : have ? ", yours" : ", $" + item.cost), text: on ? "On" : have ? "Use" : "$" + item.cost, onClick: function () { sndBuy(item.id); } }));
+          grid.appendChild(card);
+        });
+        box.appendChild(grid);
+        return box;
+      }
       const paintHero = function (bounce) {
         hero.innerHTML = "";
         hero.appendChild(hdOn() ? hdNode(avatar.hd, wide ? 330 : 250) : avNode(shopLook(shopTry ? shopFind(shopTry) : null), wide ? 300 : 230));
-        modeBtn.hidden = avatar.pk.indexOf("hd") < 0 || shopTab === "color";
+        const shopFull = shopTab === "color" || shopTab === "names" || shopTab === "sounds";
+        modeBtn.hidden = avatar.pk.indexOf("hd") < 0 || shopFull;
         modeBtn.textContent = hdOn() ? "\u21BA Classic avatar" : "\u2728 HD avatar";
         stage.classList.toggle("hd", hdOn());
-        card.classList.toggle("ci-on", shopTab === "color");
+        card.classList.toggle("ci-on", shopFull);
         if (bounce) { hero.classList.remove("bounce"); void hero.offsetWidth; hero.classList.add("bounce"); }
       };
       const packOpen = function (k, btn) {
@@ -11802,6 +12045,8 @@
         body.innerHTML = ""; seg.innerHTML = "";
         if (me && avLoading && avLoadedFor !== me.name) { body.appendChild(el("p", { class: "av-loading", text: "Loading your stuff\u2026" })); return; }
         if (shopTab === "color") { seg.setAttribute("hidden", ""); body.appendChild(ciPanel()); return; }
+        if (shopTab === "names") { seg.setAttribute("hidden", ""); body.appendChild(nsPanel()); return; }
+        if (shopTab === "sounds") { seg.setAttribute("hidden", ""); body.appendChild(sndPanel()); return; }
         if (shopTab === "pack") {
           seg.setAttribute("hidden", "");
           if (shopPack) {
