@@ -3555,6 +3555,8 @@
     .pet-egg .pet-art { width: 92px; height: auto; display: block; position: relative; }
     .pet-egg .pet-art img { display: block; width: 100%; height: auto; }
     .pet-egg small { font: 900 .95rem/1 var(--ui-font); }
+    .pet-egg.mine { border-color: #b8f0a8; }
+    .pet-egg.now { border-color: #ffe14a; background: rgba(255,255,255,.22); box-shadow: inset 0 0 0 2px rgba(255,225,74,.9); }
     .pet-room { position: relative; z-index: 1; height: 300px; border-radius: 22px; overflow: hidden; isolation: isolate; background: radial-gradient(120% 70% at 50% 0%, rgba(255,255,255,.55), transparent 42%), linear-gradient(#8ec8ff 0%, #d7f0ff 28%, #ffe7c4 62%, #f3d2a4 78%); box-shadow: inset 0 0 50px rgba(80,40,90,.18), inset 0 -30px 40px rgba(90,40,10,.12); touch-action: none; }
     .pet-room::before { content: ""; position: absolute; left: 8%; top: -10%; width: 46%; height: 70%; background: linear-gradient(180deg, rgba(255,244,200,.55), transparent 80%); clip-path: polygon(38% 0, 62% 0, 100% 100%, 0 100%); pointer-events: none; z-index: 0; }
     .pet-room::after { content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 4; background: radial-gradient(120% 90% at 50% 40%, transparent 55%, rgba(40,16,60,.28) 100%); }
@@ -10960,6 +10962,28 @@
       const other = win === a ? b : a;
       return petClean({ kind: win.kind, sp: Math.max(a.sp, b.sp), joy: a.joyAt >= b.joyAt ? a.joy : b.joy, joyAt: Math.max(a.joyAt, b.joyAt), name: win.name || other.name, room: win.room.concat(other.room) });
     }
+    function petListClean(list, current) {
+      const by = {};
+      (Array.isArray(list) ? list : []).concat(current ? [current] : []).forEach(function (p) {
+        p = petClean(p);
+        if (!p.kind) return;
+        by[p.kind] = by[p.kind] ? petMerge(by[p.kind], p) : p;
+      });
+      return PETS.map(function (k) { return by[k.id]; }).filter(Boolean);
+    }
+    function petAllMerge(aPets, bPets, aPet, bPet, localNewer) {
+      const pets = petListClean([].concat(aPets || [], bPets || [], [aPet], [bPet]));
+      const prefer = petClean(localNewer ? aPet : bPet);
+      const pet = (prefer.kind && pets.filter(function (p) { return p.kind === prefer.kind; })[0]) || pets[0] || petClean(null);
+      return { pets: pets, pet: pet };
+    }
+    function petRemember() {
+      avatar.pets = petListClean(avatar.pets, avatar.pet);
+      if (avatar.pet && avatar.pet.kind) {
+        const cur = avatar.pets.filter(function (p) { return p.kind === avatar.pet.kind; })[0];
+        if (cur) avatar.pet = cur;
+      }
+    }
     const PET_STAGE_FILES = ["egg", "baby", "kid", "teen", "grown-up"];
     const petImgCache = {};
     function petImgSrc(kind, stage) {
@@ -11069,7 +11093,12 @@
         hd: hdClean(a.hd, Array.isArray(a.pk) && a.pk.indexOf("hd") >= 0),
         sc: scClean(a.sc),
         ci: ciClean(a.ci),
-        pet: petClean(a.pet),
+        pets: petListClean(a.pets, a.pet),
+        pet: (function () {
+          const pets = petListClean(a.pets, a.pet);
+          const want = petKind(a.pet && a.pet.kind) ? a.pet.kind : (pets[0] ? pets[0].kind : "");
+          return want ? (pets.filter(function (p) { return p.kind === want; })[0] || petClean(a.pet)) : petClean(null);
+        })(),
         ns: nsClean(a.ns),
         snd: sndClean(a.snd),
         updated: Number(a.updated) || 0 };
@@ -11160,9 +11189,8 @@
           hd: Object.assign({}, base.hd, { o: (avatar.hd.o || []).concat(remote.hd.o || []) }),
           sc: Object.assign({}, base.sc || {}, { o: ((avatar.sc && avatar.sc.o) || []).concat((remote.sc && remote.sc.o) || []) }),
           ci: ciMerge(avatar.ci, remote.ci, localNewer),
-          pet: petMerge(avatar.pet, remote.pet),
           ns: nsMerge(avatar.ns, remote.ns, localNewer),
-          snd: sndMerge(avatar.snd, remote.snd, localNewer) }));
+          snd: sndMerge(avatar.snd, remote.snd, localNewer) }, petAllMerge(avatar.pets, remote.pets, avatar.pet, remote.pet, localNewer)));
         avatar.updated = upd;
         try { localStorage.setItem(AV_KEY, JSON.stringify(avatar)); } catch (e) {}
         if (JSON.stringify(Object.assign({}, remote, { updated: 0 })) !== JSON.stringify(Object.assign({}, avatar, { updated: 0 }))) avSetPending(true);
@@ -11727,7 +11755,7 @@
         el("button", { type: "button", class: "sim-reset", text: "Reset purchases", onClick: function () {
           const me = LEADERBOARD_URL ? lbMe() : null;
           avConfirm("Reset purchases?", "Removes every bought piece, opened pack, Color It picture, My Pet, name style, and sound pack" + (me ? " for " + me.name + " (also on the TEST sheet)" : " on this device") + ". Coins stay.", function () {
-            avatar.owned = []; avatar.pk = []; avatar.wear = {}; avatar.ci = { o: [], c: {} }; avatar.pet = null; avatar.ns = null; avatar.snd = null; avatar = avClean(avatar); avatar.made = true;
+            avatar.owned = []; avatar.pk = []; avatar.wear = {}; avatar.ci = { o: [], c: {} }; avatar.pet = null; avatar.pets = []; avatar.ns = null; avatar.snd = null; avatar = avClean(avatar); avatar.made = true;
             avSave(); say("Purchases reset."); redo();
           }, "Yes, reset");
         } })
@@ -12192,7 +12220,11 @@
     function petChoose(kind) {
       const info = petKind(kind);
       if (!info) return;
-      avatar.pet.kind = kind;
+      petRemember();
+      const owned = (avatar.pets || []).filter(function (p) { return p.kind === kind; })[0];
+      if (owned) { petSwitch(kind); return; }
+      avatar.pet = petClean({ kind: kind, sp: 0, joy: 80, joyAt: Date.now() });
+      petRemember();
       avatar.made = true;
       petPicking = false;
       avSaveSoon();
@@ -12200,11 +12232,27 @@
       say("You picked a " + info.name.toLowerCase() + " egg!");
       render();
     }
+    function petSwitch(kind) {
+      const info = petKind(kind);
+      if (!info) return;
+      petRemember();
+      const owned = (avatar.pets || []).filter(function (p) { return p.kind === kind; })[0];
+      if (!owned) return;
+      avatar.pet = petClean(owned);
+      avatar.made = true;
+      petPicking = false;
+      petNaming = false;
+      avSaveSoon();
+      petSound("chirp");
+      say(owned.name ? "Hi, " + owned.name + "!" : "Your " + info.name.toLowerCase() + "!");
+      render();
+    }
     function petSaveName(raw) {
       const name = String(raw || "").replace(/\s+/g, " ").trim().slice(0, 12);
       if (!name || !/[a-z]/i.test(name)) { say("Type a name for your pet."); return; }
       if (petBad(name)) { say("Pick a kinder name for class."); return; }
       avatar.pet.name = name;
+      petRemember();
       avatar.made = true;
       petNaming = false;
       avSaveSoon();
@@ -12212,8 +12260,21 @@
       render();
     }
     let petDragged = false, petBall = null, petHelloAt = 0, petChompUntil = 0;
+    function petBack() {
+      petDragged = false;
+      const ghost = document.getElementById("pet-ghost"); if (ghost) ghost.remove();
+      if (petPicking || !avatar.pet || !avatar.pet.kind) {
+        petPicking = false;
+        petGoHome();
+        return;
+      }
+      petPicking = true;
+      petRemember();
+      render();
+    }
     function petGoHome() {
       petDragged = false;
+      petPicking = false;
       const ghost = document.getElementById("pet-ghost"); if (ghost) ghost.remove();
       if (location.hash !== "#menu") location.hash = "#menu";
       // iOS sometimes drops hashchange when the same tap also starts audio. Paint home anyway.
@@ -12245,6 +12306,7 @@
     function petJoy(n) {
       avatar.pet.joy = Math.min(100, avatar.pet.joy + n);
       avatar.pet.joyAt = Date.now();
+      petRemember();
       avatar.made = true;
       avSaveSoon();
       const bar = document.querySelector(".pet-heart span");
@@ -12260,6 +12322,7 @@
       avatar.pet.joy = Math.min(100, avatar.pet.joy + spec[2]);
       avatar.pet.joyAt = Date.now();
       const after = petStage(avatar.pet.sp);
+      petRemember();
       avatar.made = true;
       avSaveSoon();
       petSound(spec[1] ? "munch" : "chirp");
@@ -12293,7 +12356,7 @@
         if (!moved) return;
         petDragged = true;
         const hit = document.elementFromPoint(ev.clientX, ev.clientY);
-        if (hit && hit.closest && hit.closest(".pet-back")) { petGoHome(); return; }
+        if (hit && hit.closest && hit.closest(".pet-back")) { petBack(); return; }
         if (hit && hit.closest && hit.closest(".pet-room")) petCare(type);
       }
       btn.addEventListener("pointerdown", function (ev) {
@@ -12310,6 +12373,7 @@
       if (coinGet() < item[2]) { say("You need $" + item[2] + " for the " + item[1].toLowerCase() + ". You have $" + coinGet() + "."); return; }
       if (!coinSpend(item[2])) return;
       avatar.pet.room.push(id);
+      petRemember();
       avatar.made = true;
       avSaveSoon();
       petSound("chirp");
@@ -12320,29 +12384,36 @@
       let storedPet = null;
       try { const raw = JSON.parse(localStorage.getItem(AV_KEY) || "null"); storedPet = raw && raw.pet ? raw.pet : null; } catch (e) {}
       avatar.pet = petClean(avatar.pet);
+      petRemember();
       if (avatar.pet.kind && storedPet && (storedPet.sp == null || storedPet.g != null || storedPet.joy !== avatar.pet.joy)) avSaveSoon();
       const card = el("div", { class: "card pet-card" });
       const coins = el("p", { class: "coin-bank shp-coins", "data-short": "1", role: "status", "aria-label": coinGet() + " coins" }, [el("span", { class: "coin-ico", "aria-hidden": "true", text: "$" }), el("span", { text: String(coinGet()) })]);
       card.appendChild(el("div", { class: "pet-bar" }, [
-        el("button", { type: "button", class: "pet-back", text: "\u2039 Back", onClick: function (ev) { if (ev) ev.stopPropagation(); petGoHome(); } }),
+        el("button", { type: "button", class: "pet-back", text: "\u2039 Back", onClick: function (ev) { if (ev) ev.stopPropagation(); petBack(); } }),
         el("span", { class: "pet-ttl", text: "My Pet" }),
         coins
       ]));
       const pet = avatar.pet;
       const showEggs = !pet.kind || petPicking;
-      if (showEggs) petPreload(null); else petPreload(pet);
       if (showEggs) {
-        card.appendChild(el("p", { class: "pet-stage", text: "Pick an egg. Every egg is free." }));
+        petPreload(null);
+        (avatar.pets || []).forEach(function (p) { petPreload(p); });
+      } else petPreload(pet);
+      if (showEggs) {
+        const have = avatar.pets || [];
+        card.appendChild(el("p", { class: "pet-stage", text: have.length ? "Tap a pet to play with it, or pick a new egg. Every new egg is free." : "Pick an egg. Every egg is free." }));
         const grid = el("div", { class: "pet-eggs" });
         PETS.forEach(function (k) {
-          const btn = el("button", { type: "button", class: "pet-egg", "aria-label": k.name + " egg, free", onClick: function () { petChoose(k.id); } });
-          btn.innerHTML = petSVG({ kind: k.id, sp: 0, joy: 80 }, 92);
-          btn.appendChild(el("span", { text: k.name }));
-          btn.appendChild(el("small", { text: "Free" }));
+          const owned = have.filter(function (p) { return p.kind === k.id; })[0];
+          const now = !!(owned && pet.kind === k.id);
+          const label = owned ? ((owned.name || k.name) + (now ? ", in the room" : ", " + PET_STAGES[petStage(owned.sp)].name)) : k.name + " egg, free";
+          const btn = el("button", { type: "button", class: "pet-egg" + (owned ? " mine" : "") + (now ? " now" : ""), "aria-label": label, onClick: function () { if (owned) petSwitch(k.id); else petChoose(k.id); } });
+          btn.innerHTML = petSVG(owned || { kind: k.id, sp: 0, joy: 80 }, 92);
+          btn.appendChild(el("span", { text: owned && owned.name ? owned.name : k.name }));
+          btn.appendChild(el("small", { text: now ? "In the room" : owned ? PET_STAGES[petStage(owned.sp)].name : "Free" }));
           grid.appendChild(btn);
         });
         card.appendChild(grid);
-        if (pet.kind) card.appendChild(el("button", { type: "button", class: "pet-rename", text: "Back to my egg", onClick: function () { petPicking = false; render(); } }));
       } else {
         const stage = petStage(pet.sp);
         const next = PET_STAGES[stage + 1];
@@ -12452,7 +12523,6 @@
         } else if (stage > 0) {
           card.appendChild(el("button", { type: "button", class: "pet-rename", text: "Rename", onClick: function () { petNaming = true; render(); } }));
         }
-        if (stage === 0) card.appendChild(el("button", { type: "button", class: "pet-swap", text: "Pick a different egg", onClick: function () { petPicking = true; render(); } }));
       }
       if (SIM_ON) card.appendChild(simBar());
       return card;
