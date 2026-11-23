@@ -3554,11 +3554,49 @@
     .pet-egg { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 0; min-height: 148px; padding: 10px 8px 12px; border-radius: 18px; border: 3px solid #ffe58a; background: rgba(255,255,255,.1); color: #fff; font: 800 1.05rem/1.15 var(--ui-font); cursor: pointer; }
     .pet-egg svg { width: 92px; height: auto; }
     .pet-egg small { font: 900 .95rem/1 var(--ui-font); }
-    .pet-view { position: relative; display: grid; place-items: end center; min-height: 230px; border-radius: 22px; background: radial-gradient(60% 70% at 50% 100%, rgba(255,240,180,.35), transparent 70%), rgba(255,255,255,.08); overflow: hidden; }
-    .pet-fig { border: 0; background: transparent; padding: 8px 8px 0; cursor: pointer; }
-    .pet-fig svg { display: block; width: var(--pw, 160px); height: auto; }
+    .pet-room { position: relative; height: 300px; border-radius: 22px; overflow: hidden; background: linear-gradient(#9fd8ff, #ffe7c2 62%, #f3d2a4); box-shadow: inset 0 0 40px rgba(255,255,255,.35); touch-action: none; }
+    .pet-sun { position: absolute; left: 18%; top: 10%; width: 54px; height: 54px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #fff, #ffe14a 45%, #ffb020); box-shadow: 0 0 28px #ffe14a; }
+    .pet-win { position: absolute; right: 8%; top: 8%; width: 34%; height: 42%; border-radius: 12px; background: linear-gradient(#c9ecff, #7eb6e8); border: 6px solid #fff6e4; box-shadow: inset 0 0 0 3px #e0b48a, 0 8px 16px rgba(80,40,20,.18); }
+    .pet-win::before, .pet-win::after { content: ""; position: absolute; background: rgba(255,255,255,.75); }
+    .pet-win::before { left: 50%; top: 0; bottom: 0; width: 5px; margin-left: -2px; }
+    .pet-win::after { top: 50%; left: 0; right: 0; height: 5px; margin-top: -2px; }
+    .pet-floor { position: absolute; left: 0; right: 0; bottom: 0; height: 38%; background: linear-gradient(#e7b98a, #c9895a); }
+    .pet-rug { position: absolute; left: 12%; right: 12%; bottom: 8%; height: 22%; border-radius: 50%; background: radial-gradient(circle at 50% 50%, #ff8a9a, #d23b5a 70%); box-shadow: inset 0 0 0 8px #ffe08a; }
+    .pet-bed { position: absolute; left: 4%; bottom: 8%; width: 28%; height: 20%; border-radius: 16px 16px 10px 10px; background: linear-gradient(#fff, #d9e6ff); border: 3px solid #8aa4d4; }
+    .pet-bed::after { content: ""; position: absolute; left: 8%; top: 16%; width: 38%; height: 42%; border-radius: 8px; background: #ffb3c7; }
+    .pet-toys { position: absolute; right: 6%; bottom: 14%; width: 28%; height: 24%; }
+    .pet-toys i { position: absolute; display: block; border-radius: 50%; }
+    .pet-toys i:nth-child(1) { width: 28px; height: 28px; left: 0; bottom: 0; background: radial-gradient(circle at 35% 35%, #fff, #5b8cff); }
+    .pet-toys i:nth-child(2) { width: 22px; height: 22px; right: 0; bottom: 4px; background: radial-gradient(circle at 35% 35%, #fff, #ff5a7a); }
+    .pet-toys i:nth-child(3) { width: 0; height: 0; left: 30%; bottom: 18px; border-left: 12px solid transparent; border-right: 12px solid transparent; border-bottom: 20px solid #7ee07a; }
+    .pet-ball { position: absolute; bottom: 18%; width: 28px; height: 28px; margin-left: -14px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #fff, #ff5a3c 60%, #c42020); box-shadow: 0 4px 0 rgba(0,0,0,.15); }
+    .pet-fig { position: absolute; left: 50%; bottom: 10%; transform: translateX(-50%); border: 0; background: transparent; padding: 0; cursor: pointer; z-index: 2; }
+    .pet-fig svg { display: block; width: var(--pw, 168px); height: auto; filter: drop-shadow(0 8px 6px rgba(80,40,10,.25)); }
+    .pet-eye { transform-box: fill-box; transform-origin: center; animation: pet-blink 4.4s infinite; }
+    .pet-cheek { transform-box: fill-box; transform-origin: center; opacity: .35; transition: transform .15s ease, opacity .15s ease; }
+    .pet-fig.chomp .pet-cheek { opacity: 1; transform: scale(1.7); }
+    .pet-zzz { animation: pet-zzz 1.8s ease-in-out infinite; }
+    .pet-float { position: absolute; left: 46%; top: 42%; z-index: 4; font-size: 1.35rem; pointer-events: none; animation: pet-float .85s ease-out both; }
+    @keyframes pet-blink { 0%, 90%, 100% { transform: scaleY(1); } 94%, 97% { transform: scaleY(.12); } }
+    @keyframes pet-zzz { 0%, 100% { opacity: .35; } 50% { opacity: 1; } }
+    @keyframes pet-float { 0% { transform: translate(0, 8px) scale(.6); opacity: 0; } 25% { opacity: 1; } 100% { transform: translate(var(--x), var(--y)) scale(1.1); opacity: 0; } }
+    .pet-fig.wander { animation: pet-wander 7s ease-in-out infinite; }
+    .pet-fig.hello { animation: pet-dance .7s ease 2; }
+    .pet-fig.chomp { animation: pet-chomp .55s ease; }
+    .pet-fig.wiggle { animation: pet-wiggle .45s ease 2; }
+    .pet-fig.asleep, .pet-fig.egg { animation: pet-wob 1.1s ease-in-out infinite; transform-origin: 50% 80%; }
+    .pet-fig.asleep { animation: none; }
+    @keyframes pet-wob { 0%, 100% { transform: translateX(-50%) rotate(-4deg); } 50% { transform: translateX(-50%) rotate(5deg); } }
+    @keyframes pet-wander { 0%, 100% { transform: translateX(-50%); } 40% { transform: translateX(-78%); } 70% { transform: translateX(-22%); } }
+    @keyframes pet-dance { 0%, 100% { transform: translateX(-50%) rotate(0); } 25% { transform: translateX(-50%) translateY(-10px) rotate(-6deg); } 75% { transform: translateX(-50%) translateY(-6px) rotate(6deg); } }
+    @keyframes pet-chomp { 0%, 100% { transform: translateX(-50%) scale(1); } 30% { transform: translateX(-50%) scale(1.08, .9); } 60% { transform: translateX(-50%) scale(.96, 1.06); } }
+    @keyframes pet-wiggle { 0%, 100% { transform: translateX(-50%) rotate(0); } 25% { transform: translateX(-50%) rotate(-8deg); } 75% { transform: translateX(-50%) rotate(8deg); } }
     .pet-boop { animation: pet-boop .45s ease; }
-    @keyframes pet-boop { 0% { transform: translateY(0) scale(1, 1); } 35% { transform: translateY(-16px) scale(1.05, .92); } 70% { transform: translateY(0) scale(.98, 1.05); } 100% { transform: none; } }
+    @keyframes pet-boop { 0% { transform: translateX(-50%) scale(1); } 35% { transform: translateX(-50%) translateY(-14px) scale(1.05, .92); } 100% { transform: translateX(-50%); } }
+    .pet-ghost { position: fixed; z-index: 80; width: 54px; height: 54px; margin: -27px 0 0 -27px; display: grid; place-items: center; font-size: 2rem; pointer-events: none; filter: drop-shadow(0 6px 4px rgba(0,0,0,.3)); }
+    .pet-plays, .pet-decor { display: flex; flex-wrap: wrap; gap: 8px; }
+    .pet-plays button, .pet-decor button { flex: 1 1 7.5rem; min-width: 0; min-height: 52px; border-radius: 16px; border: 3px solid rgba(255,255,255,.7); background: rgba(255,255,255,.16); color: #fff; font: 800 1rem/1.15 var(--ui-font); cursor: pointer; }
+    .pet-decor button.on { background: #7ee07a; color: #143018; border-color: #e8ffe8; }
     .pet-name { margin: 0; text-align: center; font: 900 1.6rem/1.1 var(--ui-font); }
     .pet-stage { margin: 0; text-align: center; font: 800 1.05rem/1.2 var(--ui-font); color: #ffe58a; }
     .pet-barline { height: 18px; border-radius: 999px; background: rgba(0,0,0,.35); overflow: hidden; border: 2px solid rgba(255,255,255,.35); }
@@ -3571,16 +3609,17 @@
     .pet-namebox { display: flex; flex-wrap: wrap; gap: 8px; }
     .pet-namebox input { flex: 1 1 10rem; min-width: 0; min-height: 52px; border-radius: 14px; border: 3px solid #ffe58a; padding: 0 12px; font: 800 1.15rem/1 var(--ui-font); color: #1a120c; }
     .pet-namebox button { flex: 0 0 auto; min-height: 52px; padding: 0 16px; border-radius: 14px; border: 0; background: #7ee07a; color: #143018; font: 900 1.05rem/1 var(--ui-font); cursor: pointer; }
-    .pet-pop { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; }
+    .pet-pop { position: absolute; inset: 0; z-index: 5; display: grid; place-items: center; pointer-events: none; }
     .pet-pop b { position: relative; z-index: 1; padding: .4rem 1rem; border-radius: 999px; background: #ffd34e; color: #3a2400; font: 900 1.8rem/1 var(--ui-font); }
     .pet-spark { position: absolute; left: 50%; top: 42%; width: 12px; height: 12px; margin: -6px; border-radius: 3px; animation: ci-spark 1s ease-out both; }
     .pet-mini { display: inline-flex; width: 36px; height: 36px; flex: 0 0 auto; border-radius: 50%; background: #fff; overflow: hidden; align-items: center; justify-content: center; }
     .pet-mini svg { width: 34px; height: 34px; }
     .shp-pet { border: 0; padding: 0; cursor: pointer; }
     @media (prefers-reduced-motion: reduce) {
-      .pet-boop { animation: none; }
-      .pet-spark { animation: none; opacity: 0; }
+      .pet-boop, .pet-fig.wander, .pet-fig.hello, .pet-fig.chomp, .pet-fig.wiggle, .pet-fig.egg, .pet-spark, .pet-float, .pet-eye, .pet-zzz { animation: none; }
+      .pet-spark { opacity: 0; }
     }
+    @media (max-width: 719px) { .pet-room { height: 270px; } }
     body[data-page="scene"] header h1, body[data-page="scene"] .page-head { display: none; }
     .closet-card { max-width: 34rem; gap: 0; padding-top: 0; color: #fff; }
     .av-top { position: sticky; top: 0; z-index: 20; display: flex; flex-direction: column; gap: 0.55rem; padding: 0.6rem 0.2rem 0.7rem;
@@ -10710,9 +10749,10 @@
       });
       return '<svg class="ci-svg" viewBox="0 0 360 270" role="img" aria-label="' + scene.name + '">' + body + (scene.ink || "") + "</svg>";
     }
-    // My Pet. Growth comes only from coins spent here (food and treats), never from practice.
-    const PET_KINDS = [["pup", "Puppy", 0], ["kit", "Kitten", 5], ["dra", "Dragon", 5], ["tur", "Turtle", 5]];
-    const PET_STAGES = [{ at: 0, name: "Egg" }, { at: 5, name: "Baby" }, { at: 20, name: "Kid" }, { at: 50, name: "Teen" }, { at: 100, name: "Grown-up" }];
+    // My Pet. Food and treats spend coins toward the next stage ($5 each). Toys and room decor do not. Old growth points are mapped onto these stages.
+    const PETS = [{ id: "pup", name: "Puppy" }, { id: "kit", name: "Kitten" }, { id: "dra", name: "Dragon" }, { id: "tur", name: "Turtle" }];
+    const PET_STAGES = [{ at: 0, name: "Egg" }, { at: 5, name: "Baby" }, { at: 10, name: "Kid" }, { at: 15, name: "Teen" }, { at: 20, name: "Grown-up" }];
+    const PET_ROOM = [["rug", "Rug", 2], ["bed", "Bed", 3], ["toys", "Toys", 5]];
     const PET_BAD_HARD = ["fuck", "shit", "bitch", "nigger", "nigga", "faggot", "retard", "porn", "whore", "slut", "cunt"];
     const PET_BAD_SOFT = ["damn", "hell", "crap", "ass", "piss", "poop", "butt", "sex", "kill"];
     function petBad(name) {
@@ -10721,12 +10761,20 @@
       if (PET_BAD_HARD.some(function (w) { return raw.indexOf(w) >= 0; })) return true;
       return words.some(function (w) { return PET_BAD_SOFT.indexOf(w) >= 0; });
     }
-    function petKind(id) { return PET_KINDS.find(function (k) { return k[0] === id; }) || null; }
-    function petStage(g) { let i = 0; PET_STAGES.forEach(function (s, n) { if (g >= s.at) i = n; }); return i; }
+    function petKind(id) { return PETS.find(function (k) { return k.id === id; }) || null; }
+    function petFromOld(g) {
+      g = Math.max(0, Math.min(100, Math.floor(Number(g) || 0)));
+      if (g < 5) return g;
+      if (g < 20) return 5 + Math.round((g - 5) / 15 * 5);
+      if (g < 50) return 10 + Math.round((g - 20) / 30 * 5);
+      if (g < 100) return 15 + Math.round((g - 50) / 50 * 5);
+      return 20;
+    }
+    function petStage(sp) { let i = 0; PET_STAGES.forEach(function (s, n) { if (sp >= s.at) i = n; }); return i; }
     function petClean(p) {
       p = p && typeof p === "object" ? p : {};
       const kind = petKind(p.kind) ? p.kind : "";
-      let g = Math.max(0, Math.min(100, Math.floor(Number(p.g) || 0)));
+      const sp = p.sp == null || p.sp === "" ? petFromOld(p.g) : Math.max(0, Math.min(80, Math.floor(Number(p.sp) || 0)));
       let joy = Math.max(0, Math.min(100, Math.floor(p.joy == null || p.joy === "" ? 80 : Number(p.joy) || 0)));
       let joyAt = Math.max(0, Math.floor(Number(p.joyAt) || 0));
       const now = Date.now();
@@ -10737,62 +10785,90 @@
       }
       let name = String(p.name || "").replace(/\s+/g, " ").trim().slice(0, 12);
       if (petBad(name)) name = "";
-      const paid = [];
-      (Array.isArray(p.paid) ? p.paid : []).forEach(function (id) { if (id !== "pup" && petKind(id) && paid.indexOf(id) < 0) paid.push(id); });
-      return { kind: kind, g: g, joy: joy, joyAt: joyAt, name: name, paid: paid };
+      const room = [];
+      (Array.isArray(p.room) ? p.room : []).forEach(function (id) { if (PET_ROOM.some(function (r) { return r[0] === id; }) && room.indexOf(id) < 0) room.push(id); });
+      return { kind: kind, sp: sp, joy: joy, joyAt: joyAt, name: name, room: room };
     }
     function petMerge(a, b) {
       a = petClean(a); b = petClean(b);
       if (!a.kind) return b;
       if (!b.kind) return a;
-      const win = a.g > b.g || (a.g === b.g && a.joyAt >= b.joyAt) ? a : b;
+      const win = a.sp > b.sp || (a.sp === b.sp && a.joyAt >= b.joyAt) ? a : b;
       const other = win === a ? b : a;
-      return petClean({ kind: win.kind, g: Math.max(a.g, b.g), joy: a.joyAt >= b.joyAt ? a.joy : b.joy, joyAt: Math.max(a.joyAt, b.joyAt), name: win.name || other.name, paid: win.paid.concat(other.paid) });
+      return petClean({ kind: win.kind, sp: Math.max(a.sp, b.sp), joy: a.joyAt >= b.joyAt ? a.joy : b.joy, joyAt: Math.max(a.joyAt, b.joyAt), name: win.name || other.name, room: win.room.concat(other.room) });
     }
-    function petEye(x, y, sleepy) {
-      return sleepy ? '<path d="M' + (x - 4) + ' ' + y + ' q4 3.5 8 0" fill="none" stroke="#1a120c" stroke-width="2.4" stroke-linecap="round"/>' : '<circle cx="' + x + '" cy="' + y + '" r="2.5" fill="#1a120c"/>';
+    let petSeq = 0;
+    function petShine(id, a, b, c) { return '<radialGradient id="' + id + '" cx="32%" cy="26%" r="80%"><stop offset="0" stop-color="' + a + '"/><stop offset=".48" stop-color="' + b + '"/><stop offset="1" stop-color="' + c + '"/></radialGradient>'; }
+    function petEyes(id, x, y, x2, r, sleepy) {
+      if (sleepy) return '<path d="M' + (x - r) + " " + y + " Q" + x + " " + (y + r * 0.75) + " " + (x + r) + " " + y + '" fill="none" stroke="#3a2418" stroke-width="3.2" stroke-linecap="round"/><path d="M' + (x2 - r) + " " + y + " Q" + x2 + " " + (y + r * 0.75) + " " + (x2 + r) + " " + y + '" fill="none" stroke="#3a2418" stroke-width="3.2" stroke-linecap="round"/>';
+      const g = id + "ey";
+      function one(cx) { return '<g class="pet-eye"><ellipse cx="' + cx + '" cy="' + y + '" rx="' + r + '" ry="' + (r * 1.22) + '" fill="#fff"/><circle cx="' + cx + '" cy="' + (y + 1) + '" r="' + (r * 0.62) + '" fill="url(#' + g + ')"/><circle cx="' + (cx - r * 0.28) + '" cy="' + (y - r * 0.34) + '" r="' + (r * 0.22) + '" fill="#fff"/><circle cx="' + (cx + r * 0.2) + '" cy="' + (y + r * 0.2) + '" r="' + (r * 0.08) + '" fill="#fff"/></g>'; }
+      return '<radialGradient id="' + g + '"><stop offset="0" stop-color="#fff"/><stop offset=".16" stop-color="#c8f0ff"/><stop offset=".45" stop-color="#2a3d88"/><stop offset="1" stop-color="#070b16"/></radialGradient>' + one(x) + one(x2);
     }
-    function petEgg(kind) {
-      const spot = {
-        pup: '<ellipse cx="48" cy="80" rx="8" ry="6" fill="#e0a15a" stroke="#1a120c" stroke-width="3"/><ellipse cx="70" cy="72" rx="6" ry="5" fill="#c4843c" stroke="#1a120c" stroke-width="3"/><circle cx="58" cy="94" r="4" fill="#e0a15a" stroke="#1a120c" stroke-width="3"/>',
-        kit: '<path d="M42 52 L50 36 L58 52 Z" fill="#f0a050" stroke="#1a120c" stroke-width="3"/><path d="M62 52 L70 36 L78 52 Z" fill="#f0a050" stroke="#1a120c" stroke-width="3"/>',
-        dra: '<ellipse cx="48" cy="76" rx="7" ry="5" fill="#3cbf58" stroke="#1a120c" stroke-width="3"/><ellipse cx="72" cy="86" rx="7" ry="5" fill="#67d86a" stroke="#1a120c" stroke-width="3"/><path d="M78 58 Q96 46 88 72 Z" fill="#3cbf58" stroke="#1a120c" stroke-width="3"/>',
-        tur: '<ellipse cx="60" cy="80" rx="16" ry="12" fill="#3cbf58" stroke="#1a120c" stroke-width="3"/><path d="M52 72 H68 M60 64 V90" stroke="#1f7a38" stroke-width="2" fill="none"/>'
-      }[kind] || "";
-      return '<ellipse cx="60" cy="78" rx="32" ry="40" fill="#fff8e8" stroke="#1a120c" stroke-width="4"/>' + spot;
+    function petEggArt(kind, id, cracks) {
+      const tint = { pup: "#f0c48a", kit: "#ffd0e0", dra: "#b6f0c8", tur: "#c6efb0" }[kind] || "#ffe7c4";
+      let crack = "";
+      ["M86 96 L98 118 L80 136", "M118 78 L106 104 L126 122", "M72 140 L92 154 L78 170", "M128 132 L112 156 L132 168"].forEach(function (d, i) { if (i < cracks) crack += '<path d="' + d + '" fill="none" stroke="#8a5a3a" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>'; });
+      const mark = { pup: '<ellipse cx="84" cy="132" rx="11" ry="8" fill="#e0a15a"/><ellipse cx="116" cy="118" rx="8" ry="6" fill="#c4843c"/><circle cx="100" cy="150" r="6" fill="#e8b56a"/>', kit: '<path d="M74 86 L86 58 L102 88 Z" fill="#ffb0c8"/><path d="M126 86 L114 58 L98 88 Z" fill="#ffb0c8"/>', dra: '<path d="M130 100 Q162 78 146 128 Z" fill="#5dce78"/><ellipse cx="82" cy="132" rx="10" ry="7" fill="#3cbf58"/>', tur: '<ellipse cx="100" cy="136" rx="24" ry="16" fill="#3cbf58"/><path d="M86 128 H114 M100 114 V152" stroke="#1f7a38" stroke-width="2.6" fill="none"/>' }[kind] || "";
+      return petShine(id + "s", "#fffef8", "#ffe4c4", tint) + '<ellipse cx="100" cy="128" rx="50" ry="60" fill="url(#' + id + 's)"/><ellipse cx="80" cy="100" rx="18" ry="11" fill="#fff" opacity=".6"/>' + mark + crack;
     }
-    function petBody(kind, stage, sleepy) {
-      const e = function (x, y) { return petEye(x, y, sleepy); };
+    function petArt(kind, stage, sleepy, id) {
+      const eyes = function (x, y, x2, r) { return petEyes(id, x, y, x2, r, sleepy); };
+      const cheeks = function (x, y, x2) { return '<ellipse class="pet-cheek" cx="' + x + '" cy="' + y + '" rx="8" ry="5" fill="#ff8aa8"/><ellipse class="pet-cheek" cx="' + x2 + '" cy="' + y + '" rx="8" ry="5" fill="#ff8aa8"/>'; };
+      const leg = function (x, y, w, h, fill) { return '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="' + (w / 2) + '" fill="' + fill + '"/>'; };
       if (kind === "pup") {
-        if (stage <= 1) return '<ellipse cx="60" cy="104" rx="20" ry="12" fill="#e8b56a" stroke="#1a120c" stroke-width="3.5"/><circle cx="60" cy="76" r="20" fill="#f0c48a" stroke="#1a120c" stroke-width="3.5"/><ellipse cx="42" cy="64" rx="8" ry="14" fill="#c4843c" stroke="#1a120c" stroke-width="3.5"/><ellipse cx="78" cy="64" rx="8" ry="14" fill="#c4843c" stroke="#1a120c" stroke-width="3.5"/>' + e(52, 74) + e(68, 74) + '<ellipse cx="60" cy="82" rx="4" ry="3" fill="#5a3418"/>';
-        if (stage === 2) return '<ellipse cx="86" cy="96" rx="10" ry="6" fill="#e8b56a" stroke="#1a120c" stroke-width="3.5"/><ellipse cx="60" cy="100" rx="28" ry="16" fill="#e8b56a" stroke="#1a120c" stroke-width="3.5"/><circle cx="60" cy="68" r="22" fill="#f0c48a" stroke="#1a120c" stroke-width="3.5"/><ellipse cx="40" cy="54" rx="9" ry="16" fill="#c4843c" stroke="#1a120c" stroke-width="3.5"/><ellipse cx="80" cy="54" rx="9" ry="16" fill="#c4843c" stroke="#1a120c" stroke-width="3.5"/><ellipse cx="46" cy="114" rx="8" ry="5" fill="#e8b56a" stroke="#1a120c" stroke-width="3"/><ellipse cx="74" cy="114" rx="8" ry="5" fill="#e8b56a" stroke="#1a120c" stroke-width="3"/>' + e(52, 66) + e(70, 66) + '<ellipse cx="60" cy="76" rx="5" ry="3.5" fill="#5a3418"/><path d="M52 84 q8 6 16 0" fill="none" stroke="#1a120c" stroke-width="2" stroke-linecap="round"/>';
-        if (stage === 3) return '<path d="M88 86 Q108 74 98 100" fill="none" stroke="#e8b56a" stroke-width="8" stroke-linecap="round"/><ellipse cx="64" cy="90" rx="30" ry="18" fill="#e8b56a" stroke="#1a120c" stroke-width="3.5"/><circle cx="34" cy="68" r="18" fill="#f0c48a" stroke="#1a120c" stroke-width="3.5"/><ellipse cx="20" cy="54" rx="8" ry="14" fill="#c4843c" stroke="#1a120c" stroke-width="3.5"/><rect x="42" y="100" width="9" height="18" rx="4" fill="#e8b56a" stroke="#1a120c" stroke-width="3"/><rect x="60" y="100" width="9" height="18" rx="4" fill="#e8b56a" stroke="#1a120c" stroke-width="3"/><rect x="78" y="98" width="9" height="16" rx="4" fill="#c4843c" stroke="#1a120c" stroke-width="3"/>' + e(28, 66) + e(40, 66) + '<ellipse cx="32" cy="76" rx="4" ry="3" fill="#5a3418"/>';
-        return '<path d="M96 74 Q118 56 104 98" fill="none" stroke="#e8b56a" stroke-width="10" stroke-linecap="round"/><ellipse cx="66" cy="86" rx="34" ry="22" fill="#e8b56a" stroke="#1a120c" stroke-width="3.5"/><circle cx="32" cy="60" r="20" fill="#f0c48a" stroke="#1a120c" stroke-width="3.5"/><ellipse cx="16" cy="44" rx="9" ry="16" fill="#c4843c" stroke="#1a120c" stroke-width="3.5"/><ellipse cx="42" cy="42" rx="8" ry="14" fill="#c4843c" stroke="#1a120c" stroke-width="3.5"/><rect x="38" y="100" width="11" height="20" rx="4" fill="#e8b56a" stroke="#1a120c" stroke-width="3"/><rect x="58" y="100" width="11" height="20" rx="4" fill="#e8b56a" stroke="#1a120c" stroke-width="3"/><rect x="80" y="98" width="11" height="18" rx="4" fill="#c4843c" stroke="#1a120c" stroke-width="3"/><rect x="22" y="68" width="24" height="8" rx="3" fill="#e23b4a" stroke="#1a120c" stroke-width="2.5"/>' + e(26, 58) + e(38, 58) + '<ellipse cx="28" cy="68" rx="4" ry="3" fill="#5a3418"/><path d="M24 74 q6 8 4 12 q-2 -4 -6 -2" fill="#e23b4a"/>';
+        const fur = petShine(id + "f", "#fff6e4", "#f0c48a", "#b87432"), ear = petShine(id + "e", "#f6d2a4", "#c4843c", "#7a3e16");
+        const fluff = '<ellipse cx="86" cy="154" rx="7" ry="5" fill="#c4843c" opacity=".28"/><ellipse cx="118" cy="160" rx="8" ry="5" fill="#c4843c" opacity=".22"/>';
+        if (stage <= 1) return fur + ear + '<ellipse cx="100" cy="186" rx="34" ry="20" fill="url(#' + id + 'f)"/><ellipse cx="68" cy="128" rx="14" ry="26" fill="url(#' + id + 'e)"/><ellipse cx="132" cy="128" rx="14" ry="26" fill="url(#' + id + 'e)"/><ellipse cx="68" cy="132" rx="7" ry="16" fill="#ffd0c0"/><ellipse cx="132" cy="132" rx="7" ry="16" fill="#ffd0c0"/><circle cx="100" cy="142" r="36" fill="url(#' + id + 'f)"/>' + fluff + '<ellipse cx="86" cy="118" rx="12" ry="7" fill="#fff" opacity=".45"/><ellipse cx="100" cy="158" rx="16" ry="11" fill="#fff3dc"/>' + eyes(86, 138, 114, 11) + cheeks(78, 152, 122) + '<ellipse cx="100" cy="156" rx="6" ry="4.2" fill="#5a3418"/>';
+        if (stage === 2) return fur + ear + '<ellipse cx="158" cy="168" rx="16" ry="10" fill="url(#' + id + 'e)" transform="rotate(-30 158 168)"/><ellipse cx="100" cy="176" rx="46" ry="26" fill="url(#' + id + 'f)"/><ellipse cx="64" cy="118" rx="14" ry="26" fill="url(#' + id + 'e)"/><ellipse cx="136" cy="118" rx="14" ry="26" fill="url(#' + id + 'e)"/><circle cx="100" cy="132" r="34" fill="url(#' + id + 'f)"/>' + fluff + '<ellipse cx="72" cy="198" rx="13" ry="8" fill="#e8b56a"/><ellipse cx="128" cy="198" rx="13" ry="8" fill="#e8b56a"/><ellipse cx="100" cy="150" rx="15" ry="10" fill="#fff3dc"/>' + eyes(86, 128, 116, 11) + '<ellipse cx="100" cy="148" rx="6" ry="4" fill="#5a3418"/><path d="M90 158 q10 8 20 0" fill="none" stroke="#5a3418" stroke-width="2.4" stroke-linecap="round"/>';
+        if (stage === 3) return fur + ear + '<path d="M150 150 Q186 118 168 178 Q150 170 146 158 Z" fill="url(#' + id + 'f)"/><ellipse cx="118" cy="164" rx="46" ry="28" fill="url(#' + id + 'f)"/>' + leg(78, 176, 16, 30, "#e8b56a") + leg(108, 178, 16, 28, "#e8b56a") + leg(136, 174, 16, 28, "#c4843c") + '<ellipse cx="48" cy="112" rx="13" ry="24" fill="url(#' + id + 'e)"/><circle cx="62" cy="128" r="28" fill="url(#' + id + 'f)"/><ellipse cx="40" cy="140" rx="16" ry="11" fill="#fff3dc"/><rect x="36" y="132" width="30" height="10" rx="5" fill="#e23b4a"/>' + eyes(52, 124, 74, 9) + '<ellipse cx="36" cy="140" rx="5.5" ry="4" fill="#5a3418"/>';
+        return fur + ear + '<path d="M148 132 Q192 78 174 168 Q156 176 146 150 Z" fill="url(#' + id + 'f)"/><ellipse cx="168" cy="118" rx="10" ry="16" fill="#fff6e4" opacity=".7"/><ellipse cx="116" cy="158" rx="50" ry="32" fill="url(#' + id + 'f)"/><ellipse cx="108" cy="166" rx="26" ry="16" fill="#fff6e4" opacity=".55"/>' + fluff + leg(74, 176, 18, 32, "#e8b56a") + leg(104, 178, 18, 30, "#e8b56a") + leg(138, 174, 18, 30, "#c4843c") + '<ellipse cx="36" cy="100" rx="14" ry="26" fill="url(#' + id + 'e)"/><ellipse cx="36" cy="108" rx="7" ry="14" fill="#ffd0c0"/><circle cx="58" cy="120" r="30" fill="url(#' + id + 'f)"/><ellipse cx="34" cy="136" rx="18" ry="12" fill="#fff3dc"/><rect x="28" y="126" width="34" height="11" rx="5" fill="#e23b4a"/><circle cx="54" cy="132" r="5.5" fill="#ffd34e" stroke="#e0a020" stroke-width="1.4"/>' + eyes(48, 114, 72, 10) + '<ellipse cx="30" cy="134" rx="6" ry="4.2" fill="#5a3418"/><path d="M24 142 q8 12 4 16 q-8 -4 -12 0" fill="#ff5a6a"/>';
       }
       if (kind === "kit") {
-        if (stage <= 1) return '<ellipse cx="60" cy="104" rx="18" ry="11" fill="#f0a050" stroke="#1a120c" stroke-width="3.5"/><circle cx="60" cy="74" r="20" fill="#ffb86a" stroke="#1a120c" stroke-width="3.5"/><path d="M42 64 L46 42 L58 60 Z" fill="#ffb86a" stroke="#1a120c" stroke-width="3.5"/><path d="M78 64 L74 42 L62 60 Z" fill="#ffb86a" stroke="#1a120c" stroke-width="3.5"/>' + e(52, 74) + e(68, 74) + '<path d="M56 82 L60 86 L64 82" fill="none" stroke="#1a120c" stroke-width="2"/>';
-        if (stage === 2) return '<path d="M84 100 Q104 110 96 88" fill="none" stroke="#f0a050" stroke-width="7" stroke-linecap="round"/><ellipse cx="60" cy="100" rx="26" ry="16" fill="#f0a050" stroke="#1a120c" stroke-width="3.5"/><circle cx="60" cy="66" r="22" fill="#ffb86a" stroke="#1a120c" stroke-width="3.5"/><path d="M40 56 L46 32 L60 54 Z" fill="#ffb86a" stroke="#1a120c" stroke-width="3.5"/><path d="M80 56 L74 32 L60 54 Z" fill="#ffb86a" stroke="#1a120c" stroke-width="3.5"/>' + e(52, 66) + e(70, 66) + '<ellipse cx="60" cy="76" rx="4" ry="3" fill="#e23b4a"/><path d="M48 80 H40 M72 80 H80" stroke="#1a120c" stroke-width="1.6"/>';
-        if (stage === 3) return '<path d="M90 84 Q114 70 100 108" fill="none" stroke="#f0a050" stroke-width="8" stroke-linecap="round"/><ellipse cx="64" cy="92" rx="30" ry="18" fill="#f0a050" stroke="#1a120c" stroke-width="3.5"/><circle cx="34" cy="66" r="18" fill="#ffb86a" stroke="#1a120c" stroke-width="3.5"/><path d="M22 54 L28 32 L42 52 Z" fill="#ffb86a" stroke="#1a120c" stroke-width="3.5"/><path d="M48 52 L42 30 L28 50 Z" fill="#ffb86a" stroke="#1a120c" stroke-width="3.5"/><rect x="44" y="102" width="8" height="16" rx="4" fill="#f0a050" stroke="#1a120c" stroke-width="3"/><rect x="70" y="102" width="8" height="16" rx="4" fill="#f0a050" stroke="#1a120c" stroke-width="3"/>' + e(28, 64) + e(40, 64);
-        return '<path d="M98 70 Q120 48 106 100" fill="none" stroke="#f0a050" stroke-width="10" stroke-linecap="round"/><ellipse cx="66" cy="88" rx="34" ry="20" fill="#f0a050" stroke="#1a120c" stroke-width="3.5"/><circle cx="30" cy="60" r="20" fill="#ffb86a" stroke="#1a120c" stroke-width="3.5"/><path d="M16 48 L22 22 L38 46 Z" fill="#ffb86a" stroke="#1a120c" stroke-width="3.5"/><path d="M46 46 L40 20 L22 44 Z" fill="#ffb86a" stroke="#1a120c" stroke-width="3.5"/><rect x="40" y="100" width="10" height="18" rx="4" fill="#f0a050" stroke="#1a120c" stroke-width="3"/><rect x="72" y="100" width="10" height="18" rx="4" fill="#f0a050" stroke="#1a120c" stroke-width="3"/>' + e(24, 58) + e(38, 58) + '<path d="M18 66 H8 M42 68 H52" stroke="#1a120c" stroke-width="1.8"/>';
+        const fur = petShine(id + "f", "#fff4e4", "#ffb86a", "#e07820"), pink = "#ffd0e4";
+        const stripes = '<path d="M92 160 q10 5 0 12 M108 164 q10 5 0 12" fill="none" stroke="#d06818" stroke-width="2.2" stroke-linecap="round" opacity=".55"/>';
+        if (stage <= 1) return fur + '<ellipse cx="100" cy="188" rx="32" ry="18" fill="url(#' + id + 'f)"/><path d="M70 128 L78 92 L98 124 Z" fill="url(#' + id + 'f)"/><path d="M130 128 L122 92 L102 124 Z" fill="url(#' + id + 'f)"/><path d="M76 116 L84 100 L94 118 Z" fill="' + pink + '"/><path d="M124 116 L116 100 L106 118 Z" fill="' + pink + '"/><circle cx="100" cy="146" r="34" fill="url(#' + id + 'f)"/><ellipse cx="86" cy="124" rx="10" ry="6" fill="#fff" opacity=".4"/>' + eyes(86, 142, 114, 11) + cheeks(78, 156, 122) + '<path d="M94 158 L100 166 L106 158" fill="#e23b4a"/><path d="M100 166 v6" stroke="#a84820" stroke-width="1.6"/>';
+        if (stage === 2) return fur + '<path d="M148 176 Q176 196 160 148" stroke="#f0a050" stroke-width="12" fill="none" stroke-linecap="round"/><ellipse cx="100" cy="178" rx="44" ry="24" fill="url(#' + id + 'f)"/>' + stripes + '<path d="M72 122 L80 86 L100 118 Z" fill="url(#' + id + 'f)"/><path d="M128 122 L120 86 L100 118 Z" fill="url(#' + id + 'f)"/><path d="M78 110 L86 94 L96 112 Z" fill="' + pink + '"/><path d="M122 110 L114 94 L104 112 Z" fill="' + pink + '"/><circle cx="100" cy="136" r="32" fill="url(#' + id + 'f)"/><ellipse cx="74" cy="198" rx="12" ry="7" fill="#f0a050"/><ellipse cx="126" cy="198" rx="12" ry="7" fill="#f0a050"/>' + eyes(86, 132, 116, 10) + '<ellipse cx="100" cy="148" rx="5" ry="3.5" fill="#e23b4a"/><path d="M70 140 H52 M130 140 H148" stroke="#5a3418" stroke-width="1.8" stroke-linecap="round"/>';
+        if (stage === 3) return fur + '<path d="M150 140 Q188 100 162 176" stroke="#f0a050" stroke-width="12" fill="none" stroke-linecap="round"/><ellipse cx="112" cy="166" rx="46" ry="26" fill="url(#' + id + 'f)"/>' + stripes + leg(86, 178, 14, 26, "#f0a050") + leg(118, 178, 14, 26, "#f0a050") + '<path d="M48 112 L56 78 L74 110 Z" fill="url(#' + id + 'f)"/><path d="M78 108 L86 76 L64 104 Z" fill="url(#' + id + 'f)"/><path d="M54 102 L60 84 L68 102 Z" fill="' + pink + '"/><circle cx="62" cy="128" r="26" fill="url(#' + id + 'f)"/><circle cx="48" cy="142" r="5" fill="#ffd34e"/>' + eyes(52, 124, 74, 9) + '<ellipse cx="46" cy="140" rx="4.5" ry="3" fill="#e23b4a"/><path d="M36 132 H18" stroke="#5a3418" stroke-width="1.8" stroke-linecap="round"/>';
+        return fur + '<path d="M152 128 Q198 70 168 176" stroke="#f0a050" stroke-width="14" fill="none" stroke-linecap="round"/><path d="M168 112 Q186 96 178 128" stroke="#ffd0e4" stroke-width="3" fill="none" stroke-linecap="round"/><ellipse cx="114" cy="162" rx="50" ry="30" fill="url(#' + id + 'f)"/><path d="M96 154 q12 8 0 16 M114 158 q14 8 0 16 M132 154 q12 8 0 16" fill="none" stroke="#d06818" stroke-width="2.4" stroke-linecap="round" opacity=".6"/>' + leg(84, 178, 15, 28, "#f0a050") + leg(120, 178, 15, 28, "#f0a050") + '<path d="M36 108 L44 70 L66 106 Z" fill="url(#' + id + 'f)"/><path d="M72 104 L80 66 L54 100 Z" fill="url(#' + id + 'f)"/><path d="M42 96 L48 76 L58 96 Z" fill="' + pink + '"/><path d="M66 94 L72 74 L58 92 Z" fill="' + pink + '"/><circle cx="56" cy="124" r="28" fill="url(#' + id + 'f)"/><ellipse cx="42" cy="110" rx="9" ry="5" fill="#fff" opacity=".4"/><circle cx="42" cy="140" r="6" fill="#ffd34e" stroke="#e0a020" stroke-width="1.2"/>' + eyes(46, 118, 68, 10) + '<ellipse cx="40" cy="136" rx="5" ry="3.4" fill="#e23b4a"/><path d="M30 126 H12 M30 134 H8 M78 128 H96" stroke="#5a3418" stroke-width="1.8" stroke-linecap="round"/>';
       }
       if (kind === "dra") {
-        if (stage <= 1) return '<ellipse cx="60" cy="102" rx="20" ry="14" fill="#3cbf58" stroke="#1a120c" stroke-width="3.5"/><circle cx="60" cy="74" r="18" fill="#67d86a" stroke="#1a120c" stroke-width="3.5"/><path d="M40 78 Q24 70 36 96 Z" fill="#2f9e45" stroke="#1a120c" stroke-width="3"/><path d="M80 78 Q96 70 84 96 Z" fill="#2f9e45" stroke="#1a120c" stroke-width="3"/>' + e(53, 72) + e(67, 72);
-        if (stage === 2) return '<path d="M86 100 Q100 112 92 88" fill="#3cbf58" stroke="#1a120c" stroke-width="3"/><ellipse cx="60" cy="100" rx="26" ry="16" fill="#3cbf58" stroke="#1a120c" stroke-width="3.5"/><circle cx="60" cy="66" r="20" fill="#67d86a" stroke="#1a120c" stroke-width="3.5"/><path d="M44 60 L48 44 L56 58 Z" fill="#e0a43a" stroke="#1a120c" stroke-width="3"/><path d="M76 60 L72 44 L64 58 Z" fill="#e0a43a" stroke="#1a120c" stroke-width="3"/><path d="M36 74 Q14 60 30 100 Z" fill="#2f9e45" stroke="#1a120c" stroke-width="3.5"/><path d="M84 74 Q106 60 90 100 Z" fill="#2f9e45" stroke="#1a120c" stroke-width="3.5"/>' + e(52, 66) + e(68, 66);
-        if (stage === 3) return '<path d="M92 88 Q112 100 100 72" fill="#3cbf58" stroke="#1a120c" stroke-width="3"/><ellipse cx="64" cy="92" rx="30" ry="18" fill="#3cbf58" stroke="#1a120c" stroke-width="3.5"/><circle cx="36" cy="64" r="18" fill="#67d86a" stroke="#1a120c" stroke-width="3.5"/><path d="M28 50 L32 32 L42 50 Z" fill="#e0a43a" stroke="#1a120c" stroke-width="3"/><path d="M48 50 L44 30 L34 48 Z" fill="#e0a43a" stroke="#1a120c" stroke-width="3"/><path d="M30 70 Q4 48 22 108 Z" fill="#2f9e45" stroke="#1a120c" stroke-width="3.5"/><path d="M86 72 Q114 46 100 112 Z" fill="#2f9e45" stroke="#1a120c" stroke-width="3.5"/>' + e(30, 62) + e(42, 62);
-        return '<path d="M100 80 Q118 98 104 64" fill="#3cbf58" stroke="#1a120c" stroke-width="3"/><ellipse cx="64" cy="88" rx="32" ry="22" fill="#3cbf58" stroke="#1a120c" stroke-width="3.5"/><circle cx="32" cy="58" r="20" fill="#67d86a" stroke="#1a120c" stroke-width="3.5"/><path d="M22 42 L26 20 L40 42 Z" fill="#e0a43a" stroke="#1a120c" stroke-width="3"/><path d="M46 40 L40 18 L28 40 Z" fill="#e0a43a" stroke="#1a120c" stroke-width="3"/><path d="M28 64 Q0 36 16 112 Z" fill="#2f9e45" stroke="#1a120c" stroke-width="3.5"/><path d="M90 62 Q120 28 108 116 Z" fill="#2f9e45" stroke="#1a120c" stroke-width="3.5"/>' + e(26, 56) + e(40, 56) + '<path d="M24 66 q6 4 4 8" fill="none" stroke="#e23b4a" stroke-width="2"/>';
+        const sc = petShine(id + "f", "#f2ffe4", "#5dce78", "#1c7a3e"), wing = petShine(id + "w", "#f8ffe8", "#8ee08a", "#146b32"), belly = "#e8ffd0";
+        const scales = '<path d="M96 158 q8 5 16 0 M108 170 q8 5 16 0 M90 172 q8 5 16 0" fill="none" stroke="#146b32" stroke-width="1.7" stroke-linecap="round" opacity=".55"/>';
+        if (stage <= 1) return sc + '<ellipse cx="100" cy="182" rx="40" ry="24" fill="url(#' + id + 'f)"/><ellipse cx="100" cy="186" rx="22" ry="12" fill="' + belly + '"/><circle cx="100" cy="140" r="34" fill="url(#' + id + 'f)"/><path d="M72 150 Q48 138 64 176 Z" fill="#2f9e45"/><path d="M128 150 Q152 138 136 176 Z" fill="#2f9e45"/><ellipse cx="100" cy="156" rx="16" ry="11" fill="' + belly + '"/>' + eyes(86, 136, 114, 11) + cheeks(78, 150, 122);
+        if (stage === 2) return sc + wing + '<path d="M150 176 Q178 196 164 150 Z" fill="url(#' + id + 'f)"/><ellipse cx="112" cy="176" rx="42" ry="26" fill="url(#' + id + 'f)"/>' + scales + '<path d="M78 150 C48 128 36 150 52 176 C62 164 74 166 82 156 Z" fill="url(#' + id + 'w)"/><path d="M78 150 C56 140 48 156 58 168" fill="none" stroke="#146b32" stroke-width="1.6"/><path d="M108 146 C128 122 148 136 136 164 C124 156 112 158 106 150 Z" fill="url(#' + id + 'w)" opacity=".9"/><circle cx="70" cy="138" r="26" fill="url(#' + id + 'f)"/><path d="M56 118 L62 100 L74 120 Z" fill="#ffd34e"/><path d="M84 116 L90 98 L74 118 Z" fill="#ffd34e"/><ellipse cx="70" cy="154" rx="12" ry="8" fill="' + belly + '"/>' + eyes(60, 134, 82, 9);
+        if (stage === 3) return sc + wing + '<path d="M156 168 Q190 150 176 112 Q160 140 150 160 Z" fill="url(#' + id + 'f)"/><ellipse cx="116" cy="170" rx="46" ry="30" fill="url(#' + id + 'f)"/>' + scales + '<path d="M96 148 C58 96 22 118 30 162 C40 184 78 176 96 158 Z" fill="url(#' + id + 'w)"/><path d="M96 148 C70 118 46 132 42 158" fill="none" stroke="#146b32" stroke-width="1.8"/><path d="M124 140 C156 92 186 118 176 160 C166 180 140 172 126 154 Z" fill="url(#' + id + 'w)" opacity=".92"/><path d="M124 140 C150 112 168 128 170 152" fill="none" stroke="#146b32" stroke-width="1.8"/>' + leg(92, 186, 14, 22, "#3cbf58") + leg(124, 186, 14, 22, "#3cbf58") + '<circle cx="62" cy="132" r="26" fill="url(#' + id + 'f)"/><path d="M46 112 L50 84 L66 114 Z" fill="#ffd34e"/><path d="M78 110 L86 80 L68 112 Z" fill="#e0a020"/><ellipse cx="50" cy="146" rx="12" ry="8" fill="' + belly + '"/>' + eyes(52, 128, 74, 9);
+        return sc + wing + petShine(id + "fr", "#fff6b0", "#ff9a1f", "#e23b4a") + '<path d="M158 156 Q196 132 184 96 Q164 128 150 150 Z" fill="url(#' + id + 'f)"/><ellipse cx="118" cy="166" rx="48" ry="32" fill="url(#' + id + 'f)"/><ellipse cx="112" cy="174" rx="24" ry="16" fill="' + belly + '" opacity=".85"/>' + scales + '<path d="M100 142 C52 72 12 102 22 156 C32 190 78 180 100 156 Z" fill="url(#' + id + 'w)"/><path d="M100 142 C68 100 40 118 36 152 M100 146 C72 118 52 136 48 164" fill="none" stroke="#146b32" stroke-width="1.8"/><path d="M130 132 C168 64 198 100 188 156 C178 190 146 176 132 150 Z" fill="url(#' + id + 'w)"/><path d="M130 132 C160 90 180 112 178 148" fill="none" stroke="#146b32" stroke-width="1.8"/>' + leg(90, 186, 16, 24, "#3cbf58") + leg(126, 186, 16, 24, "#2f9e45") + '<circle cx="58" cy="128" r="28" fill="url(#' + id + 'f)"/><path d="M40 108 L42 74 L62 110 Z" fill="#ffd34e"/><path d="M74 104 L84 68 L70 108 Z" fill="#e0a020"/><ellipse cx="44" cy="144" rx="13" ry="9" fill="' + belly + '"/><path d="M34 140 C16 132 2 122 0 108 C12 124 4 136 16 148 C8 154 18 162 36 152 Z" fill="url(#' + id + 'fr)"/><path d="M28 142 C16 134 10 124 8 116" fill="none" stroke="#fff6b0" stroke-width="2.2" stroke-linecap="round" opacity=".85"/>' + eyes(48, 122, 72, 10);
       }
-      if (stage <= 1) return '<ellipse cx="60" cy="96" rx="26" ry="18" fill="#3cbf58" stroke="#1a120c" stroke-width="3.5"/><circle cx="86" cy="86" r="10" fill="#b6ef8a" stroke="#1a120c" stroke-width="3"/>' + e(84, 84) + e(92, 86);
-      if (stage === 2) return '<ellipse cx="58" cy="96" rx="30" ry="20" fill="#2f9e45" stroke="#1a120c" stroke-width="3.5"/><ellipse cx="58" cy="96" rx="16" ry="12" fill="#b6ef8a" stroke="#1f7a38" stroke-width="2"/><circle cx="96" cy="84" r="11" fill="#b6ef8a" stroke="#1a120c" stroke-width="3"/><ellipse cx="36" cy="112" rx="8" ry="5" fill="#67d86a" stroke="#1a120c" stroke-width="3"/><ellipse cx="78" cy="112" rx="8" ry="5" fill="#67d86a" stroke="#1a120c" stroke-width="3"/>' + e(94, 82) + e(102, 84);
-      if (stage === 3) return '<ellipse cx="58" cy="92" rx="34" ry="24" fill="#2f9e45" stroke="#1a120c" stroke-width="3.5"/><path d="M44 80 H72 M58 70 V108" stroke="#1f7a38" stroke-width="3"/><circle cx="100" cy="74" r="12" fill="#b6ef8a" stroke="#1a120c" stroke-width="3"/><rect x="100" y="70" width="16" height="6" rx="3" fill="#67d86a" stroke="#1a120c" stroke-width="2.5"/><ellipse cx="32" cy="112" rx="9" ry="5" fill="#67d86a" stroke="#1a120c" stroke-width="3"/><ellipse cx="80" cy="114" rx="9" ry="5" fill="#67d86a" stroke="#1a120c" stroke-width="3"/>' + e(98, 72) + e(106, 74);
-      return '<ellipse cx="56" cy="88" rx="38" ry="28" fill="#2f9e45" stroke="#1a120c" stroke-width="3.5"/><path d="M40 76 H74 M56 62 V112" stroke="#145c28" stroke-width="3.5"/><circle cx="104" cy="64" r="14" fill="#b6ef8a" stroke="#1a120c" stroke-width="3.5"/><rect x="108" y="58" width="18" height="7" rx="3" fill="#67d86a" stroke="#1a120c" stroke-width="2.5"/><ellipse cx="28" cy="114" rx="10" ry="6" fill="#67d86a" stroke="#1a120c" stroke-width="3"/><ellipse cx="78" cy="116" rx="10" ry="6" fill="#67d86a" stroke="#1a120c" stroke-width="3"/><path d="M24 96 Q12 104 20 112" fill="none" stroke="#2f9e45" stroke-width="6" stroke-linecap="round"/>' + e(100, 62) + e(110, 64);
+      const sh = petShine(id + "f", "#eaffc8", "#3cbf58", "#146b32"), skin = petShine(id + "k", "#f6ffe6", "#c6ef8a", "#4e8a38");
+      const scutes = function (cx, cy, s) {
+        return '<ellipse cx="' + cx + '" cy="' + (cy - s) + '" rx="' + (s * 0.7) + '" ry="' + (s * 0.45) + '" fill="#d8ffb0" stroke="#1f7a38" stroke-width="1.6"/><ellipse cx="' + (cx - s * 0.85) + '" cy="' + cy + '" rx="' + (s * 0.62) + '" ry="' + (s * 0.4) + '" fill="#c6ef8a" stroke="#1f7a38" stroke-width="1.6"/><ellipse cx="' + (cx + s * 0.85) + '" cy="' + cy + '" rx="' + (s * 0.62) + '" ry="' + (s * 0.4) + '" fill="#c6ef8a" stroke="#1f7a38" stroke-width="1.6"/><ellipse cx="' + cx + '" cy="' + (cy + s * 0.7) + '" rx="' + (s * 0.55) + '" ry="' + (s * 0.36) + '" fill="#b6e878" stroke="#1f7a38" stroke-width="1.6"/>';
+      };
+      if (stage <= 1) return sh + skin + '<ellipse cx="96" cy="168" rx="46" ry="34" fill="url(#' + id + 'f)"/><ellipse cx="96" cy="172" rx="22" ry="16" fill="#e8ffd0"/><ellipse cx="148" cy="150" rx="16" ry="14" fill="url(#' + id + 'k)"/>' + eyes(142, 148, 156, 6);
+      if (stage === 2) return sh + skin + '<ellipse cx="92" cy="168" rx="50" ry="36" fill="url(#' + id + 'f)"/>' + scutes(92, 164, 16) + '<path d="M138 150 Q156 142 160 128" fill="none" stroke="#8ee08a" stroke-width="10" stroke-linecap="round"/><circle cx="164" cy="122" r="16" fill="url(#' + id + 'k)"/><ellipse cx="48" cy="196" rx="14" ry="8" fill="#7ee07a"/><ellipse cx="124" cy="198" rx="14" ry="8" fill="#7ee07a"/>' + eyes(158, 120, 172, 6);
+      if (stage === 3) return sh + skin + '<path d="M40 176 Q24 190 36 200" fill="none" stroke="#2f9e45" stroke-width="7" stroke-linecap="round"/><ellipse cx="96" cy="164" rx="54" ry="40" fill="url(#' + id + 'f)"/>' + scutes(96, 160, 18) + '<path d="M146 146 Q168 132 172 112" fill="none" stroke="#8ee08a" stroke-width="11" stroke-linecap="round"/><circle cx="176" cy="106" r="16" fill="url(#' + id + 'k)"/><ellipse cx="40" cy="198" rx="15" ry="8" fill="#7ee07a"/><ellipse cx="78" cy="204" rx="15" ry="8" fill="#7ee07a"/><ellipse cx="128" cy="202" rx="15" ry="8" fill="#7ee07a"/>' + eyes(170, 104, 184, 6) + '<path d="M166 114 q8 6 14 0" fill="none" stroke="#3a2418" stroke-width="1.8" stroke-linecap="round"/>';
+      return sh + skin + '<path d="M36 168 Q14 186 28 204" fill="none" stroke="#2f9e45" stroke-width="8" stroke-linecap="round"/><ellipse cx="90" cy="162" rx="58" ry="44" fill="url(#' + id + 'f)"/><ellipse cx="78" cy="150" rx="16" ry="8" fill="#fff" opacity=".28"/>' + scutes(90, 158, 20) + '<path d="M142 148 Q170 128 176 102" fill="none" stroke="#8ee08a" stroke-width="12" stroke-linecap="round"/><circle cx="180" cy="96" r="18" fill="url(#' + id + 'k)"/><ellipse cx="196" cy="98" rx="8" ry="5" fill="#6ed468"/><ellipse cx="36" cy="200" rx="16" ry="9" fill="#7ee07a"/><ellipse cx="72" cy="208" rx="16" ry="9" fill="#7ee07a"/><ellipse cx="118" cy="206" rx="16" ry="9" fill="#7ee07a"/><ellipse cx="150" cy="198" rx="14" ry="8" fill="#7ee07a"/>' + eyes(174, 92, 188, 7) + '<path d="M168 104 q10 7 16 0" fill="none" stroke="#3a2418" stroke-width="2" stroke-linecap="round"/>';
+    }
+    function petHoist(raw) {
+      const grads = [];
+      let body = "", i = 0;
+      while (i < raw.length) {
+        const a = raw.indexOf("<radialGradient", i);
+        if (a < 0) { body += raw.slice(i); break; }
+        body += raw.slice(i, a);
+        const b = raw.indexOf("</radialGradient>", a);
+        grads.push(raw.slice(a, b + 17));
+        i = b + 17;
+      }
+      return "<defs>" + grads.join("") + "</defs>" + body;
     }
     function petSVG(pet, size) {
-      const stage = petStage(pet.g || 0);
-      const sleepy = (pet.joy || 0) < 35;
-      const inner = stage === 0 ? petEgg(pet.kind || "pup") : petBody(pet.kind || "pup", stage, sleepy);
-      const z = sleepy ? '<text x="90" y="28" font-size="18" font-family="Arial,sans-serif" font-weight="700" fill="#5a6a88">z</text>' : "";
-      const h = Math.round(size * 130 / 120);
-      return '<svg class="pet-svg" viewBox="0 0 120 130" width="' + size + '" height="' + h + '" aria-hidden="true">' + inner + z + "</svg>";
+      const sp = pet.sp || 0, stage = petStage(sp), sleepy = (pet.joy || 0) < 35;
+      const id = "pg" + (++petSeq);
+      const raw = stage === 0 ? petEggArt(pet.kind || "pup", id, Math.min(4, sp)) : petArt(pet.kind || "pup", stage, sleepy, id);
+      const z = sleepy ? '<g class="pet-zzz"><text x="156" y="78" font-size="22" font-family="Arial,sans-serif" font-weight="700" fill="#6a7ca0">z</text><text x="172" y="60" font-size="14" font-family="Arial,sans-serif" font-weight="700" fill="#9ab0d0">z</text></g>' : "";
+      const h = Math.round(size * 230 / 200);
+      return '<svg class="pet-svg" viewBox="0 0 200 230" width="' + size + '" height="' + h + '" aria-hidden="true">' + petHoist(raw) + z + "</svg>";
     }
     function avClean(a) {
       a = a && typeof a === "object" ? a : {};
@@ -11854,23 +11930,13 @@
     function petChoose(kind) {
       const info = petKind(kind);
       if (!info) return;
-      if (avatar.pet.kind === kind) { petPicking = false; render(); return; }
-      const free = kind === "pup" || avatar.pet.paid.indexOf(kind) >= 0;
-      const go = function () {
-        if (!free) {
-          if (!coinSpend(info[2])) return;
-          if (avatar.pet.paid.indexOf(kind) < 0) avatar.pet.paid.push(kind);
-        }
-        avatar.pet.kind = kind;
-        avatar.made = true;
-        petPicking = false;
-        avSaveSoon();
-        say("You picked a " + info[1].toLowerCase() + " egg!");
-        render();
-      };
-      if (free) { go(); return; }
-      if (coinGet() < info[2]) { say("You need $" + info[2] + " for the " + info[1].toLowerCase() + " egg. You have $" + coinGet() + "."); return; }
-      avConfirm("Get the " + info[1].toLowerCase() + " egg for $" + info[2] + "?", "You have $" + coinGet() + ".", go, "Yes, get it!");
+      avatar.pet.kind = kind;
+      avatar.made = true;
+      petPicking = false;
+      avSaveSoon();
+      petSound("chirp");
+      say("You picked a " + info.name.toLowerCase() + " egg!");
+      render();
     }
     function petSaveName(raw) {
       const name = String(raw || "").replace(/\s+/g, " ").trim().slice(0, 12);
@@ -11883,31 +11949,94 @@
       say("Hi, " + name + "!");
       render();
     }
-    function petCare(type) {
-      const spec = { food: [1, 1, 15, "food"], treat: [3, 4, 30, "a treat"], toy: [2, 0, 22, "a toy"] }[type];
-      if (!spec || !avatar.pet.kind) return;
-      if (coinGet() < spec[0]) { say("You need $" + spec[0] + " for " + spec[3] + ". You have $" + coinGet() + "."); return; }
-      const before = petStage(avatar.pet.g);
-      if (!coinSpend(spec[0])) return;
-      avatar.pet.g = Math.min(100, avatar.pet.g + spec[1]);
-      avatar.pet.joy = Math.min(100, avatar.pet.joy + spec[2]);
+    let petAC = null, petDragged = false, petBall = null, petHelloAt = 0, petChompUntil = 0;
+    function petSound(name) {
+      if (state.muted) return;
+      let ac = petAC;
+      try { if (!ac) ac = petAC = new (window.AudioContext || window.webkitAudioContext)(); if (ac.state === "suspended") ac.resume(); } catch (e) { return; }
+      function beep(freq, dur, type, gain, when) {
+        const o = ac.createOscillator(), g = ac.createGain(), t = ac.currentTime + (when || 0);
+        o.type = type || "sine"; o.frequency.value = freq;
+        g.gain.setValueAtTime(gain || 0.06, t);
+        g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+        o.connect(g); g.connect(ac.destination); o.start(t); o.stop(t + dur);
+      }
+      if (name === "munch") { beep(160, 0.08, "triangle", 0.07); beep(230, 0.1, "triangle", 0.06, 0.09); }
+      else if (name === "chirp") { beep(680, 0.07, "sine", 0.05); beep(920, 0.1, "sine", 0.045, 0.08); }
+      else if (name === "giggle") { [540, 700, 820].forEach(function (f, i) { beep(f, 0.06, "sine", 0.04, i * 0.07); }); }
+      else if (name === "fanfare") { [523, 659, 784, 1046].forEach(function (f, i) { beep(f, 0.2, "triangle", 0.06, i * 0.12); }); }
+    }
+    function petJoy(n) {
+      avatar.pet.joy = Math.min(100, avatar.pet.joy + n);
       avatar.pet.joyAt = Date.now();
-      const after = petStage(avatar.pet.g);
       avatar.made = true;
       avSaveSoon();
+      const bar = document.querySelector(".pet-heart span");
+      if (bar) bar.style.width = avatar.pet.joy + "%";
+    }
+    function petCare(type) {
+      const spec = { food: [1, 1, 14, "food"], treat: [5, 5, 28, "a treat"], toy: [2, 0, 20, "a toy"] }[type];
+      if (!spec || !avatar.pet.kind) return;
+      if (coinGet() < spec[0]) { say("You need $" + spec[0] + " for " + spec[3] + ". You have $" + coinGet() + "."); return; }
+      const before = petStage(avatar.pet.sp);
+      if (!coinSpend(spec[0])) return;
+      avatar.pet.sp = Math.min(80, avatar.pet.sp + spec[1]);
+      avatar.pet.joy = Math.min(100, avatar.pet.joy + spec[2]);
+      avatar.pet.joyAt = Date.now();
+      const after = petStage(avatar.pet.sp);
+      avatar.made = true;
+      avSaveSoon();
+      petSound(spec[1] ? "munch" : "chirp");
       if (after > before) {
-        petPopName = PET_STAGES[after].name;
-        petPopUntil = Date.now() + 1500;
+        petPopName = before === 0 ? "Hatched" : PET_STAGES[after].name;
+        petPopUntil = Date.now() + (before === 0 ? 1800 : 1600);
         if (!avatar.pet.name) petNaming = true;
-        say((avatar.pet.name ? avatar.pet.name + " is a " : "Your pet is a ") + petPopName + "!");
-      } else say(spec[1] ? "Yum!" : "Wee!");
+        petSound("fanfare");
+        say((avatar.pet.name ? avatar.pet.name + " is a " : "Your pet is a ") + PET_STAGES[after].name + "!");
+      } else { petChompUntil = Date.now() + 700; say(spec[1] ? "Yum!" : "Wee!"); }
+      render();
+    }
+    function petBindDrag(btn, type) {
+      let drag = null;
+      btn.addEventListener("pointerdown", function (ev) { drag = { x: ev.clientX, y: ev.clientY, moved: false, id: ev.pointerId }; try { btn.setPointerCapture(ev.pointerId); } catch (e) {} });
+      btn.addEventListener("pointermove", function (ev) {
+        if (!drag || ev.pointerId !== drag.id) return;
+        if (Math.abs(ev.clientX - drag.x) + Math.abs(ev.clientY - drag.y) < 12) return;
+        drag.moved = true;
+        let ghost = document.getElementById("pet-ghost");
+        if (!ghost) { ghost = el("div", { id: "pet-ghost", class: "pet-ghost", text: type === "treat" ? "\uD83C\uDF6A" : "\uD83C\uDF56" }); document.body.appendChild(ghost); }
+        ghost.style.left = ev.clientX + "px"; ghost.style.top = ev.clientY + "px";
+      });
+      function up(ev) {
+        if (!drag || ev.pointerId !== drag.id) return;
+        const moved = drag.moved;
+        drag = null;
+        const ghost = document.getElementById("pet-ghost"); if (ghost) ghost.remove();
+        if (!moved) return;
+        petDragged = true;
+        const hit = document.elementFromPoint(ev.clientX, ev.clientY);
+        if (hit && hit.closest && hit.closest(".pet-room")) petCare(type);
+      }
+      btn.addEventListener("pointerup", up);
+      btn.addEventListener("pointercancel", up);
+    }
+    function petBuyRoom(id) {
+      const item = PET_ROOM.find(function (r) { return r[0] === id; });
+      if (!item || avatar.pet.room.indexOf(id) >= 0) return;
+      if (coinGet() < item[2]) { say("You need $" + item[2] + " for the " + item[1].toLowerCase() + ". You have $" + coinGet() + "."); return; }
+      if (!coinSpend(item[2])) return;
+      avatar.pet.room.push(id);
+      avatar.made = true;
+      avSaveSoon();
+      petSound("chirp");
+      say(item[1] + " is in the room!");
       render();
     }
     function petCard() {
-      let storedJoy = null;
-      try { const raw = JSON.parse(localStorage.getItem(AV_KEY) || "null"); storedJoy = raw && raw.pet ? raw.pet.joy : null; } catch (e) {}
+      let storedPet = null;
+      try { const raw = JSON.parse(localStorage.getItem(AV_KEY) || "null"); storedPet = raw && raw.pet ? raw.pet : null; } catch (e) {}
       avatar.pet = petClean(avatar.pet);
-      if (avatar.pet.kind && storedJoy != null && storedJoy !== avatar.pet.joy) avSaveSoon();
+      if (avatar.pet.kind && storedPet && (storedPet.sp == null || storedPet.g != null || storedPet.joy !== avatar.pet.joy)) avSaveSoon();
       const card = el("div", { class: "card pet-card" });
       const coins = el("p", { class: "coin-bank shp-coins", "data-short": "1", role: "status", "aria-label": coinGet() + " coins" }, [el("span", { class: "coin-ico", "aria-hidden": "true", text: "$" }), el("span", { text: String(coinGet()) })]);
       card.appendChild(el("div", { class: "pet-bar" }, [
@@ -11918,51 +12047,81 @@
       const pet = avatar.pet;
       const showEggs = !pet.kind || petPicking;
       if (showEggs) {
-        card.appendChild(el("p", { class: "pet-stage", text: "Pick an egg. The puppy is free." }));
+        card.appendChild(el("p", { class: "pet-stage", text: "Pick an egg. Every egg is free." }));
         const grid = el("div", { class: "pet-eggs" });
-        PET_KINDS.forEach(function (k) {
-          const owned = k[0] === "pup" || pet.paid.indexOf(k[0]) >= 0;
-          const price = owned ? "Free" : "$" + k[2];
-          const btn = el("button", { type: "button", class: "pet-egg", "aria-label": k[1] + " egg, " + price, onClick: function () { petChoose(k[0]); } });
-          btn.innerHTML = petSVG({ kind: k[0], g: 0, joy: 80 }, 92);
-          btn.appendChild(el("span", { text: k[1] }));
-          btn.appendChild(el("small", { text: price }));
+        PETS.forEach(function (k) {
+          const btn = el("button", { type: "button", class: "pet-egg", "aria-label": k.name + " egg, free", onClick: function () { petChoose(k.id); } });
+          btn.innerHTML = petSVG({ kind: k.id, sp: 0, joy: 80 }, 92);
+          btn.appendChild(el("span", { text: k.name }));
+          btn.appendChild(el("small", { text: "Free" }));
           grid.appendChild(btn);
         });
         card.appendChild(grid);
         if (pet.kind) card.appendChild(el("button", { type: "button", class: "pet-rename", text: "Back to my egg", onClick: function () { petPicking = false; render(); } }));
       } else {
-        const stage = petStage(pet.g);
+        const stage = petStage(pet.sp);
         const next = PET_STAGES[stage + 1];
         const cur = PET_STAGES[stage];
         const span = next ? next.at - cur.at : 1;
-        const pct = next ? Math.max(0, Math.min(100, Math.round((pet.g - cur.at) / span * 100))) : 100;
+        const pct = next ? Math.max(0, Math.min(100, Math.round((pet.sp - cur.at) / span * 100))) : 100;
         const sleepy = pet.joy < 35;
-        const widths = [140, 160, 190, 220, 250];
+        const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        const widths = [132, 148, 164, 176, 188];
+        const hello = !sleepy && stage > 0 && Date.now() - petHelloAt > 2500;
+        if (hello) petHelloAt = Date.now();
         card.appendChild(el("p", { class: "pet-name", text: pet.name || (stage === 0 ? "A mystery egg" : "Name me!") }));
         card.appendChild(el("p", { class: "pet-stage", text: cur.name + (sleepy ? " \u00B7 sleepy" : "") }));
-        const view = el("div", { class: "pet-view" });
-        const fig = el("button", { type: "button", class: "pet-fig", "aria-label": (pet.name || cur.name) + ", tap to play", onClick: function () {
+        const view = el("div", { class: "pet-room" });
+        view.appendChild(el("div", { class: "pet-sun", "aria-hidden": "true" }));
+        view.appendChild(el("div", { class: "pet-win", "aria-hidden": "true" }));
+        view.appendChild(el("div", { class: "pet-floor", "aria-hidden": "true" }));
+        if (pet.room.indexOf("rug") >= 0) view.appendChild(el("div", { class: "pet-rug", "aria-hidden": "true" }));
+        if (pet.room.indexOf("bed") >= 0) view.appendChild(el("div", { class: "pet-bed", "aria-hidden": "true" }));
+        if (pet.room.indexOf("toys") >= 0) view.appendChild(el("div", { class: "pet-toys", "aria-hidden": "true" }, [el("i"), el("i"), el("i")]));
+        if (petBall != null) view.appendChild(el("i", { class: "pet-ball", style: "left:" + petBall + "%", "aria-hidden": "true" }));
+        const fig = el("button", { type: "button", class: "pet-fig" + (stage === 0 && !reduce ? " egg" : "") + (!reduce && stage > 0 && sleepy ? " asleep" : "") + (!reduce && stage > 0 && !sleepy && !hello ? " wander" : "") + (!reduce && hello ? " hello" : "") + (Date.now() < petPopUntil && petPopName !== "Hatched" && PET_STAGES[stage] && petPopName === PET_STAGES[stage].name ? " chomp" : ""), "aria-label": (pet.name || cur.name) + ". Rub to tickle.", onClick: function () {
+          if (petDragged) { petDragged = false; return; }
           fig.classList.remove("pet-boop"); void fig.offsetWidth; fig.classList.add("pet-boop");
+          petSound("chirp");
           say(sleepy ? (pet.name || "Your pet") + " is sleepy." : (pet.name || "Your pet") + "!");
         } });
         fig.style.setProperty("--pw", widths[stage] + "px");
+        if (stage === 0 && !reduce) fig.style.animationDuration = (1.25 - Math.min(4, pet.sp) * 0.18) + "s";
         fig.innerHTML = petSVG(pet, widths[stage]);
+        let rub = null;
+        fig.addEventListener("pointerdown", function (ev) { rub = { x: ev.clientX, y: ev.clientY, d: 0, id: ev.pointerId }; });
+        fig.addEventListener("pointermove", function (ev) {
+          if (!rub || ev.pointerId !== rub.id || stage === 0) return;
+          rub.d += Math.abs(ev.clientX - rub.x) + Math.abs(ev.clientY - rub.y);
+          rub.x = ev.clientX; rub.y = ev.clientY;
+          if (rub.d > 40) { rub.d = -9999; petJoy(6); petSound("giggle"); fig.classList.add("wiggle"); say("Hee hee!"); }
+        });
+        if (Date.now() < petChompUntil) {
+          fig.classList.add("chomp");
+          if (!reduce) ["\u2764\uFE0F,-18px,-46px", "\u2728,22px,-58px", "\u2764\uFE0F,8px,-28px"].forEach(function (s) {
+            const p = s.split(","), bit = el("span", { class: "pet-float", text: p[0] });
+            bit.style.setProperty("--x", p[1]); bit.style.setProperty("--y", p[2]);
+            view.appendChild(bit);
+          });
+        }
+        if (petBall != null) { fig.style.left = petBall + "%"; fig.classList.remove("wander"); }
         view.appendChild(fig);
         if (Date.now() < petPopUntil) {
-          const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
           const pop = el("div", { class: "pet-pop", "aria-hidden": "true" });
           pop.appendChild(el("b", { text: petPopName + "!" }));
-          if (!reduce) ["-64px,-40px,#ffe14a", "70px,-24px,#ff7ab8", "-36px,34px,#7ee07a", "60px,40px,#7ec8e8"].forEach(function (s, i) {
-            const xy = s.split(","), bit = el("i", { class: "pet-spark" });
-            bit.style.setProperty("--x", xy[0]); bit.style.setProperty("--y", xy[1]); bit.style.background = xy[2]; bit.style.animationDelay = (i * 40) + "ms";
-            pop.appendChild(bit);
-          });
+          if (!reduce) {
+            const bits = petPopName === "Hatched" ? ["-80px,-50px,#ffe14a", "84px,-36px,#ff7ab8", "-50px,40px,#7ee07a", "70px,48px,#7ec8e8", "0px,-70px,#fff", "-20px,20px,#ffb020", "40px,-10px,#e23b4a"] : ["-64px,-40px,#ffe14a", "70px,-24px,#ff7ab8", "-36px,34px,#7ee07a", "60px,40px,#7ec8e8"];
+            bits.forEach(function (s, i) {
+              const xy = s.split(","), bit = el("i", { class: "pet-spark" });
+              bit.style.setProperty("--x", xy[0]); bit.style.setProperty("--y", xy[1]); bit.style.background = xy[2]; bit.style.animationDelay = (i * 40) + "ms";
+              pop.appendChild(bit);
+            });
+          }
           view.appendChild(pop);
           petArmPop();
         }
         card.appendChild(view);
-        card.appendChild(el("p", { class: "pet-stage", text: next ? pet.g + " of " + next.at + " to " + next.name : "Grown-up" }));
+        card.appendChild(el("p", { class: "pet-stage", text: next ? "$" + (next.at - pet.sp) + " more to " + next.name : "Grown-up" }));
         const bar = el("div", { class: "pet-barline", role: "progressbar", "aria-valuemin": "0", "aria-valuemax": "100", "aria-valuenow": String(pct), "aria-label": "Growth" });
         bar.appendChild(el("span", { style: "width:" + pct + "%" }));
         card.appendChild(bar);
@@ -11970,11 +12129,34 @@
         const heart = el("div", { class: "pet-barline pet-heart", role: "progressbar", "aria-valuemin": "0", "aria-valuemax": "100", "aria-valuenow": String(pet.joy), "aria-label": "Happiness " + pet.joy });
         heart.appendChild(el("span", { style: "width:" + pet.joy + "%" }));
         card.appendChild(heart);
-        card.appendChild(el("div", { class: "pet-acts" }, [
-          el("button", { type: "button", class: "pet-act", onClick: function () { petCare("food"); } }, [document.createTextNode("Food"), el("small", { text: "$1" })]),
-          el("button", { type: "button", class: "pet-act", onClick: function () { petCare("treat"); } }, [document.createTextNode("Treat"), el("small", { text: "$3" })]),
-          el("button", { type: "button", class: "pet-act", onClick: function () { petCare("toy"); } }, [document.createTextNode("Toy"), el("small", { text: "$2" })])
+        const acts = el("div", { class: "pet-acts" });
+        [["food", "Food", "$1", "\uD83C\uDF56"], ["treat", "Treat", "$5", "\uD83C\uDF6A"], ["toy", "Toy", "$2", "\uD83E\uDDF8"]].forEach(function (a) {
+          const btn = el("button", { type: "button", class: "pet-act", "data-feed": a[0], onClick: function () { if (petDragged) { petDragged = false; return; } petCare(a[0]); } }, [document.createTextNode(a[3] + " " + a[1]), el("small", { text: a[2] + (a[0] === "toy" ? "" : " \u00B7 drag onto pet") })]);
+          if (a[0] !== "toy") petBindDrag(btn, a[0]);
+          acts.appendChild(btn);
+        });
+        card.appendChild(acts);
+        card.appendChild(el("div", { class: "pet-plays" }, [
+          el("button", { type: "button", text: "Fetch", onClick: function () {
+            if (stage === 0) { say("It has to hatch before it can fetch."); return; }
+            petBall = 18 + Math.round(Math.random() * 64);
+            petJoy(8); petSound("chirp"); say("Fetch!");
+            render();
+            setTimeout(function () { petBall = null; if (currentPage() === "pet") render(); }, 900);
+          } }),
+          el("button", { type: "button", text: "Tickle", onClick: function () {
+            if (stage === 0) { say("Wait until it hatches."); return; }
+            petJoy(6); petSound("giggle");
+            const f = document.querySelector(".pet-fig"); if (f) { f.classList.add("wiggle"); }
+            say("Hee hee!");
+          } })
         ]));
+        const decor = el("div", { class: "pet-decor" });
+        PET_ROOM.forEach(function (r) {
+          const have = pet.room.indexOf(r[0]) >= 0;
+          decor.appendChild(el("button", { type: "button", class: have ? "on" : "", text: have ? r[1] + " \u2713" : r[1] + " $" + r[2], "aria-label": r[1] + (have ? ", in the room" : ", $" + r[2]), onClick: function () { if (!have) petBuyRoom(r[0]); } }));
+        });
+        card.appendChild(decor);
         if (petNaming || (stage > 0 && !pet.name)) {
           const box = el("div", { class: "pet-namebox" });
           const input = el("input", { type: "text", maxlength: "12", "aria-label": "Pet name", placeholder: "Name your pet" });
