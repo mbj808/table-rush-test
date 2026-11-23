@@ -3,7 +3,7 @@
 <head>
   <meta name="robots" content="noindex">
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>TEST · Mad Facts Challenge</title>
   <meta name="description" content="Mad Facts Challenge (Table Rush). Practice multiplication, division, addition, subtraction, oceans, sports, Hawaiian islands, capitals, state maps, elements, flags, rhyming, and synonyms & antonyms; piano notes; instruments; vehicles; wonders of the world. No account needed." />
   <style>
@@ -1441,8 +1441,9 @@
       color: #fff7ea; text-shadow: 0 1px 3px rgba(0,0,0,0.8);
     }
     body.has-boombox main { padding-bottom: calc(clamp(10px, 3.05vw, 15px) * 12.5); }
-    /* Phones, game screen: a slim beat bar instead of the full boom box. */
-    @media (max-width: 600px) {
+    /* Phones, game screen: a slim beat bar instead of the full boom box.
+       Landscape phones are wider than 600px, so include short wide screens too. */
+    @media (max-width: 600px), (max-width: 932px) and (max-height: 500px) {
       body.play-screen .boombox:not(.home-box) { width: auto; height: auto; display: flex; align-items: center; padding: 6px 8px; gap: 0; border-radius: 16px; }
       body.play-screen .boombox:not(.home-box) .bb-spk, body.play-screen .boombox:not(.home-box) .bb-handle,
       body.play-screen .boombox:not(.home-box) .bb-top, body.play-screen .boombox:not(.home-box) .bb-deck { display: none; }
@@ -3997,6 +3998,65 @@
     body.play-screen .answers button { min-height: 6rem; font-size: clamp(2.4rem, 12vw, 3.6rem); font-weight: 700; border-radius: 1.15rem; }
     body.play-screen .answers.quiz-answers button, body.play-screen .answers.ocean-answers button, body.play-screen .answers.quiz-choice-answers button { font-size: clamp(1.15rem, 5vw, 1.7rem); min-height: 4.8rem; }
     @media (min-width: 700px) { body.play-screen .answers button { min-height: 9rem; font-size: 4.6rem; } body.play-screen .prompt { font-size: 7.5rem; } body.play-screen main { max-width: 46rem; } }
+    /* Phones, portrait and landscape: Back lives in the header so it cannot cover an answer.
+       932px is the widest phone turned sideways (320–430px portrait widths). */
+    @media (max-width: 932px) {
+      @supports (height: 100dvh) {
+        body.play-screen, body.play-screen main { height: 100dvh; }
+      }
+      body.play-screen main,
+      body.play-screen.has-boombox main {
+        overflow: hidden;
+        padding-top: max(0.45rem, env(safe-area-inset-top, 0px));
+        padding-bottom: calc(5.25rem + env(safe-area-inset-bottom, 0px));
+        padding-left: max(0.75rem, env(safe-area-inset-left, 0px));
+        padding-right: max(0.75rem, env(safe-area-inset-right, 0px));
+      }
+      /* Scroll the question inside the space above the beat bar, so an answer never sits under it. */
+      body.play-screen #app {
+        overflow-x: hidden;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        min-height: 0;
+      }
+      body.play-screen #back {
+        position: static;
+        left: auto;
+        right: auto;
+        bottom: auto;
+        z-index: auto;
+        margin: 0 0 0.35rem !important;
+      }
+      body.play-screen .answers button { min-width: 0; overflow-wrap: anywhere; }
+    }
+    @media (max-width: 932px) and (max-height: 500px) {
+      body.play-screen #app > .eq { margin-top: 0; }
+      body.play-screen #app > :last-child { margin-bottom: 0; }
+    }
+    @media (max-width: 430px) {
+      body.play-screen .state-map,
+      body.play-screen .flag-svg,
+      body.play-screen .piano-svg { max-height: 4.6rem; }
+      body.play-screen .wonder-photo { height: clamp(4.2rem, 20vh, 6.2rem); }
+      body.play-screen .ocean-world { --omap-h: clamp(4.2rem, 20vh, 7.5rem); }
+    }
+    @media (max-width: 932px) and (max-height: 430px) {
+      body.play-screen .hud { margin-bottom: 0.1rem; }
+      body.play-screen .streak-banner { margin: 0; padding: 0.15rem 0.5rem; }
+      body.play-screen .streak-count { font-size: 1.35rem; }
+      body.play-screen .game-buddy, body.play-screen .game-buddy svg { width: 52px; }
+      body.play-screen .eq { padding: 0.35rem 0.5rem 0.25rem; }
+      body.play-screen .prompt { font-size: clamp(1.45rem, 6.5vw, 2.2rem) !important; }
+      body.play-screen .eq .prompt.quiz-prompt { font-size: 1.05rem; }
+      body.play-screen .answers { gap: 0.45rem; margin-top: 0.4rem; }
+      body.play-screen .answers button,
+      body.play-screen .answers.quiz-answers button,
+      body.play-screen .answers.ocean-answers button { min-height: 3rem; font-size: 1.15rem; }
+      body.play-screen .state-map,
+      body.play-screen .flag-svg,
+      body.play-screen .wonder-photo,
+      body.play-screen .piano-svg { max-height: 4.2rem; }
+    }
     @media (prefers-reduced-motion: reduce) { .art-svg .veil { animation: none; opacity: 0; } }
 
     /* ===== Home glow-up: richer colors, soft glow, sign-in pill under the boom box. Light: gradients + box-shadow only. ===== */
