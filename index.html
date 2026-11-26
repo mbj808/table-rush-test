@@ -3912,6 +3912,18 @@
     .hw2-photo::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(20,8,36,.45) 0%, rgba(20,8,36,0) 28%); }
     body.theme-hw2 .wave-bg > :not(.hw2-scene), body.theme-hw2 .belfry-moon, body.theme-hw2 .belfry-scene { display: none !important; }
     body:not(.theme-hw2) .hw2-scene { display: none !important; }
+    body.theme-xm .wave-bg { background: linear-gradient(180deg, #1c2a52 0%, #3a4f86 55%, #1a2442 100%); }
+    .xm-scene { position: absolute; inset: 0; overflow: hidden; }
+    .xm-photo { position: absolute; inset: 0; background: #2a3a66 center 60% / cover no-repeat; }
+    .xm-photo::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(12,18,44,.35) 0%, rgba(12,18,44,0) 26%); }
+    .xm-snow { position: absolute; left: 0; right: 0; top: -400px; height: calc(100% + 400px); pointer-events: none; opacity: .85;
+      background-image: radial-gradient(3px 3px at 20px 30px, #fff 60%, transparent 62%), radial-gradient(2px 2px at 90px 120px, #fff 60%, transparent 62%), radial-gradient(4px 4px at 160px 70px, #fff 60%, transparent 62%), radial-gradient(2px 2px at 240px 220px, #fff 60%, transparent 62%), radial-gradient(3px 3px at 310px 150px, #fff 60%, transparent 62%), radial-gradient(2px 2px at 60px 330px, #fff 60%, transparent 62%), radial-gradient(4px 4px at 200px 360px, #fff 60%, transparent 62%), radial-gradient(3px 3px at 350px 300px, #fff 60%, transparent 62%);
+      background-size: 400px 400px; animation: xm-fall 14s linear infinite; will-change: transform; }
+    @keyframes xm-fall { from { transform: translateY(0); } to { transform: translateY(400px); } }
+    @media (prefers-reduced-motion: reduce) { .xm-snow { display: none; animation: none; } }
+    body.theme-xm .wave-bg > :not(.xm-scene), body.theme-xm .belfry-moon, body.theme-xm .belfry-scene { display: none !important; }
+    body:not(.theme-xm) .xm-scene { display: none !important; }
+    body.theme-xm .bgs-card .hint, body.theme-xm .av-tip, body.theme-xm .lb-updated,
     body.theme-hw2 .bgs-card .hint, body.theme-hw2 .av-tip, body.theme-hw2 .lb-updated,
     body.theme-tg .bgs-card .hint, body.theme-tg .av-tip, body.theme-tg .lb-updated { color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,.9), 0 0 8px rgba(0,0,0,.6); }
     .si-head2 { min-height: 0; }
@@ -9124,6 +9136,7 @@
       bg.classList.toggle("scene-meglo", level === 15);
       if (siteTheme === "thanksgiving") tgSetBeat(level);
       else if (siteTheme === "halloween2") hw2SetBeat(level);
+      else if (siteTheme === "christmas") xmSetBeat(level);
       sceneWake(siteTheme + level);
       if (typeof scApplyLive === "function") scApplyLive();
     }
@@ -13267,7 +13280,7 @@
     // ---- Theme: Halloween (default) or Thanksgiving. Saved on this device. Thanksgiving art is built only when picked. ----
     const THEME_KEY = "mad-facts-theme";
     let siteTheme = "halloween";
-    try { const sv = localStorage.getItem(THEME_KEY); if (sv === "thanksgiving" || sv === "halloween2") siteTheme = sv; } catch (e) {}
+    try { const sv = localStorage.getItem(THEME_KEY); if (sv === "thanksgiving" || sv === "halloween2" || sv === "christmas") siteTheme = sv; } catch (e) {}
     function tgPumpkin(x, y, s) {
       return '<g transform="translate(' + x + ' ' + y + ') scale(' + s + ')"><ellipse cx="-22" cy="0" rx="30" ry="34" fill="#e8741f"/><ellipse cx="22" cy="0" rx="30" ry="34" fill="#e8741f"/><ellipse cx="0" cy="0" rx="30" ry="36" fill="#f28a2e"/><path d="M0 -36 q4 -18 14 -22" stroke="#5a7a2a" stroke-width="7" fill="none" stroke-linecap="round"/></g>';
     }
@@ -13376,10 +13389,32 @@
       const track = PLAY_TRACKS[level] || PLAY_TRACKS[0];
       scene.firstChild.style.backgroundImage = "url(assets/hw2/" + track.id + ".webp)";
     }
+    // Christmas: 11 painted scenes (~110 KB webp each in assets/bg/christmas/). Only the current one is loaded. Light CSS snowfall (off for reduced motion).
+    const XM_SCENES = [["cabin", "15%"], ["fireplace", "50%"], ["workshop", "50%"], ["gingerbread", "35%"], ["aurora", "50%"], ["reindeer", "20%"], ["skating", "35%"], ["candycane", "50%"], ["kitchen", "50%"], ["hawaii", "40%"], ["snowman", "25%"]];
+    function xmSceneFor(level) { return XM_SCENES[((level % XM_SCENES.length) + XM_SCENES.length) % XM_SCENES.length]; }
+    function xmSetBeat(level) {
+      const bg = document.querySelector(".wave-bg");
+      if (!bg) return;
+      let scene = bg.querySelector(".xm-scene");
+      if (!scene) {
+        scene = document.createElement("div"); scene.className = "xm-scene"; scene.setAttribute("aria-hidden", "true");
+        scene.appendChild(document.createElement("div")).className = "xm-photo";
+        scene.appendChild(document.createElement("div")).className = "xm-snow";
+        bg.appendChild(scene);
+      }
+      if (scene.dataset.beat === String(level)) return;
+      scene.dataset.beat = String(level);
+      const sc = xmSceneFor(level);
+      scene.firstChild.style.backgroundImage = "url(assets/bg/christmas/" + sc[0] + ".webp)";
+      scene.firstChild.style.backgroundPosition = sc[1] + " 60%";
+    }
     function applyTheme() {
-      const tg = siteTheme === "thanksgiving", hw2 = siteTheme === "halloween2";
+      const tg = siteTheme === "thanksgiving", hw2 = siteTheme === "halloween2", xm = siteTheme === "christmas";
       document.body.classList.toggle("theme-tg", tg);
       document.body.classList.toggle("theme-hw2", hw2);
+      document.body.classList.toggle("theme-xm", xm);
+      if (!xm) { const s3 = document.querySelector(".wave-bg .xm-scene"); if (s3) s3.remove(); }
+      if (xm) xmSetBeat(chosenBackgroundLevel());
       if (!hw2) { const s2 = document.querySelector(".wave-bg .hw2-scene"); if (s2) s2.remove(); }
       if (!tg) { const s1 = document.querySelector(".wave-bg .tg-scene"); if (s1) s1.remove(); }
       if (hw2) hw2SetBeat(chosenBackgroundLevel());
@@ -13418,7 +13453,7 @@
       const card = el("div", { class: "card bgs-card" });
       card.appendChild(el("p", { class: "label", text: "Theme" }));
       const themes = el("div", { class: "lb-tabs theme-pick", role: "tablist", "aria-label": "Theme" });
-      [["halloween", "\uD83C\uDF83 Halloween"], ["halloween2", "\uD83D\uDC7B Halloween 2"], ["thanksgiving", "\uD83C\uDF42 Thanksgiving"]].forEach(function (t) {
+      [["halloween", "\uD83C\uDF83 Halloween"], ["halloween2", "\uD83D\uDC7B Halloween 2"], ["thanksgiving", "\uD83C\uDF42 Thanksgiving"], ["christmas", "\uD83C\uDF84 Christmas"]].forEach(function (t) {
         themes.appendChild(el("button", { type: "button", role: "tab", class: "lb-tab" + (siteTheme === t[0] ? " on" : ""), "aria-selected": String(siteTheme === t[0]), text: t[1], onClick: function () {
           siteTheme = t[0]; try { localStorage.setItem(THEME_KEY, t[0]); } catch (e) {} applyTheme(); render();
         } }));
@@ -13432,6 +13467,7 @@
         const open = backgroundUnlocked(i);
         const tile = el("button", { type: "button", class: "bg-tile" + (open ? "" : " locked") + (open && current === i ? " on" : ""), "data-bg": String(i) });
         if (siteTheme === "thanksgiving") tile.appendChild(el("img", { src: "assets/tg/" + track.id + "-t.webp", alt: "", loading: "lazy", decoding: "async", width: "160", height: "107" }));
+        else if (siteTheme === "christmas") tile.appendChild(el("img", { src: "assets/bg/christmas/" + xmSceneFor(i)[0] + "-t.webp", alt: "", loading: "lazy", decoding: "async", width: "160", height: "90" }));
         else if (siteTheme === "halloween2") tile.appendChild(el("img", { src: "assets/hw2/" + track.id + "-t.webp", alt: "", loading: "lazy", decoding: "async", width: "160", height: "107" }));
         else tile.appendChild(el("img", { src: "assets/backgrounds/" + track.id + ".jpg", alt: "", loading: "lazy", decoding: "async", width: "160", height: "107" }));
         const cap = el("span", { class: "bg-cap" });
