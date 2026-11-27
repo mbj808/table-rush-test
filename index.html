@@ -3894,7 +3894,7 @@
     .tg-scene > svg, .tg-scene .tg-big { display: none !important; }
     .tg-scene .tg-leaf { z-index: 2; }
     .tg-scene.tg-night .tg-stars { display: inline; }
-    body.theme-tg .wave-bg > :not(.tg-scene), body.theme-tg .belfry-moon, body.theme-tg .belfry-scene { display: none !important; }
+    body.theme-tg .wave-bg > :not(.tg-scene):not(.sc-live), body.theme-tg .belfry-moon, body.theme-tg .belfry-scene { display: none !important; }
     .tg-scene { position: absolute; inset: 0; }
     body:not(.theme-tg) .tg-scene { display: none !important; }
     .wave-bg .tg-scene svg { position: absolute; left: 0; right: auto; top: 0; bottom: 0; width: 100%; height: 100%; transform: none; animation: none; opacity: 1; filter: none; display: block !important; }
@@ -3910,7 +3910,7 @@
     .hw2-scene { position: absolute; inset: 0; }
     .hw2-photo { position: absolute; inset: 0; background: #3a1e5a center 70% / cover no-repeat; }
     .hw2-photo::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(20,8,36,.45) 0%, rgba(20,8,36,0) 28%); }
-    body.theme-hw2 .wave-bg > :not(.hw2-scene), body.theme-hw2 .belfry-moon, body.theme-hw2 .belfry-scene { display: none !important; }
+    body.theme-hw2 .wave-bg > :not(.hw2-scene):not(.sc-live), body.theme-hw2 .belfry-moon, body.theme-hw2 .belfry-scene { display: none !important; }
     body:not(.theme-hw2) .hw2-scene { display: none !important; }
     body.theme-xm .wave-bg { background: linear-gradient(180deg, #1c2a52 0%, #3a4f86 55%, #1a2442 100%); }
     .xm-scene { position: absolute; inset: 0; overflow: hidden; }
@@ -3921,7 +3921,7 @@
       background-size: 400px 400px; animation: xm-fall 14s linear infinite; will-change: transform; }
     @keyframes xm-fall { from { transform: translateY(0); } to { transform: translateY(400px); } }
     @media (prefers-reduced-motion: reduce) { .xm-snow { display: none; animation: none; } }
-    body.theme-xm .wave-bg > :not(.xm-scene), body.theme-xm .belfry-moon, body.theme-xm .belfry-scene { display: none !important; }
+    body.theme-xm .wave-bg > :not(.xm-scene):not(.sc-live), body.theme-xm .belfry-moon, body.theme-xm .belfry-scene { display: none !important; }
     body:not(.theme-xm) .xm-scene { display: none !important; }
     body.theme-xm .bgs-card .hint, body.theme-xm .av-tip, body.theme-xm .lb-updated,
     body.theme-hw2 .bgs-card .hint, body.theme-hw2 .av-tip, body.theme-hw2 .lb-updated,
